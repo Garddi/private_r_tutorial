@@ -55,6 +55,7 @@ Other operators become important when discussing logical tests or other mathemat
 - == Strict logical test, is this equal to the other thing, response in boolean
 - != Strict anti-logical test, is this thing different to the other thing, response in boolean
 - <, >, <=, >=, less than, larger than, less or equal than, larger or equal than, logical tests, returns boolean
+- &, |, Binding operators for more logical tests & (AND operator) requires both elements to be true, while | (OR operator) requires only one to be true
 - %in% Contained logical test, is there a unit in this other element which is strictly equal to the first thing.
 
 ```{r}
@@ -155,7 +156,7 @@ First thing to address is data import. Based on the type of data applied, you ut
 
 ```{r}
 
-## Note the file path specification is also specific. Two dots signal
+## Note the file path specification is also very specific. Two dots signal
 ## a directory above your current. So this data is found in 
 ## the parallell folder MA thesis, which is parallell to the folder two layers
 ## above the current directory, then with a specified path to find it.
@@ -176,7 +177,21 @@ For simple sakes, we can explore the structure of the dataset through just click
 head(SurvData)
 ```
 
-This dataset is clearly already been processed a bit, since a WVS would probably have far more variables. But for now we can tell that there are a set of variables that could interest us. 
+This dataset is clearly already been processed a bit, since a WVS would probably have far more variables. But for now we can tell that there are a set of variables that could interest us. I often recheck the precise names by calling the `names` function, which just prints out the names of the columns in the dataset. When specifying columns in tidyverse functions this can be a helpful reminder.
+
+```{r}
+names(SurvData)
+```
+This is all on an overview level, to give you an idea of what the data looks like and how to further explore it. When it comes to familiarizing yourself with aspects of the dataset, the $ sign for indexing columns becomes helpful. I usually pair this with a `table` function, or a `summary` function, which gives me an idea of what the distribution looks like. For simple interaction exploration, `table` also accepts several variables so you can see where they overlap
+
+```{r}
+summary(SurvData$gender)
+
+table(SurvData$gender)
+
+table(SurvData$gender, SurvData$whostility)
+```
+
 
 # Data wrangling
 
@@ -189,7 +204,7 @@ library(tidyverse)
 
 ## Mutating
 
-Mutate is the dplyr function for changing variables in a dataset. This means that the function can both create and modify existing variables in the dataset. As we saw in the last structure of our dataset, the gender variable is operationalized as 1 for men and 2 for women, we usually prefer a binary for this, so let us change that variable in a new dataset
+Mutate is the dplyr function for changing variables in a dataset. This means that the function can both create and modify existing variables in the dataset. As we saw in the last structure of our dataset, the gender variable is operationalized as 1 for men and 2 for women, we usually prefer a binary for this, so let us change that variable in a new dataset. Note that variable selecting in tidyverse functions are often quite straightforward, most if not all functions can specify variables by just writing them out in plain text as seen below. 
 
 ```{r}
 SurvData <- SurvData %>% 
@@ -198,6 +213,8 @@ SurvData <- SurvData %>%
 ## Lets compare the outputs to ensure successful transformation
 
 table(SurvData$gender, SurvData$gender_subtracted)
+
+table(SurvData$country)
 
 
 ```
@@ -219,7 +236,7 @@ This is doable for instances where the new variable is dichotomous, and while it
 
 ```{r}
 SurvData <- SurvData %>% 
-  mutate(gender_cased = case_when(  ## Style guide reccomends this style
+  mutate(gender_cased = case_when(  ## Style guide recomends this style
     gender == 2 ~ "Woman",
     gender == 1 ~ "Man",
     gender == 3 ~ "Non-Binary"
@@ -237,9 +254,51 @@ If you have a long set of variables you want to do the same thing to, the `acros
 Across can also be extended with anonymous functions (that is technically what is being done behind the scenes), which I will cover later in the document. 
 
 
+## Filtering
+
+The second common thing to do when treating data is to filter it, keeping only certain observations. Again you would use a logical test in order to filter these things, so get used to writing these sorts of tests. I showed earlier that the data had two countries, lets make a new dataframe with only Japan. Note also that this function will remove lines, and as such, you should not overwrite the old dataframe when filtering, like I did in the mutate section.
+
+```{r}
+jap_surv <- SurvData %>% 
+  filter(country == "Japan")
+
+```
+
+We can add more tests to filter it further, either with a binding logical operator, or a comma, but comma adds strict additional requirement. 
+
+```{r}
+jap_surv_w <- SurvData %>% 
+  filter(country == "Japan", gender_ifelsed == "Woman")
+
+table(jap_surv_w$country, jap_surv_w$gender_ifelsed)
+
+women_or_japanese <- SurvData %>% 
+  filter(country == "Japan" | gender_ifelsed == "Woman")
+
+table(women_or_japanese$country, women_or_japanese$gender_ifelsed)
+
+```
+
+
 ## Joining 
 
 The most common iteration of joining is the `left_join` function. This joins a secondary dataset to the left of the first dataset. In order to join the datasets you must specify a set of "keys", a set of variables which the values in the left dataset is supposed to match to the right dataset. 
+
+
+## Grouping and Aggregating
+
+A common need is also to use lower level data to create data on summaries of aggregate level, like the average level of women respondents across the survey years. This also has a slightly complex syntax, but you first group the dataframe with the function `group_by`, which specifies a set of variables that units should be grouped into, and then feed that into the `summarise` (`summarize` works too for americans) function, which specifies the new variables you want to create on the aggregate level. These new variables need to be specified by functions that summarise elements however, such as `mean`. In this code I will make an aggregate of Japan and South Korea over the time periods, with the number of respondents in each, and the average degree of anti-women legislator sentiment.
+
+```{r}
+grouped_f <- SurvData %>% 
+  mutate(whostility = ifelse(whostility < 0, NA, whostility)) %>%  # You can add the unchanged vector as a responsein an ifelse, Values less than 0 are missing categories in WVS
+  group_by(country, year) %>% 
+  summarise(respondents = n(),
+            whostility = mean(whostility, na.rm = TRUE))
+
+
+```
+
 
 
 ## Pivoting
@@ -248,6 +307,46 @@ The most common iteration of joining is the `left_join` function. This joins a s
 
 # Plotting
 
+To paraphrase the Beatles, all you need is ggplot. This framework allows you to plot essentially everything, although some packages obviously makes this plotting simpler, but most of them are just wrappers for ggplot code. You could write entire books worth of information on plotting with ggplot. In fact someone did, I have it if you're interested. 
+
+![neat book](./images/healy_vis.jpeg)
+
+## Layers
+
+It is prudent to think of visualisations in ggplot as layered. These layers are bound together with plus signs, and each construct a layer ontop of the plot or other visualisation you want to make. The most basic general layer that all ggplots need is the base layer of the `ggplot` function itself. In this function you specify your dataset, and the general aesthetics. Within the `ggplot` function (and most `geom_` derivatives) there is an `aes` argument, this is an aesthetic argument, it specifies what variable from the dataset should represent what element of the plot. Based on the plot type the type of aesthetic accepted varies, but a list of potential aesthetics are: x, y, color, fill, shape, size, linewidth, linetype, etc. Following this, you add a layer that specifies what type of plot you want, this is done through a family of `geom_` functions such as `geom_point` for scatterplot, `geom_bar` for a barplot, `geom_boxplot` for a boxplot with distributions, etc. Which you use depends on how you want to visualise. If you are curious about the options, type `geom_` in R, and switch through the optins that it auto-completes to. Lets use this information to build a scatterplot of the first grouped dataframe created earlier.
+
+```{r}
+grouped_f %>% ### Obviously you can pipe it in 
+  ggplot(aes(x=year, y=whostility, color = country)) + 
+  geom_point()
+
+```
+ Very ugly, but it does the job. We can now add a couple of layers to improve the look. There are several themes that can be used by default, such as `theme_bw` which is my favourite, just add the function in a layer. Additionally we can modify the labels of the plot through the `lab` function as a separate layer. 
+ 
+```{r}
+grouped_f %>% 
+  ggplot(aes(x=year, y=whostility, color = country)) + 
+  geom_point() + 
+  theme_bw() + 
+  labs(title = "Here's a Title", x = "Time period", y = "Anti-women sentiment", color = "Region")
+```
+ For the final plot, I will also do some changes to the datastructure so that it visualises a bit better, there's perhaps too much space between the timings as it is. Additionally, I think the points are too small, so I will change them manually through arguments fed through the layers. 
+ 
+```{r}
+grouped_f %>% 
+  mutate(wave = case_when(
+    year == 1995 | year == 1996 ~ 1,
+    year == 2000 | year == 2001 ~ 2,
+    year == 2005 ~ 3,
+    year == 2010 ~ 4
+  )) %>% 
+  ggplot(aes(x=wave, y = whostility, color = country)) + 
+  geom_point(size = 2) + 
+  theme_bw() + 
+  scale_color_manual(values = c("cornflowerblue", "goldenrod")) + 
+  labs(title = "Hostility towards women as legislators", x = "WVS Wave", y = "Hostility")
+```
+The values and precise aesthetics of a variable can be set with the function family `scale_AESTHETIC_TYPE`, which provides a large range of ways to modify the aesthetics. In the plot above I manually (therefore manual at the end) assign two values to the color aesthetic (therefore color in the middle). This function family can also modify labels and other elements.  
 
 # Advanced methods
 
@@ -276,5 +375,14 @@ str_detect(this_is_a_string, "[A-Z]{1}[a-z]{2,}")
 
 str_extract(this_is_a_string, "[A-Z]{1}[a-z]{2,}")
 
+
 ```
 
+## Keyboard shortcuts and tips
+
+- ctrl + shift + m gives a pipe %>% 
+- alt + - gives an assignment operator <- 
+- shift + any arrow key, highlihgts text as you move the text entry thing
+- ctrl + shift + left/right highlights while skipping elements, so you can highlight entire words
+
+There is an extensive style guide, but generally R custom is to use what is called snake case for variable and object naming. The name "SurvData" used earlier violates this by being pascalcase, a strict snake case version would be "surv_data". point being, avoid upper case letters, bind words with an underscore. Same custom goes for filenaming of R-scripts and datasets. 
