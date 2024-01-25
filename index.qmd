@@ -126,7 +126,7 @@ ex_list <- list(df_example, a_vector)
 ex_list[[2]]
 
 ```
-Lists are not often used in datascience, but will appear as accidental outputs to certain functions and processes, so its good to know what they are. 
+Lists are not often used in our branch of datascience, but will appear as accidental outputs to certain functions and processes, so its good to know what they are. 
 
 ## Functions
 
@@ -151,15 +151,32 @@ mean(new_vector, na.rm = TRUE)
 
 Before you can use R to conduct data wrangling or very directed plotting, you should utilize some functions to explore the data you are interested in. In this section I will utilize a singular dataset to demonstrate some of the simpler data exploring techniques. 
 
-First thing to address is data import. Based on the type of data applied, you utilize a particular function, usually found in the `haven` package, or just in base R. The most common datatypes are .csv for comma separated files, .xlsx files for excel (lots of strange things can happen when reading these files, be mindful), .sav for stata files, etc. Each has an appropriate function for reading the relevant data. In this instance a xxx file.
+First thing to address is data import. Based on the type of data applied, you utilize a particular function, usually found in the `haven` package, or just in base R. The most common datatypes are .csv for comma separated files, .xlsx files for excel (lots of strange things can happen when reading these files, be mindful), .sav for stata files, additionally, R has a set of unique filetypes that are relevant, .rda, .rds, and .rdata, .rda and .rdata are loaded with a simple `load` function, while .rds is read using a `readRDS` function.  Each has an appropriate function for reading the relevant data. I load in a compiled set from WVS from South Korea and Japan here.
 
 ```{r}
+
+## Note the file path specification is also specific. Two dots signal
+## a directory above your current. So this data is found in 
+## the parallell folder MA thesis, which is parallell to the folder two layers
+## above the current directory, then with a specified path to find it.
+
+
+load("../../MA thesis/Data and R scripts/Survey Data/SurvData.Rdata")
 
 
 
 ```
 
 
+## Simple data structure functions
+
+For simple sakes, we can explore the structure of the dataset through just clicking on it in the global environment, the same effect can be achieved by using the `view` function, either in the console or in the script (but it can get annoying when re-running it inside the script). For a more systematized view of the data, the `head`, `str`, and `summary` functions are often used. Try them on your own data, but I will utilize head here, because it looks the best in this type of document.
+
+```{r}
+head(SurvData)
+```
+
+This dataset is clearly already been processed a bit, since a WVS would probably have far more variables. But for now we can tell that there are a set of variables that could interest us. 
 
 # Data wrangling
 
