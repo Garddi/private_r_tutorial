@@ -346,7 +346,57 @@ grouped_f %>%
   scale_color_manual(values = c("cornflowerblue", "goldenrod")) + 
   labs(title = "Hostility towards women as legislators", x = "WVS Wave", y = "Hostility")
 ```
-The values and precise aesthetics of a variable can be set with the function family `scale_AESTHETIC_TYPE`, which provides a large range of ways to modify the aesthetics. In the plot above I manually (therefore manual at the end) assign two values to the color aesthetic (therefore color in the middle). This function family can also modify labels and other elements.  
+The values and precise aesthetics of a variable can be set with the function family `scale_AESTHETIC_TYPE`, which provides a large range of ways to modify the aesthetics. In the plot above I manually (therefore manual at the end) assign two values to the color aesthetic (therefore color in the middle). This function family can also modify labels and other elements. 
+
+## Maps
+
+You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually. 
+
+```{r}
+library(geodata) # for gadm download
+library(sf)
+
+nor_map <- gadm(country = "NO", level = 1, path = "./") %>% 
+  st_as_sf()
+
+ggplot() +  ## in map data the ggplot is empty
+  geom_sf(data = nor_map) + 
+  theme_void() # common theme to eliminate all lines
+
+```
+Aesthetics are possible, filling the map to make a cloropleth for instance. You can also left join data that are not of a GIS character straight into this dataframe, then use those variables as aesthetics, but for now lets just make a new variable based on whether I have visited the county.
+
+```{r}
+nor_map <- nor_map %>% 
+  mutate(me_there = case_when(
+    HASC_1 == "NO.AA" ~ "Yes",
+    HASC_1 == "NO.AK" ~ "Home",
+    HASC_1 == "NO.BU" ~ "Yes",
+    HASC_1 == "NO.FI" ~ "No",
+    HASC_1 == "NO.HE" ~ "Yes",
+    HASC_1 == "NO.HO" ~ "Yes",
+    HASC_1 == "NO.MR" ~ "No",
+    HASC_1 == "NO.NO" ~ "No",
+    HASC_1 == "NO.NT" ~ "No",
+    HASC_1 == "NO.OF" ~ "Yes",
+    HASC_1 == "NO.OP" ~ "Yes",
+    HASC_1 == "NO.OS" ~ "Yes",
+    HASC_1 == "NO.RO" ~ "Yes",
+    HASC_1 == "NO.SF" ~ "Home",
+    HASC_1 == "NO.ST" ~ "Yes",
+    HASC_1 == "NO.TE" ~ "Yes",
+    HASC_1 == "NO.TR" ~ "No",
+    HASC_1 == "NO.VA" ~ "Yes",
+    HASC_1 == "NO.VF" ~ "Yes"
+))
+
+ggplot() + 
+  geom_sf(data = nor_map, aes(fill = me_there)) + 
+  theme_void() + 
+  labs(title = "Mitt lille land", fill = "Have I been?") + 
+  scale_fill_manual(values = c("goldenrod", "firebrick", "cornflowerblue"))
+```
+
 
 # Advanced methods
 
