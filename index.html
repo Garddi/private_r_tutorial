@@ -364,12 +364,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="data-wrangling" class="level1">
 <h1>Data wrangling</h1>
 <p>Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator <code>%&gt;%</code>, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="mutating" class="level2">
 <h2 class="anchored" data-anchor-id="mutating">Mutating</h2>
-<p>Mutate is the dplyr function for changing variables in a dataset. This means that the function can both create and modify existing variables in the dataset.</p>
+<p>Mutate is the dplyr function for changing variables in a dataset. This means that the function can both create and modify existing variables in the dataset. As we saw in the last structure of our dataset, the gender variable is operationalized as 1 for men and 2 for women, we usually prefer a binary for this, so let us change that variable in a new dataset</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>SurvData <span class="ot">&lt;-</span> SurvData <span class="sc">%&gt;%</span> </span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gender_subtracted =</span> gender <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Lets compare the outputs to ensure successful transformation</span></span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(SurvData<span class="sc">$</span>gender, SurvData<span class="sc">$</span>gender_subtracted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   
+       0    1
+  1 5219    0
+  2    0 5585</code></pre>
+</div>
+</div>
 <section id="ifelse-and-case-when-mutations" class="level3">
 <h3 class="anchored" data-anchor-id="ifelse-and-case-when-mutations">Ifelse and Case when mutations</h3>
-<p>One of the most common techniques for assigning new values, other than just committing straight mathematical operations on them, is to utilize a logical test to assign new values. The most simple way of doing this is the <code>ifelse</code> function. It simple put tests each element of a vector</p>
+<p>One of the most common techniques for assigning new values, other than just committing straight mathematical operations on them, is to utilize a logical test to assign new values. The most simple way of doing this is the <code>ifelse</code> function. It, simply put, tests each element of a vector and then assigns a new value based on TRUE or FALSE response, the syntax is as follows <code>ifelse(logicaltest, value_if_TRUE, value_if_FALSE)</code>. If for instance we wanted the new gender variable to be a character based on gender we could do the following.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>SurvData <span class="ot">&lt;-</span> SurvData <span class="sc">%&gt;%</span> </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gender_ifelsed =</span> <span class="fu">ifelse</span>(gender <span class="sc">==</span> <span class="dv">2</span>, <span class="st">"Woman"</span>, <span class="st">"Man"</span>))</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(SurvData<span class="sc">$</span>gender, SurvData<span class="sc">$</span>gender_ifelsed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   
+     Man Woman
+  1 5219     0
+  2    0  5585</code></pre>
+</div>
+</div>
+<p>This is doable for instances where the new variable is dichotomous, and while it is possible to put a second <code>ifelse</code> function inside the response for the results of the logical test, this can get extremely cluttered as several cases appear. Which is why the dplyr package, helpfully has the <code>case_when</code> function, which is a vectorized version of ifelse, the helpfile will even say so. <code>case_when</code> has a bit more complex of a syntax, where the logical test is followed by a ~ and then the assigned value, with commas separating all cases.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>SurvData <span class="ot">&lt;-</span> SurvData <span class="sc">%&gt;%</span> </span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gender_cased =</span> <span class="fu">case_when</span>(  <span class="do">## Style guide reccomends this style</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Woman"</span>,</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Man"</span>,</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>    gender <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Non-Binary"</span></span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(SurvData<span class="sc">$</span>gender, SurvData<span class="sc">$</span>gender_cased)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   
+     Man Woman
+  1 5219     0
+  2    0  5585</code></pre>
+</div>
+</div>
 </section>
 <section id="across" class="level3">
 <h3 class="anchored" data-anchor-id="across">Across</h3>
@@ -398,23 +444,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="string-manipulation">String manipulation</h2>
 <p>I will not go into details in this section, but will make it clear that character variables can be utilized in many different ways through what is known as regular expressions or regex, which are lines of very silly text which can be used as pattern matching to strings as data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
-<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
-<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
-<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
-<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Gard"</code></pre>
 </div>

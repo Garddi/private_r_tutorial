@@ -182,14 +182,53 @@ This dataset is clearly already been processed a bit, since a WVS would probably
 
 Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.
 
+```{r}
+library(tidyverse)
+```
+
+
 ## Mutating
 
-Mutate is the dplyr function for changing variables in a dataset. This means that the function can both create and modify existing variables in the dataset. 
+Mutate is the dplyr function for changing variables in a dataset. This means that the function can both create and modify existing variables in the dataset. As we saw in the last structure of our dataset, the gender variable is operationalized as 1 for men and 2 for women, we usually prefer a binary for this, so let us change that variable in a new dataset
+
+```{r}
+SurvData <- SurvData %>% 
+  mutate(gender_subtracted = gender - 1)
+
+## Lets compare the outputs to ensure successful transformation
+
+table(SurvData$gender, SurvData$gender_subtracted)
+
+
+```
+
 
 
 ### Ifelse and Case when mutations
 
-One of the most common techniques for assigning new values, other than just committing straight mathematical operations on them, is to utilize a logical test to assign new values. The most simple way of doing this is the `ifelse` function. It simple put tests each element of a vector 
+One of the most common techniques for assigning new values, other than just committing straight mathematical operations on them, is to utilize a logical test to assign new values. The most simple way of doing this is the `ifelse` function. It, simply put, tests each element of a vector and then assigns a new value based on TRUE or FALSE response, the syntax is as follows `ifelse(logicaltest, value_if_TRUE, value_if_FALSE)`. If for instance we wanted the new gender variable to be a character based on gender we could do the following.
+
+```{r}
+SurvData <- SurvData %>% 
+  mutate(gender_ifelsed = ifelse(gender == 2, "Woman", "Man"))
+
+table(SurvData$gender, SurvData$gender_ifelsed)
+
+```
+This is doable for instances where the new variable is dichotomous, and while it is possible to put a second `ifelse` function inside the response for the results of the logical test, this can get extremely cluttered as several cases appear. Which is why the dplyr package, helpfully has the `case_when` function, which is a vectorized version of ifelse, the helpfile will even say so. `case_when` has a bit more complex of a syntax, where the logical test is followed by a ~ and then the assigned value, with commas separating all cases. 
+
+```{r}
+SurvData <- SurvData %>% 
+  mutate(gender_cased = case_when(  ## Style guide reccomends this style
+    gender == 2 ~ "Woman",
+    gender == 1 ~ "Man",
+    gender == 3 ~ "Non-Binary"
+  ))
+
+table(SurvData$gender, SurvData$gender_cased)
+
+```
+
 
 ### Across
 
