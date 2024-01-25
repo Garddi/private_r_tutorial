@@ -36,7 +36,7 @@ All entries in a script (which is just a text file), are sent to the console whi
 
 ## Assignment
 
-While strictly speaking a functional programming language, object oriented programming is highly supported, and the norm for usage amongst data scientists. Most processes in the language will be assigned a name, and appear in the global environment (in one of the other tabs). This is done either with a `=` or (more commonly, due to specific interactions with an equals sign) with the `<-` known as the assignment operator.  
+While strictly speaking a functional programming language, object oriented programming is highly supported, and the norm for usage amongst data scientists. Most outputs in the language will be assigned a name, and appear in the global environment (in one of the other windows in your RStudio IDE). This is done either with a `=` or (more commonly, due to specific interactions with an equals sign) with the `<-` known as the assignment operator.  
 
 ```{r}
 hello <- 23
@@ -104,18 +104,49 @@ mean(new_vector)
 
 mean(new_vector, na.rm = TRUE)
 ```
+
+
 # Simple Analysis
 
-Before you can use R
+Before you can use R to conduct data wrangling or very directed plotting, you should utilize some functions to explore the data you are interested in. In this section I will utilize a singular dataset to demonstrate some of the simpler data exploring techniques. 
+
+First thing to address is data import. Based on the type of data applied, you utilize a particular function, usually found in the `haven` package, or just in base R. The most common datatypes are .csv for comma separated files, .xlsx files for excel (lots of strange things can happen when reading these files, be mindful), .sav for stata files, etc. Each has an appropriate function for reading the relevant data. In this instance a xxx file.
+
+```{r}
+
+
+
+```
+
 
 
 # Data wrangling
 
-Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe. Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. 
+Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.
 
 ## Mutating
 
 Mutate is the dplyr function for changing variables in a dataset. This means that the function can both create and modify existing variables in the dataset. 
+
+
+### Ifelse and Case when mutations
+
+One of the most common techniques for assigning new values, other than just committing straight mathematical operations on them, is to utilize a logical test to assign new values. The most simple way of doing this is the `ifelse` function. It simple put tests each element of a vector 
+
+### Across
+
+If you have a long set of variables you want to do the same thing to, the `across` selection function can be very helpful. When used within a mutate function it can apply the same function unto several columns. 
+
+Across can also be extended with anonymous functions (that is technically what is being done behind the scenes), which I will cover later in the document. 
+
+
+## Joining 
+
+The most common iteration of joining is the `left_join` function. This joins a secondary dataset to the left of the first dataset. In order to join the datasets you must specify a set of "keys", a set of variables which the values in the left dataset is supposed to match to the right dataset. 
+
+
+## Pivoting
+
 
 
 # Plotting
@@ -126,3 +157,27 @@ Mutate is the dplyr function for changing variables in a dataset. This means tha
 ## Functional programming with anonymous functions
 
 If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the `lapply` function, or the general family of `apply` functions, one can assign a very efficient function to be applied over a set of elements in a list. 
+
+## String manipulation
+
+I will not go into details in this section, but will make it clear that character variables can be utilized in many different ways through what is known as regular expressions or regex, which are lines of very silly text which can be used as pattern matching to strings as data. 
+
+```{r}
+this_is_a_string <- "hi my name is Gard and I have clinical depression, please help"
+
+## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string
+
+library(stringr)
+
+## Now i check the string on a pattern that matches to any substring that 
+## starts with a single capitalized letter followed by 2 or more uncapitalized
+## letters.
+
+str_detect(this_is_a_string, "[A-Z]{1}[a-z]{2,}")
+
+## Other functions could do similar stuff, like extract the match
+
+str_extract(this_is_a_string, "[A-Z]{1}[a-z]{2,}")
+
+```
+

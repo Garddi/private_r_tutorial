@@ -177,7 +177,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="assignment" class="level2">
 <h2 class="anchored" data-anchor-id="assignment">Assignment</h2>
-<p>While strictly speaking a functional programming language, object oriented programming is highly supported, and the norm for usage amongst data scientists. Most processes in the language will be assigned a name, and appear in the global environment (in one of the other tabs). This is done either with a <code>=</code> or (more commonly, due to specific interactions with an equals sign) with the <code>&lt;-</code> known as the assignment operator.</p>
+<p>While strictly speaking a functional programming language, object oriented programming is highly supported, and the norm for usage amongst data scientists. Most outputs in the language will be assigned a name, and appear in the global environment (in one of the other windows in your RStudio IDE). This is done either with a <code>=</code> or (more commonly, due to specific interactions with an equals sign) with the <code>&lt;-</code> known as the assignment operator.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>hello <span class="ot">&lt;-</span> <span class="dv">23</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -267,14 +267,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="simple-analysis" class="level1">
 <h1>Simple Analysis</h1>
-<p>Before you can use R</p>
+<p>Before you can use R to conduct data wrangling or very directed plotting, you should utilize some functions to explore the data you are interested in. In this section I will utilize a singular dataset to demonstrate some of the simpler data exploring techniques.</p>
+<p>First thing to address is data import. Based on the type of data applied, you utilize a particular function, usually found in the <code>haven</code> package, or just in base R. The most common datatypes are .csv for comma separated files, .xlsx files for excel (lots of strange things can happen when reading these files, be mindful), .sav for stata files, etc. Each has an appropriate function for reading the relevant data. In this instance a xxx file.</p>
+<div class="cell">
+
+</div>
 </section>
 <section id="data-wrangling" class="level1">
 <h1>Data wrangling</h1>
-<p>Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator <code>%&gt;%</code>, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe. Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping.</p>
+<p>Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator <code>%&gt;%</code>, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.</p>
 <section id="mutating" class="level2">
 <h2 class="anchored" data-anchor-id="mutating">Mutating</h2>
 <p>Mutate is the dplyr function for changing variables in a dataset. This means that the function can both create and modify existing variables in the dataset.</p>
+<section id="ifelse-and-case-when-mutations" class="level3">
+<h3 class="anchored" data-anchor-id="ifelse-and-case-when-mutations">Ifelse and Case when mutations</h3>
+<p>One of the most common techniques for assigning new values, other than just committing straight mathematical operations on them, is to utilize a logical test to assign new values. The most simple way of doing this is the <code>ifelse</code> function. It simple put tests each element of a vector</p>
+</section>
+<section id="across" class="level3">
+<h3 class="anchored" data-anchor-id="across">Across</h3>
+<p>If you have a long set of variables you want to do the same thing to, the <code>across</code> selection function can be very helpful. When used within a mutate function it can apply the same function unto several columns.</p>
+<p>Across can also be extended with anonymous functions (that is technically what is being done behind the scenes), which I will cover later in the document.</p>
+</section>
+</section>
+<section id="joining" class="level2">
+<h2 class="anchored" data-anchor-id="joining">Joining</h2>
+<p>The most common iteration of joining is the <code>left_join</code> function. This joins a secondary dataset to the left of the first dataset. In order to join the datasets you must specify a set of “keys”, a set of variables which the values in the left dataset is supposed to match to the right dataset.</p>
+</section>
+<section id="pivoting" class="level2">
+<h2 class="anchored" data-anchor-id="pivoting">Pivoting</h2>
 </section>
 </section>
 <section id="plotting" class="level1">
@@ -285,6 +305,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="functional-programming-with-anonymous-functions" class="level2">
 <h2 class="anchored" data-anchor-id="functional-programming-with-anonymous-functions">Functional programming with anonymous functions</h2>
 <p>If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the <code>lapply</code> function, or the general family of <code>apply</code> functions, one can assign a very efficient function to be applied over a set of elements in a list.</p>
+</section>
+<section id="string-manipulation" class="level2">
+<h2 class="anchored" data-anchor-id="string-manipulation">String manipulation</h2>
+<p>I will not go into details in this section, but will make it clear that character variables can be utilized in many different ways through what is known as regular expressions or regex, which are lines of very silly text which can be used as pattern matching to strings as data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'stringr' was built under R version 4.2.3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Gard"</code></pre>
+</div>
+</div>
 </section>
 </section>
 
