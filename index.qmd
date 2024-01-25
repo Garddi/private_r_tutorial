@@ -2,17 +2,19 @@
 title: "R Tutorial"
 author: "Gard Olav Dietrichson"
 format: html
+execute: 
+  warning: false
 ---
 
 # Introduction
 
-Welcome to a thorough walkthrough of R in applied areas. Covers the sections: General Structure, Data import, Simple Data checking, Data Wrangling, Plotting, and advanced R methods. 
+Welcome to a (more or less) thorough walkthrough of R in applied areas. Covers the sections: General Structure, Data import, Simple Data checking, Data Wrangling, Plotting, and advanced R methods. 
 
 # General structure
 
 ## Data Types
 
-Information takes several forms in R, all attached with a class, the basic forms of data that needs to be known are numeric (will appear as "double" sometimes), integer, factor, character, and boolean. Additionally there are a class of missing values, but they are all covered by NA.
+Information takes several forms in R, all attached with a class, the basic forms of data that needs to be known are numeric (will appear as "double" sometimes, this is related to memory allocation, but just means more decimals numeric), integer (whole numbers), factor (text but with numbers assigned to certain values), character, and boolean (logical, true or false). Additionally there are a class of missing values, but they are all covered by NA.
 
 ```{r}
 1 + 1 ### Comments are in hashtags 
@@ -32,7 +34,7 @@ TRUE
 FALSE
 
 ```
-All entries in a script (which is just a text file), are sent to the console which interprets the text. 
+All entries in a script (which is just a text file), are sent to the console which interprets the text. There are also certain special datatypes, such as NULL for empty (which is not the same as missing), Inf for infinite values (dividing by zero for instance), and NaN (Not a Number, errors in certain computational processes)
 
 ## Assignment
 
@@ -85,7 +87,46 @@ a_vector[4] ## Fourth number of the vector above
 ```
 ## Dataframes
 
-Two dimensional data structures are referred to as dataframes, and consists of rows of units across columns of variables. Columns are essentially vectors, and must therefore be of the same type. Indexing is done using brackets, and has to be separated with a comma, 
+Two dimensional data structures are referred to as dataframes, and consists of rows of units across columns of variables. Columns are essentially vectors, and must therefore be of the same type. Indexing is done using brackets, and has to be separated with a comma, first number is the rownumber, second is the column number. Empty spaces extracts the whole row/column.
+
+```{r}
+df_example <- data.frame(names = c("Gard", "Grad", "Gard Olav", "the Notorious G.A.R.D."),
+                         age = c(27, 23, 21, 19),
+                         fav_movie = c("The Adolescence of Utena", "12 Angry Men", "Inception", "Straight outta Compton"),
+                         happy = c(FALSE, TRUE, FALSE, TRUE))
+
+df_example[1,]
+
+df_example[c(1,2),]
+
+df_example[,1]
+
+df_example[,1:2]
+
+df_example[3,2]
+
+## Selecting on names
+
+df_example[,c("fav_movie")]
+
+## Index tool
+
+df_example$age
+
+df_example$happy
+
+```
+## Lists
+
+Lists can have anything in them, even dataframes or vectors, with no rules as to consistency over elements. Elements are then stored unidimensionally, accessed with double brackets for a relevant element. 
+
+```{r}
+ex_list <- list(df_example, a_vector)
+
+ex_list[[2]]
+
+```
+Lists are not often used in datascience, but will appear as accidental outputs to certain functions and processes, so its good to know what they are. 
 
 ## Functions
 
