@@ -388,10 +388,43 @@ mean_values_for_transf <- joined_sets2 %>%
   pivot_longer(cols = all_of(vars_i), names_to = "question", values_to = "mean_vals")
 
 
+head(mean_values_for_transf)
 
 
 ```
 
+Note that we now only have four variables, but far more rows, instead of each question being a variable, each question is now a row for an individual. Lets do the same for the un-summarised version, then `left_join` this aggregate. 
+
+```{r}
+joined_sets2_i <-joined_sets2
+joined_sets2_i$id <- 1:nrow(joined_sets2) ## If you want a fun story, ask why this is here........
+
+
+new_joined <- joined_sets2_i %>% 
+  mutate(across(all_of(vars_i), ~ haven::zap_labels(.x)),
+         across(all_of(vars_i), ~ ifelse(!(.x %in% c(1,2,3,4,5)), NA, .x))) %>%  ## Likert scale, so outside 1-5 is missing vals
+  pivot_longer(cols = all_of(vars_i), names_to = "question", values_to = "q_response") %>% 
+  left_join(mean_values_for_transf, by = c("parti", "tid", "question")) ## Note the join so that the mean vals for the questions is there as well
+
+dim(new_joined) ## Gets the dimensions of the object
+
+```
+As you can see the new frame has 136010 rows, and 23 columns, longer and narrower than the original one. Let's now turn that frame back to the original set, but now with "distance from party-year mean" as the variable on each question. Note that `pivot_longer` requires you to specify the columns that should be pivoted from, in addition to their destination, while `pivot_wider` knows that the names are going to be column names, and the values fill columns. That was poorly worded, remind me to come back to that and make it make sense.
+
+As a sidenote, this section had to go through several revisions, because nothing works on first attempt, so do not be fooled into thinking this is an easy process, but practice makes perfect, and by using this language for yourself you eventually become quite apt at finding the source of your mistakes (and very good at googling). 
+
+```{r}
+
+dist_means_joined <- new_joined %>% 
+  mutate(dist_score = q_response - mean_vals) %>% 
+  select(-q_response, -mean_vals) %>% ### Removing these because they are reduntant and would create strange frames
+  pivot_wider(names_from = "question", values_from = "dist_score")
+
+head(joined_sets2[,vars_i])
+
+head(dist_means_joined[,vars_i])
+
+```
 
 
 
@@ -441,7 +474,7 @@ The values and precise aesthetics of a variable can be set with the function fam
 
 ## Maps
 
-You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually. 
+You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually. There are a lot of intricacies involving maps and shapefiles in general, but to use it with ggplot it is most common to have it as a `sf` type file, you can see that the map assignment in the code chunk below is piped into a `st_as_sf` function, this transform the `tera` (I believe it is) class object, into an `sf` class object. In some instances we would have to assign a crs as well, but that's perhaps too much complicated to talk about right now. 
 
 ```{r}
 library(geodata) # for gadm download
@@ -487,7 +520,7 @@ ggplot() +
   labs(title = "Mitt lille land", fill = "Have I been?") + 
   scale_fill_manual(values = c("goldenrod", "firebrick", "cornflowerblue"))
 ```
-
+Note that the aesthetic argument is `fill` not `colour` (I have done that mistake several times). 
 
 # Advanced methods
 
@@ -527,7 +560,9 @@ lapply(loopy_vector, FUN = function(x){ ## x serves here as our "iterator"
 })
 
 ```
-Note that the output from the function is a list, with nested singular values, a normal method is to wrap a lapply function in an `unlist` function, or to feed the lapply to one using a pipe. 
+Note that the output from the function is a list, with nested singular values, a normal method is to wrap a `lapply` function in an `unlist` function, or to feed the `lapply` to one using a pipe. 
+
+If you know what you unit you want to do the same thing over and over again for, you do practically anything with an `apply` function. A good idea is to practice situations with it, because then when you are faced with an unfamiliar problem, you can go straight to work fixing the issue, rather than searching for obscure packages with functions that do the thing you want. 
 
 ## String manipulation
 

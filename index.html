@@ -645,7 +645,76 @@ $class
 <span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(parti, tid, <span class="fu">all_of</span>(vars_i)) <span class="sc">%&gt;%</span> </span>
 <span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(parti, tid) <span class="sc">%&gt;%</span> </span>
 <span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(vars_i), <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">all_of</span>(vars_i), <span class="at">names_to =</span> <span class="st">"question"</span>, <span class="at">values_to =</span> <span class="st">"mean_vals"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">all_of</span>(vars_i), <span class="at">names_to =</span> <span class="st">"question"</span>, <span class="at">values_to =</span> <span class="st">"mean_vals"</span>)</span>
+<span id="cb96-11"><a href="#cb96-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-12"><a href="#cb96-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-13"><a href="#cb96-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mean_values_for_transf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+# Groups:   parti [1]
+  parti   tid question     mean_vals
+  &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;
+1 Ap     1991 straff          NaN   
+2 Ap     1991 utkant            1.81
+3 Ap     1991 likestilling      1.69
+4 Ap     1991 eu                4.17
+5 Ap     1991 eea             NaN   
+6 Ap     1991 u_hjelp           3.67</code></pre>
+</div>
+</div>
+<p>Note that we now only have four variables, but far more rows, instead of each question being a variable, each question is now a row for an individual. Lets do the same for the un-summarised version, then <code>left_join</code> this aggregate.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>joined_sets2_i <span class="ot">&lt;-</span>joined_sets2</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>joined_sets2_i<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(joined_sets2) <span class="do">## If you want a fun story, ask why this is here........</span></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>new_joined <span class="ot">&lt;-</span> joined_sets2_i <span class="sc">%&gt;%</span> </span>
+<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(vars_i), <span class="sc">~</span> haven<span class="sc">::</span><span class="fu">zap_labels</span>(.x)),</span>
+<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a>         <span class="fu">across</span>(<span class="fu">all_of</span>(vars_i), <span class="sc">~</span> <span class="fu">ifelse</span>(<span class="sc">!</span>(.x <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>)), <span class="cn">NA</span>, .x))) <span class="sc">%&gt;%</span>  <span class="do">## Likert scale, so outside 1-5 is missing vals</span></span>
+<span id="cb98-8"><a href="#cb98-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">all_of</span>(vars_i), <span class="at">names_to =</span> <span class="st">"question"</span>, <span class="at">values_to =</span> <span class="st">"q_response"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb98-9"><a href="#cb98-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mean_values_for_transf, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"parti"</span>, <span class="st">"tid"</span>, <span class="st">"question"</span>)) <span class="do">## Note the join so that the mean vals for the questions is there as well</span></span>
+<span id="cb98-10"><a href="#cb98-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb98-11"><a href="#cb98-11" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(new_joined) <span class="do">## Gets the dimensions of the object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 136010     23</code></pre>
+</div>
+</div>
+<p>As you can see the new frame has 136010 rows, and 23 columns, longer and narrower than the original one. Let’s now turn that frame back to the original set, but now with “distance from party-year mean” as the variable on each question. Note that <code>pivot_longer</code> requires you to specify the columns that should be pivoted from, in addition to their destination, while <code>pivot_wider</code> knows that the names are going to be column names, and the values fill columns. That was poorly worded, remind me to come back to that and make it make sense.</p>
+<p>As a sidenote, this section had to go through several revisions, because nothing works on first attempt, so do not be fooled into thinking this is an easy process, but practice makes perfect, and by using this language for yourself you eventually become quite apt at finding the source of your mistakes (and very good at googling).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>dist_means_joined <span class="ot">&lt;-</span> new_joined <span class="sc">%&gt;%</span> </span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dist_score =</span> q_response <span class="sc">-</span> mean_vals) <span class="sc">%&gt;%</span> </span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>q_response, <span class="sc">-</span>mean_vals) <span class="sc">%&gt;%</span> <span class="do">### Removing these because they are reduntant and would create strange frames</span></span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">"question"</span>, <span class="at">values_from =</span> <span class="st">"dist_score"</span>)</span>
+<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(joined_sets2[,vars_i])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 14
+  straff    utkant  likestilling eu      eea   u_hjelp organisasjonsmakt alkohol
+  &lt;dbl+lbl&gt; &lt;dbl+l&gt; &lt;dbl+lbl&gt;    &lt;dbl+l&gt; &lt;dbl&gt; &lt;dbl+l&gt; &lt;dbl+lbl&gt;         &lt;dbl+l&gt;
+1 NA        3 [Bad… 4 [Noksa ue… 6 [Vet… NA    5 [Hel… 3 [Bade og]       3 [Bad…
+2 NA        4 [Nok… 2 [Noksa en… 1 [Hel… NA    5 [Hel… 1 [Helt enig]     1 [Hel…
+3 NA        4 [Nok… 2 [Noksa en… 1 [Hel… NA    5 [Hel… 1 [Helt enig]     2 [Nok…
+4 NA        1 [Hel… 2 [Noksa en… 1 [Hel… NA    1 [Hel… 3 [Bade og]       4 [Nok…
+5 NA        2 [Nok… 1 [Helt eni… 1 [Hel… NA    5 [Hel… 1 [Helt enig]     1 [Hel…
+6 NA        3 [Bad… 1 [Helt eni… 1 [Hel… NA    3 [Bad… 3 [Bade og]       1 [Hel…
+# ℹ 6 more variables: forskjeller &lt;dbl+lbl&gt;, int_lvl &lt;dbl+lbl&gt;,
+#   off_tjen &lt;dbl+lbl&gt;, krist &lt;dbl+lbl&gt;, innvandring &lt;dbl+lbl&gt;, klima &lt;dbl+lbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dist_means_joined[,vars_i])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 14
+  straff utkant likestilling    eu   eea u_hjelp organisasjonsmakt alkohol
+   &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;             &lt;dbl&gt;   &lt;dbl&gt;
+1     NA -0.211        1.23  NA       NA   0.435             0.977   1.17 
+2     NA  0.789       -0.772 -1.29    NA   0.435            -1.02   -0.829
+3     NA  0.789       -0.772 -1.29    NA   0.435            -1.02    0.171
+4     NA -2.21        -0.772 -1.29    NA  -3.56              0.977   2.17 
+5     NA -1.21        -1.77  -1.29    NA   0.435            -1.02   -0.829
+6     NA -0.211       -1.77  -1.29    NA  -1.56              0.977  -0.829
+# ℹ 6 more variables: forskjeller &lt;dbl&gt;, int_lvl &lt;dbl&gt;, off_tjen &lt;dbl&gt;,
+#   krist &lt;dbl&gt;, innvandring &lt;dbl&gt;, klima &lt;dbl&gt;</code></pre>
+</div>
 </div>
 </section>
 </section>
@@ -662,96 +731,97 @@ $class
 <h2 class="anchored" data-anchor-id="layers">Layers</h2>
 <p>It is prudent to think of visualisations in ggplot as layered. These layers are bound together with plus signs, and each construct a layer ontop of the plot or other visualisation you want to make. The most basic general layer that all ggplots need is the base layer of the <code>ggplot</code> function itself. In this function you specify your dataset, and the general aesthetics. Within the <code>ggplot</code> function (and most <code>geom_</code> derivatives) there is an <code>aes</code> argument, this is an aesthetic argument, it specifies what variable from the dataset should represent what element of the plot. Based on the plot type the type of aesthetic accepted varies, but a list of potential aesthetics are: x, y, color, fill, shape, size, linewidth, linetype, etc. Following this, you add a layer that specifies what type of plot you want, this is done through a family of <code>geom_</code> functions such as <code>geom_point</code> for scatterplot, <code>geom_bar</code> for a barplot, <code>geom_boxplot</code> for a boxplot with distributions, etc. Which you use depends on how you want to visualise. If you are curious about the options, type <code>geom_</code> in R, and switch through the optins that it auto-completes to. Lets use this information to build a scatterplot of the first grouped dataframe created earlier.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> <span class="do">### Obviously you can pipe it in </span></span>
-<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
-<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> <span class="do">### Obviously you can pipe it in </span></span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Very ugly, but it does the job. We can now add a couple of layers to improve the look. There are several themes that can be used by default, such as <code>theme_bw</code> which is my favourite, just add the function in a layer. Additionally we can modify the labels of the plot through the <code>lab</code> function as a separate layer.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> </span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
-<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Here's a Title"</span>, <span class="at">x =</span> <span class="st">"Time period"</span>, <span class="at">y =</span> <span class="st">"Anti-women sentiment"</span>, <span class="at">color =</span> <span class="st">"Region"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> </span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Here's a Title"</span>, <span class="at">x =</span> <span class="st">"Time period"</span>, <span class="at">y =</span> <span class="st">"Anti-women sentiment"</span>, <span class="at">color =</span> <span class="st">"Region"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>For the final plot, I will also do some changes to the datastructure so that it visualises a bit better, there’s perhaps too much space between the timings as it is. Additionally, I think the points are too small, so I will change them manually through arguments fed through the layers. Finally, I also add a <code>geom_line</code> which when combined in this instance, draws a line between the points, separated by the color specification, by default, <code>geom_</code> functions inherit their aesthetic from the layer previous, so the same <code>aes</code> specification is inherited from the higher level.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> </span>
-<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wave =</span> <span class="fu">case_when</span>(</span>
-<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">1995</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">1996</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2000</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">2001</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2005</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
-<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">~</span> <span class="dv">4</span></span>
-<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
-<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>wave, <span class="at">y =</span> whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
-<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
-<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
-<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb99-12"><a href="#cb99-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"cornflowerblue"</span>, <span class="st">"goldenrod"</span>)) <span class="sc">+</span> </span>
-<span id="cb99-13"><a href="#cb99-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Hostility towards women as legislators"</span>, <span class="at">x =</span> <span class="st">"WVS Wave"</span>, <span class="at">y =</span> <span class="st">"Hostility"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> </span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wave =</span> <span class="fu">case_when</span>(</span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">1995</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">1996</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2000</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">2001</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2005</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb106-6"><a href="#cb106-6" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">~</span> <span class="dv">4</span></span>
+<span id="cb106-7"><a href="#cb106-7" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
+<span id="cb106-8"><a href="#cb106-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>wave, <span class="at">y =</span> whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
+<span id="cb106-9"><a href="#cb106-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb106-10"><a href="#cb106-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb106-11"><a href="#cb106-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb106-12"><a href="#cb106-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"cornflowerblue"</span>, <span class="st">"goldenrod"</span>)) <span class="sc">+</span> </span>
+<span id="cb106-13"><a href="#cb106-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Hostility towards women as legislators"</span>, <span class="at">x =</span> <span class="st">"WVS Wave"</span>, <span class="at">y =</span> <span class="st">"Hostility"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>The values and precise aesthetics of a variable can be set with the function family <code>scale_AESTHETIC_TYPE</code>, which provides a large range of ways to modify the aesthetics. In the plot above I manually (therefore manual at the end) assign two values to the color aesthetic (therefore color in the middle). This function family can also modify labels and other elements.</p>
 </section>
 <section id="maps" class="level2">
 <h2 class="anchored" data-anchor-id="maps">Maps</h2>
-<p>You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually.</p>
+<p>You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually. There are a lot of intricacies involving maps and shapefiles in general, but to use it with ggplot it is most common to have it as a <code>sf</code> type file, you can see that the map assignment in the code chunk below is piped into a <code>st_as_sf</code> function, this transform the <code>tera</code> (I believe it is) class object, into an <code>sf</code> class object. In some instances we would have to assign a crs as well, but that’s perhaps too much complicated to talk about right now.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geodata) <span class="co"># for gadm download</span></span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>nor_map <span class="ot">&lt;-</span> <span class="fu">gadm</span>(<span class="at">country =</span> <span class="st">"NO"</span>, <span class="at">level =</span> <span class="dv">1</span>, <span class="at">path =</span> <span class="st">"./"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>()</span>
-<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb100-7"><a href="#cb100-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span>  <span class="do">## in map data the ggplot is empty</span></span>
-<span id="cb100-8"><a href="#cb100-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map) <span class="sc">+</span> </span>
-<span id="cb100-9"><a href="#cb100-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="co"># common theme to eliminate all lines</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geodata) <span class="co"># for gadm download</span></span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>nor_map <span class="ot">&lt;-</span> <span class="fu">gadm</span>(<span class="at">country =</span> <span class="st">"NO"</span>, <span class="at">level =</span> <span class="dv">1</span>, <span class="at">path =</span> <span class="st">"./"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>()</span>
+<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span>  <span class="do">## in map data the ggplot is empty</span></span>
+<span id="cb107-8"><a href="#cb107-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map) <span class="sc">+</span> </span>
+<span id="cb107-9"><a href="#cb107-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="co"># common theme to eliminate all lines</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Aesthetics are possible, filling the map to make a cloropleth for instance. You can also left join data that are not of a GIS character straight into this dataframe, then use those variables as aesthetics, but for now lets just make a new variable based on whether I have visited the county.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>nor_map <span class="ot">&lt;-</span> nor_map <span class="sc">%&gt;%</span> </span>
-<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">me_there =</span> <span class="fu">case_when</span>(</span>
-<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.AA"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.AK"</span> <span class="sc">~</span> <span class="st">"Home"</span>,</span>
-<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.BU"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.FI"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.HE"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.HO"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-9"><a href="#cb101-9" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.MR"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb101-10"><a href="#cb101-10" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.NO"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb101-11"><a href="#cb101-11" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.NT"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb101-12"><a href="#cb101-12" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OF"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-13"><a href="#cb101-13" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OP"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-14"><a href="#cb101-14" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OS"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-15"><a href="#cb101-15" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.RO"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-16"><a href="#cb101-16" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.SF"</span> <span class="sc">~</span> <span class="st">"Home"</span>,</span>
-<span id="cb101-17"><a href="#cb101-17" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.ST"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-18"><a href="#cb101-18" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.TE"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-19"><a href="#cb101-19" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.TR"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb101-20"><a href="#cb101-20" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.VA"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb101-21"><a href="#cb101-21" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.VF"</span> <span class="sc">~</span> <span class="st">"Yes"</span></span>
-<span id="cb101-22"><a href="#cb101-22" aria-hidden="true" tabindex="-1"></a>))</span>
-<span id="cb101-23"><a href="#cb101-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb101-24"><a href="#cb101-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb101-25"><a href="#cb101-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map, <span class="fu">aes</span>(<span class="at">fill =</span> me_there)) <span class="sc">+</span> </span>
-<span id="cb101-26"><a href="#cb101-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span> </span>
-<span id="cb101-27"><a href="#cb101-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mitt lille land"</span>, <span class="at">fill =</span> <span class="st">"Have I been?"</span>) <span class="sc">+</span> </span>
-<span id="cb101-28"><a href="#cb101-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"goldenrod"</span>, <span class="st">"firebrick"</span>, <span class="st">"cornflowerblue"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>nor_map <span class="ot">&lt;-</span> nor_map <span class="sc">%&gt;%</span> </span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">me_there =</span> <span class="fu">case_when</span>(</span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.AA"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.AK"</span> <span class="sc">~</span> <span class="st">"Home"</span>,</span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.BU"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-6"><a href="#cb108-6" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.FI"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb108-7"><a href="#cb108-7" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.HE"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-8"><a href="#cb108-8" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.HO"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-9"><a href="#cb108-9" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.MR"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb108-10"><a href="#cb108-10" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.NO"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb108-11"><a href="#cb108-11" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.NT"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb108-12"><a href="#cb108-12" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OF"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-13"><a href="#cb108-13" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OP"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-14"><a href="#cb108-14" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OS"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-15"><a href="#cb108-15" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.RO"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-16"><a href="#cb108-16" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.SF"</span> <span class="sc">~</span> <span class="st">"Home"</span>,</span>
+<span id="cb108-17"><a href="#cb108-17" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.ST"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-18"><a href="#cb108-18" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.TE"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-19"><a href="#cb108-19" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.TR"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb108-20"><a href="#cb108-20" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.VA"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb108-21"><a href="#cb108-21" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.VF"</span> <span class="sc">~</span> <span class="st">"Yes"</span></span>
+<span id="cb108-22"><a href="#cb108-22" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb108-23"><a href="#cb108-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb108-24"><a href="#cb108-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb108-25"><a href="#cb108-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map, <span class="fu">aes</span>(<span class="at">fill =</span> me_there)) <span class="sc">+</span> </span>
+<span id="cb108-26"><a href="#cb108-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span> </span>
+<span id="cb108-27"><a href="#cb108-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mitt lille land"</span>, <span class="at">fill =</span> <span class="st">"Have I been?"</span>) <span class="sc">+</span> </span>
+<span id="cb108-28"><a href="#cb108-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"goldenrod"</span>, <span class="st">"firebrick"</span>, <span class="st">"cornflowerblue"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>Note that the aesthetic argument is <code>fill</code> not <code>colour</code> (I have done that mistake several times).</p>
 </section>
 </section>
 <section id="advanced-methods" class="level1">
@@ -761,13 +831,13 @@ $class
 <p>A central part of programming in most languages is the flow control and for loops. For loops in R are slower than most other languages, and usually apply family of functions is preferred, since they can basically function in the same way as for loops, with the right specifications. But knowledge of loops can give you a tool to solve certain difficult tasks where you do not want to spend a couple of hours finding a relevant function. For loops consist of the function <code>for(iterator in sequence)</code>, the iterator is the thing that changes with each loop. A for loop is an instruction to do the same task over a set of times.</p>
 <p>Below is a simple for loop. First I create a vector of some numbers. The loop itself, I call the iterator i, and specify that I am looping over a sequence of numbers, from 1 to the length of the vector. I then use that operator as an index to the vector, so that for each iteration of the loop it prints the i vector position squared.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>loopy_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">15</span>,<span class="dv">23</span>,<span class="dv">34</span>,<span class="dv">66</span>,<span class="dv">32</span>)</span>
-<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(loopy_vector)){</span>
-<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(loopy_vector[i]<span class="sc">^</span><span class="dv">2</span>) <span class="do">### Note that unlike outside the loop, it does not print results automatically</span></span>
-<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>loopy_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">15</span>,<span class="dv">23</span>,<span class="dv">34</span>,<span class="dv">66</span>,<span class="dv">32</span>)</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(loopy_vector)){</span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb109-5"><a href="#cb109-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(loopy_vector[i]<span class="sc">^</span><span class="dv">2</span>) <span class="do">### Note that unlike outside the loop, it does not print results automatically</span></span>
+<span id="cb109-6"><a href="#cb109-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb109-7"><a href="#cb109-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 225
 [1] 529
@@ -782,13 +852,13 @@ $class
 <h2 class="anchored" data-anchor-id="functional-programming-with-anonymous-functions">Functional programming with anonymous functions</h2>
 <p>If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the <code>lapply</code> function, or the general family of <code>apply</code> functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where <code>lapply</code> is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. <code>sapply</code> will attempt to return the simplest datatype possible, <code>vapply</code> will return a vector.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(loopy_vector, <span class="at">FUN =</span> <span class="cf">function</span>(x){ <span class="do">## x serves here as our "iterator"</span></span>
-<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> x<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
-<span id="cb104-6"><a href="#cb104-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb104-7"><a href="#cb104-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(loopy_vector, <span class="at">FUN =</span> <span class="cf">function</span>(x){ <span class="do">## x serves here as our "iterator"</span></span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb111-3"><a href="#cb111-3" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> x<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb111-4"><a href="#cb111-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb111-5"><a href="#cb111-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
+<span id="cb111-6"><a href="#cb111-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb111-7"><a href="#cb111-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [1] 225
@@ -806,45 +876,46 @@ $class
 [1] 1024</code></pre>
 </div>
 </div>
-<p>Note that the output from the function is a list, with nested singular values, a normal method is to wrap a lapply function in an <code>unlist</code> function, or to feed the lapply to one using a pipe.</p>
+<p>Note that the output from the function is a list, with nested singular values, a normal method is to wrap a <code>lapply</code> function in an <code>unlist</code> function, or to feed the <code>lapply</code> to one using a pipe.</p>
+<p>If you know what you unit you want to do the same thing over and over again for, you do practically anything with an <code>apply</code> function. A good idea is to practice situations with it, because then when you are faced with an unfamiliar problem, you can go straight to work fixing the issue, rather than searching for obscure packages with functions that do the thing you want.</p>
 </section>
 <section id="string-manipulation" class="level2">
 <h2 class="anchored" data-anchor-id="string-manipulation">String manipulation</h2>
 <p>I will not go into details in this section, but will make it clear that character variables can be utilized in many different ways through what is known as regular expressions or regex, which are lines of very silly text which can be used as pattern matching to strings as data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
-<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
-<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb106-6"><a href="#cb106-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb106-7"><a href="#cb106-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
-<span id="cb106-8"><a href="#cb106-8" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
-<span id="cb106-9"><a href="#cb106-9" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
-<span id="cb106-10"><a href="#cb106-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb106-11"><a href="#cb106-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb113-5"><a href="#cb113-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb113-6"><a href="#cb113-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb113-7"><a href="#cb113-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
+<span id="cb113-8"><a href="#cb113-8" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
+<span id="cb113-9"><a href="#cb113-9" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
+<span id="cb113-10"><a href="#cb113-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb113-11"><a href="#cb113-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
-<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-3"><a href="#cb115-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Gard"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Same but for a comma and then anything</span></span>
-<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"</span><span class="sc">\\</span><span class="st">,.*"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Same but for a comma and then anything</span></span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"</span><span class="sc">\\</span><span class="st">,.*"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] ", please help"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Anything following a comma, but not the comma</span></span>
-<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"(?&lt;=</span><span class="sc">\\</span><span class="st">,).*"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Anything following a comma, but not the comma</span></span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"(?&lt;=</span><span class="sc">\\</span><span class="st">,).*"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] " please help"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the space is also there</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the space is also there</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="keyboard-shortcuts-and-tips" class="level2">
