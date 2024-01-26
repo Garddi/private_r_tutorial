@@ -164,6 +164,7 @@ First thing to address is data import. Based on the type of data applied, you ut
 ## the parallell folder MA thesis, which is parallell to the folder two layers
 ## above the current directory, then with a specified path to find it.
 
+library(haven)
 
 load("../../MA thesis/Data and R scripts/Survey Data/SurvData.Rdata")
 
@@ -279,9 +280,26 @@ table(SurvData$gender, SurvData$gender_cased)
 
 ### Across
 
-If you have a long set of variables you want to do the same thing to, the `across` selection function can be very helpful. When used within a mutate function it can apply the same function unto several columns. 
+If you have a long set of variables you want to do the same thing to, the `across` selection function can be very helpful. When used within a mutate function it can apply the same function unto several columns. The function assignment is signalled here with a ~ which is called a "purr-style" lambda function, but other ways of assigning the function is technically possible. The .x following signifies the place the column to change has in the function used in it.  
 
 Across can also be extended with anonymous functions (that is technically what is being done behind the scenes), which I will cover later in the document. 
+
+```{r}
+
+vars_i <- names(joined_sets2)[16:29]
+
+joined_sets2_mutated <- joined_sets2 %>% 
+  mutate(across(all_of(vars_i), ~ haven::zap_labels(.x))) %>% ## Heres a fun interaction with haven...
+  mutate(across(all_of(vars_i), ~ ifelse(.x > 2.5, "High", "Low")))
+
+
+head(joined_sets2[,16:29])
+#Compared with
+head(joined_sets2_mutated[,16:29])
+
+
+```
+
 
 
 ## Filtering
@@ -351,21 +369,26 @@ Here we see a NaN example, where a mean of nothing is not a number, since we spe
 
 ## Pivoting
 
-Say we have a dataset where differences in years are stored in columns, and we want a single row for each yearly observation. Or we have data that is more extensive than we want, and we want to limit the number of rows. This can be achieved through pivot functions, primarily `pivot_wider` and `pivot_longer` which have fairly intuitive names, they make the dataframe wider or longer, by making it shorter or narrower, respectively. Lets use a different dataset for a more applicable situation. I am here loading a dataset from a survey which is meant to measure agreement within party structures, I transform the question values to instead be distance to the mean of the party. 
+Say we have a dataset where differences in years are stored in columns, and we want a single row for each yearly observation. Or we have data that is more extensive than we want, and we want to limit the number of rows. This can be achieved through pivot functions, primarily `pivot_wider` and `pivot_longer` which have fairly intuitive names, they make the dataframe wider or longer, by making it shorter or narrower, respectively. The way to use them is to feed a dataframe into it, with a pipe of course, and then, depending on wider or narrower, you have to specify which columns the names go to or from, and where the values go to and from. For a wider pivot, the new names are all a class of variables, such as a character string for instance, when specifying `names_from`, this is the variable that the new columns will be named after. 
+
+Lets use a different dataset for a more applicable situation. I am here loading a dataset from a survey which is meant to measure agreement within party structures, I transform the question values to instead be distance to the mean of the party. 
+
 
 ```{r}
 
 ## Will limit this dataset to only a single party, and a couple of questions and key variables
+## Ignore the complex code, it might make sense later
 
 vars_i <- names(joined_sets2)[16:29]
 
 mean_values_for_transf <- joined_sets2 %>% 
   select(parti, tid, all_of(vars_i)) %>% 
   group_by(parti, tid) %>% 
-  summarise(across(all_of(vars_i), ~ mean(.x, na.rm = TRUE)))
+  summarise(across(all_of(vars_i), ~ mean(.x, na.rm = TRUE))) %>% 
+  pivot_longer(cols = all_of(vars_i), names_to = "question", values_to = "mean_vals")
 
-more_relevant_f <- joined_sets2 %>% 
-  select(kjonn, tid, parti, )
+
+
 
 ```
 
