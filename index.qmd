@@ -57,6 +57,7 @@ Other operators become important when discussing logical tests or other mathemat
 - <, >, <=, >=, less than, larger than, less or equal than, larger or equal than, logical tests, returns boolean
 - &, |, Binding operators for more logical tests & (AND operator) requires both elements to be true, while | (OR operator) requires only one to be true
 - %in% Contained logical test, is there a unit in this other element which is strictly equal to the first thing.
+- ! in general reverses the proceeding logical test, so if you write `!("YES" == "YES")` it will ask if the thing inside the parenthesis _is not_ the case, reversing the logical test. 
 
 ```{r}
 "Yes" == "Yes"
@@ -71,6 +72,7 @@ Other operators become important when discussing logical tests or other mathemat
 
 ```
 
+Logical tests are also relevant through certain functions, these functions all return either TRUE or FALSE values, which is useful in several cases, inside other functions or for flow control in loops (all of this is covered later). These functions include `is.na`, `is.empty`, `is.character`, `is.numeric`, etc. Lots of functions to explore that start with `is.`
 
 ## Vectors
 
@@ -328,10 +330,6 @@ table(women_or_japanese$country, women_or_japanese$gender_ifelsed)
 ```
 
 
-## Joining 
-
-The most common iteration of joining is the `left_join` function. This joins a secondary dataset to the left of the first dataset. In order to join the datasets you must specify a set of "keys", a set of variables which the values in the left dataset is supposed to match to the right dataset. 
-
 
 ## Grouping and Aggregating
 
@@ -366,6 +364,32 @@ head(grouped_more)
 ```
 Here we see a NaN example, where a mean of nothing is not a number, since we specified na.rm to be true. 
 
+
+
+## Joining 
+
+The most common iteration of joining is the `left_join` function. This joins a secondary dataset to the right of the first dataset. In order to join the datasets you must specify a set of "keys", a set of variables which the values in the left dataset is supposed to match to the right dataset. These do not have to create an exact match between datasets, multiple points in the original set can match single values in the joining set, but the reverse makes things complicated. If a single row in the original set matches multiple rows of the new one, then duplicates are created. For this reason make sure that the original dataset is either on a sub-level hierarchically, or that there are unique and exact matches in the new dataset. 
+
+The most common scenario to join values in my experience is when you have aggregate data that you want to join in to individual level data. Say I have survey result data from certain countries, and I want to join in some contextual variables. I could match that on just country and year variables. Below I utilize the survey in Norwegian parties, first I aggregate a frame, then join it. 
+
+```{r}
+joined_lim <- joined_sets2 %>% 
+  mutate(eu = ifelse(eu %in% c(1,2,3,4,5), eu, NA)) %>% 
+  select(kjonn, parti, tid, eu)
+
+joined_lim_agg <- joined_sets2 %>% 
+  mutate(eu = ifelse(eu %in% c(1,2,3,4,5), eu, NA)) %>% 
+  group_by(parti, tid) %>% 
+  summarise(mean_eu = mean(eu, na.rm = TRUE))
+
+joined_lim[c(3,4,64,65,556,557,1231,1232,5688, 5689,6783, 6784),] ## Indexing some random rows, so we can see variance
+
+joined_lim_joined <- joined_lim %>% 
+  left_join(joined_lim_agg, by = c("parti", "tid")) # Here i join in the new set, i know that the parti and tid variables are in both sets
+
+joined_lim_joined[c(3,4,64,65,556,557,1231,1232,5688, 5689,6783, 6784),] ## Indexing the same numbers
+```
+Since `mean_eu` was the only variable in the aggregated set except the key variables `parti` and `tid`, this is the only new column in the merged dataset. 
 
 ## Pivoting
 
@@ -474,8 +498,7 @@ The values and precise aesthetics of a variable can be set with the function fam
 
 ## Maps
 
-You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually. There are a lot of intricacies involving maps and shapefiles in general, but to use it with ggplot it is most common to have it as a `sf` type file, you can see that the map assignment in the code chunk below is piped into a `st_as_sf` function, this transform the `tera` (I believe it is) class object, into an `sf` class object. In some instances we would have to assign a crs as well, but that's perhaps too much complicated to talk about right now. 
-
+You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually. There are a lot of intricacies involving maps and shapefiles in general, but to use it with ggplot it is most common to have it as a `sf` type file, you can see that the map assignment in the code chunk below is piped into a `st_as_sf` function, this transform the `tera` (I believe it is) class object, into an `sf` class object. In some instances we would have to assign a crs as well, but that's perhaps too much complicated to talk about right now. Note also that the `ggplot` layer is itself empty, because the data and aesthetic mapping needs to be from a shapefile function of `geom_sf`. 
 ```{r}
 library(geodata) # for gadm download
 library(sf)
@@ -543,6 +566,19 @@ for(i in 1:length(loopy_vector)){
 
 ```
 For loops can interact with global variables, and assignment inside the loops are tracked in the global environment, and change variables you have in your environment, unlike lapply, which usually only changes return values. 
+
+### flow control
+
+For loops are just one version of repeating code, `while` and `repeat` also do similar things, however, I have never used them, and highly doubt the reader will do as well. 
+
+Flow control refers to ways in which you control a for loop or other similar iterative processes. These keywords are highlighted differently than other keyterms (in my instance they are red (I think, I cant see colours), but it varies with RStudio theme). These words are amonst others:
+
+- `if(){}` code in the bracket only executed if the logical test within parenthesis returns TRUE, can be followed by else
+- `else{}` follows the end of the if code bracket, code is executed if the test in the if function is returned as FALSE
+- `next`, usually nested within an if or else test, skips to the next iteration of the loop. 
+- `break`, exits the loop completely, stopping the iteration over loops, *needs* to be present in a repeat loop, or it will never stop
+- `return`, specifies what object or element within the function or loop that should be returned when the iteration is complete, by default the function will return the last object created within it.  
+
 
 ## Functional programming with anonymous functions
 
