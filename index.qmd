@@ -117,6 +117,9 @@ df_example$age
 df_example$happy
 
 ```
+
+The most common process of accessing variables when using dataframe objects however, is to use the $ sign, which is an indexation tool for column names.
+
 ## Lists
 
 Lists can have anything in them, even dataframes or vectors, with no rules as to consistency over elements. Elements are then stored unidimensionally, accessed with double brackets for a relevant element. 
@@ -191,14 +194,41 @@ table(SurvData$gender)
 
 table(SurvData$gender, SurvData$whostility)
 ```
+Also, you can use some very simple plots to help you view the distribution, such as a density plot, or a histogram for certain values.
 
+```{r}
+plot(density(SurvData$whostility))
+
+hist(SurvData$whostility)
+```
+Additionally, some dataforms have labels attached to their columns, this is normal for data imported from spss, or stata. These labels provide information about the coding, without searching the codebook, these can be found with the `attributes` function. I load a dataset here, which has this type of labels. This data will also be used later.
+
+```{r}
+load("../../advanced_statistics_phd/my_data/simple_set.rda")
+
+attributes(joined_sets2$straff)
+
+```
+
+ It is also in Norwegian, apologies for that. 
 
 # Data wrangling
 
-Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.
+Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. Selecting in tidyverse also supports something called tidyselect functions, which allows you to select certain variables based on a pattern, such as the `starts_with` function, which selects all variables that start with a specified string pattern. If you have a vector of your variable names you can also use the `all_of` function to select all of thoes. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.
 
 ```{r}
 library(tidyverse)
+
+## A simple pipe explanation
+
+SurvData %>% 
+  pull(whostility) %>% 
+  mean(na.rm = TRUE)
+
+# Is the same as 
+
+mean(pull(SurvData, whostility), na.rm = TRUE)
+
 ```
 
 
@@ -297,17 +327,54 @@ grouped_f <- SurvData %>%
             whostility = mean(whostility, na.rm = TRUE))
 
 
-```
+head(grouped_f)
 
+
+```
+Given that grouping is part of tidyverse, we can also use tidyselect within it. Lets say I want the mean of several variables.
+
+```{r}
+
+my_vars <- c("PolDisc", "interest", "whostility")
+
+grouped_more <- SurvData %>% 
+  mutate(across(all_of(my_vars), ~ ifelse(.x < 0, NA, .x))) %>% 
+  group_by(country, year) %>% 
+  summarise(across(all_of(my_vars), ~ mean(.x, na.rm = TRUE)))
+
+
+head(grouped_more)
+
+```
+Here we see a NaN example, where a mean of nothing is not a number, since we specified na.rm to be true. 
 
 
 ## Pivoting
+
+Say we have a dataset where differences in years are stored in columns, and we want a single row for each yearly observation. Or we have data that is more extensive than we want, and we want to limit the number of rows. This can be achieved through pivot functions, primarily `pivot_wider` and `pivot_longer` which have fairly intuitive names, they make the dataframe wider or longer, by making it shorter or narrower, respectively. Lets use a different dataset for a more applicable situation. I am here loading a dataset from a survey which is meant to measure agreement within party structures, I transform the question values to instead be distance to the mean of the party. 
+
+```{r}
+
+## Will limit this dataset to only a single party, and a couple of questions and key variables
+
+vars_i <- names(joined_sets2)[16:29]
+
+mean_values_for_transf <- joined_sets2 %>% 
+  select(parti, tid, all_of(vars_i)) %>% 
+  group_by(parti, tid) %>% 
+  summarise(across(all_of(vars_i), ~ mean(.x, na.rm = TRUE)))
+
+more_relevant_f <- joined_sets2 %>% 
+  select(kjonn, tid, parti, )
+
+```
+
 
 
 
 # Plotting
 
-To paraphrase the Beatles, all you need is ggplot. This framework allows you to plot essentially everything, although some packages obviously makes this plotting simpler, but most of them are just wrappers for ggplot code. You could write entire books worth of information on plotting with ggplot. In fact someone did, I have it if you're interested. 
+To paraphrase the Beatles, all you need is ggplot. This framework allows you to plot essentially everything, although some packages obviously makes this plotting simpler, but most of them are just wrappers for ggplot code (even some python and Julia packages use ggplot in R as a backend). You could write entire books worth of information on plotting with ggplot. In fact someone did, I have it if you're interested. 
 
 ![neat book](./images/healy_vis.jpeg)
 
@@ -400,9 +467,43 @@ ggplot() +
 
 # Advanced methods
 
+## For loops and flow control
+
+A central part of programming in most languages is the flow control and for loops. For loops in R are slower than most other languages, and usually apply family of functions is preferred, since they can basically function in the same way as for loops, with the right specifications. But knowledge of loops can give you a tool to solve certain difficult tasks where you do not want to spend a couple of hours finding a relevant function. For loops consist of the function `for(iterator in sequence)`, the iterator is the thing that changes with each loop. A for loop is an instruction to do the same task over a set of times. 
+
+Below is a simple for loop. First I create a vector of some numbers. The loop itself, I call the iterator i, and specify that I am looping over a sequence of numbers, from 1 to the length of the vector. I then use that operator as an index to the vector, so that for each iteration of the loop it prints the i vector position squared. 
+
+```{r}
+
+loopy_vector <- c(15,23,34,66,32)
+
+for(i in 1:length(loopy_vector)){
+  
+  print(loopy_vector[i]^2) ### Note that unlike outside the loop, it does not print results automatically
+
+}
+
+
+```
+For loops can interact with global variables, and assignment inside the loops are tracked in the global environment, and change variables you have in your environment, unlike lapply, which usually only changes return values. 
+
 ## Functional programming with anonymous functions
 
-If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the `lapply` function, or the general family of `apply` functions, one can assign a very efficient function to be applied over a set of elements in a list. 
+If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the `lapply` function, or the general family of `apply` functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where `lapply` is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. `sapply` will attempt to return the simplest datatype possible, `vapply` will return a vector. 
+
+
+```{r}
+
+lapply(loopy_vector, FUN = function(x){ ## x serves here as our "iterator"
+  
+  y <- x^2
+  
+  return(y)
+  
+})
+
+```
+Note that the output from the function is a list, with nested singular values, a normal method is to wrap a lapply function in an `unlist` function, or to feed the lapply to one using a pipe. 
 
 ## String manipulation
 
@@ -426,6 +527,16 @@ str_detect(this_is_a_string, "[A-Z]{1}[a-z]{2,}")
 str_extract(this_is_a_string, "[A-Z]{1}[a-z]{2,}")
 
 
+## Same but for a comma and then anything
+
+str_extract(this_is_a_string, "\\,.*")
+
+## Anything following a comma, but not the comma
+
+str_extract(this_is_a_string, "(?<=\\,).*") 
+
+# Note the space is also there
+
 ```
 
 ## Keyboard shortcuts and tips
@@ -434,5 +545,6 @@ str_extract(this_is_a_string, "[A-Z]{1}[a-z]{2,}")
 - alt + - gives an assignment operator <- 
 - shift + any arrow key, highlihgts text as you move the text entry thing
 - ctrl + shift + left/right highlights while skipping elements, so you can highlight entire words
+- If you have an entire section highlighted, you can wrap it in ", (, [, etc. By just pressing that button while having the thing highlighted
 
 There is an extensive style guide, but generally R custom is to use what is called snake case for variable and object naming. The name "SurvData" used earlier violates this by being pascalcase, a strict snake case version would be "surv_data". point being, avoid upper case letters, bind words with an underscore. Same custom goes for filenaming of R-scripts and datasets. 
