@@ -420,7 +420,7 @@ grouped_f %>%
   theme_bw() + 
   labs(title = "Here's a Title", x = "Time period", y = "Anti-women sentiment", color = "Region")
 ```
- For the final plot, I will also do some changes to the datastructure so that it visualises a bit better, there's perhaps too much space between the timings as it is. Additionally, I think the points are too small, so I will change them manually through arguments fed through the layers. 
+ For the final plot, I will also do some changes to the datastructure so that it visualises a bit better, there's perhaps too much space between the timings as it is. Additionally, I think the points are too small, so I will change them manually through arguments fed through the layers. Finally, I also add a `geom_line` which when combined in this instance, draws a line between the points, separated by the color specification, by default, `geom_` functions inherit their aesthetic from the layer previous, so the same `aes` specification is inherited from the higher level. 
  
 ```{r}
 grouped_f %>% 
@@ -432,6 +432,7 @@ grouped_f %>%
   )) %>% 
   ggplot(aes(x=wave, y = whostility, color = country)) + 
   geom_point(size = 2) + 
+  geom_line() + 
   theme_bw() + 
   scale_color_manual(values = c("cornflowerblue", "goldenrod")) + 
   labs(title = "Hostility towards women as legislators", x = "WVS Wave", y = "Hostility")
