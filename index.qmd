@@ -20,7 +20,7 @@ Welcome to a (more or less) thorough walkthrough of R in applied areas. Covers t
 
 ## Data Types
 
-Information takes several forms in R, all attached with a class, the basic forms of data that needs to be known are numeric (will appear as "double" sometimes, this is related to memory allocation, but just means more decimals numeric), integer (whole numbers), factor (text but with numbers assigned to certain values), character, and boolean (logical, true or false). Additionally there are a class of missing values, but they are all covered by NA.
+Information takes several forms in R, all attached with a class, the basic forms of data that needs to be known are numeric (will appear as "double" sometimes, this is related to memory allocation, but just means more decimals numeric), integer (whole numbers), factor (text but with numbers assigned to certain values), character, boolean (logical, true or false), and several types of Date data. Additionally there are a class of missing values, but they are all covered by NA.
 
 ```{r}
 1 + 1 ### Comments are in hashtags 
@@ -203,7 +203,21 @@ table(SurvData$gender)
 
 table(SurvData$gender, SurvData$whostility)
 ```
-Also, you can use some very simple plots to help you view the distribution, such as a density plot, or a histogram for certain values.
+Another key function to use both when exploring your data, but also when you are troubleshooting issues later, is the `class` function. Quite simply it tells you what type of data the thing you are entering is. It works both on vectors/variables, which can let you know if you are dealing with a character variable or a numeric one, but also on complex objects in your environment, so you can know whether the object you are using is appropriate for certain functions. For instance, map visualisations usually requires objects of the `sf` class, not just dataframes. 
+
+```{r}
+class(SurvData$gender)
+
+class(SurvData$country)
+
+class(df_example$happy)
+
+class(SurvData)
+
+
+```
+
+Furthermore, you can use some very simple plots to help you view the distribution, such as a density plot, or a histogram for certain values.
 
 ```{r}
 plot(density(SurvData$whostility))
@@ -255,6 +269,18 @@ table(SurvData$gender, SurvData$gender_subtracted)
 
 table(SurvData$country)
 
+
+```
+A common thing you might find with your dataset is that the variables have the wrong type. Perhaps a column that was meant to be a number was read as a character, because the idiot who made the excel sheet decided to spell out "no data" in the missing cells (these people should be executed). In many instances the simplest way of changing a variable, is to force it into another class by using an `as.` function, `as.numeric`, `as.character`, `as.Date`, and `as.double` are common variations of this. There is also the `factor` function, which allows you to create ordinal values. Where the `as.` functions are relatively simple (perhaps except the date one), factor also requires that you supply a vector of the rankings of the factor. 
+
+```{r}
+
+SurvData <- SurvData %>% 
+  mutate(gender_text = as.character(gender))
+
+class(SurvData$gender_text)
+
+head(SurvData$gender_text)
 
 ```
 
@@ -397,7 +423,9 @@ joined_lim_joined[c(3,4,64,65,556,557,1231,1232,5688, 5689,6783, 6784),] ## Inde
 ```
 Since `mean_eu` was the only variable in the aggregated set except the key variables `parti` and `tid`, this is the only new column in the merged dataset. 
 
-`left_join` is by far the most common way of joining a dataset when you want new information or elements to be added to your existing dataset. There also exist `right_join` and `full_join`, but `right_join` is practically the same as left, just less intuitive and more niche in my opinion, while `full_join` should not be used because it signals a misspecification of your datasets. 
+`left_join` is by far the most common way of joining a dataset when you want new information or elements to be added to your existing dataset. There also exist `right_join` and `full_join`, but `right_join` is practically the same as left, just less intuitive and more niche in my opinion, while `full_join` should not be used because I can rarely think of a scenario where it makes sense to use in relation to dataset specifications. 
+
+The other relevant form of merging is when you have new data that is identical in structure to the old data, but they represent perhaps new observations to that data. In this instance you seek to bind the rows together, and suitably the function is just called `bind_rows`, if the datasets are structured properly, then you can just enter two datasets in that function and it should merge them. If they are not similar, you have to data wrangle them a bit. 
 
 ## Pivoting
 
@@ -489,18 +517,18 @@ grouped_f %>%
  
 ```{r}
 grouped_f %>% 
-  mutate(wave = case_when(
+  mutate(wave = case_when(             ### Mutating to better cases, so they are parallel
     year == 1995 | year == 1996 ~ 1,
     year == 2000 | year == 2001 ~ 2,
     year == 2005 ~ 3,
     year == 2010 ~ 4
   )) %>% 
-  ggplot(aes(x=wave, y = whostility, color = country)) + 
-  geom_point(size = 2) + 
-  geom_line() + 
-  theme_bw() + 
-  scale_color_manual(values = c("cornflowerblue", "goldenrod")) + 
-  labs(title = "Hostility towards women as legislators", x = "WVS Wave", y = "Hostility")
+  ggplot(aes(x=wave, y = whostility, color = country)) +  ### Setting aesthetic
+  geom_point(size = 2) +  # Scatterplot, with 2 as size of the dots
+  geom_line() +          # make a line, inherits past aesthetics
+  theme_bw() +        # theme_bw is the best
+  scale_color_manual(values = c("cornflowerblue", "goldenrod")) +  ## Values are assigned alphabetically when set manually, so Japan gets first colour
+  labs(title = "Hostility towards women as legislators", x = "WVS Wave", y = "Hostility") ## Creating labels
 ```
 The values and precise aesthetics of a variable can be set with the function family `scale_AESTHETIC_TYPE`, which provides a large range of ways to modify the aesthetics. In the plot above I manually (therefore manual at the end) assign two values to the color aesthetic (therefore color in the middle). This function family can also modify labels and other elements. 
 
@@ -638,29 +666,53 @@ str_extract(this_is_a_string, "\\,.*")
 
 str_extract(this_is_a_string, "(?<=\\,).*") 
 
-# Note the space is also there
+# Note the space is still there
 
 ```
+Regex can get extremely complex, and string manipulation in general is a very advanced topic in terms of common R usage, I still have to google many of the characters used in these patterns, and to teach away how regex works properly could probably be an entire course or two in and of itself. 
 
 ## Keyboard shortcuts and tips
 
 - ctrl + shift + m gives a pipe %>% 
 - alt + - gives an assignment operator <- 
-- shift + any arrow key, highlihgts text as you move the text entry thing
+- shift + any arrow key, highlights text as you move the text entry thing
 - ctrl + shift + left/right highlights while skipping elements, so you can highlight entire words
 - If you have an entire section highlighted, you can wrap it in ", (, [, etc. By just pressing that button while having the thing highlighted
+- ctrl + alt + up/down, gives you more cursors, so you can add more than one line at a time. Useful for repeated entries of the same thing
 
 There is an extensive style guide, but generally R custom is to use what is called snake case for variable and object naming. The name "SurvData" used earlier violates this by being pascalcase, a strict snake case version would be "surv_data". point being, avoid upper case letters, bind words with an underscore. Same custom goes for filenaming of R-scripts and datasets. 
 
 ## Structuring your scripts
 
-Scripts are there for reproduction, you could technically run your entire code through the console, but scripts exist to ensure that you can reproduce your results, and that others can reproduce your results. For that reason it is a good idea to have a good structure to your scripts. The main elements that you should always keep in mind is: Linearity, outline, and comments. Linearity in this instance refers to a technical requirement as much as a readers requirement. It is common when beginning to write longer scripts, that you start to run elements of the code out of order. That is fine in and of itself, but becomes a problem when you start writing new code in places it does not make sense to, and when code that depends on variables specified later in your script is added. R is almost always run sequentially, if I am reviewing someone else's script, I will just highlight the entire script, and run all of it. You should ensure that your scripts will run on the first time they are done this way, therefore, be mindful of where your variable specifications are, and of where you change variables, where you create them, and when your output needs them to be used. 
+Scripts are there for reproduction, you could technically run your entire code through the console, but scripts exist to ensure that you can reproduce your results, and that others can reproduce your results. For that reason it is a good idea to have a good structure to your scripts. The main elements that you should always keep in mind is: Linearity, outline, readability, and comments. Linearity in this instance refers to a technical requirement as much as a readers requirement. It is common when beginning to write longer scripts, that you start to run elements of the code out of order. That is fine in and of itself, but becomes a problem when you start writing new code in places it does not make sense to, and when code that depends on variables specified later in your script is added. R is almost always run sequentially, if I am reviewing someone else's script, I will just highlight the entire script, and run all of it. You should ensure that your scripts will run on the first time they are done this way, therefore, be mindful of where your variable specifications are, and of where you change variables, where you create them, and when your output needs them to be used. 
 
 Outline in this instance refers to the idea that you separate your script into easily identifiable chunks. This can actually be done in the comments. If you comment 4 or more #, followed by text and then 4 or more # or -, it will create a section in your script, which can be visible from the outline command.
 
 ![outline](./images/outliners.png)
 
-You can then use this table of contents to more easily navigate the structure of your script. Additionally, creating such outlines is good to ensure the previously mentioned requirement of linearity. 
+You can then use this table of contents to more easily navigate the structure of your script. Additionally, creating such outlines is good to ensure the previously mentioned requirement of linearity.
+
+When it comes to readability, it is important that you take a couple of key steps to ensure that your code is light on the eyes and the code viewer. Remember to have proper spacing between elements of your code, below are a couple of examples of good and bad practice when it comes to writing code with spacing.
+
+```{r}
+df_example2<-df_example%>%filter(happy==FALSE) ## BAD
+df_example_2 <- df_example %>% filter(happy == FALSE) ## Good
+
+## Note the spacing between opeerators, but not between parenthesis and text. 
+
+df_example2 <- df_example %>% filter(happy == FALSE,age == 27) ## BAD
+df_example2 <- df_example %>% filter(happy == FALSE, age == 27) ## GOOD
+
+## Note that spacing after the commas, just like normal writing, is good practice
+
+```
+
+Additionally, your code should not be too wide. Perhaps you have noticed a strange grey line running down your script editor. This is the recommended width by posit, the company who makes RStudio. while it is generally fine to break this line once or twice, it should serve as a guide to how wide your script should be, to ensure that it is easy to follow. Linebreaks are automatically spaced in a nice way when you use them inside functions between arguments, as is evident from some of the code demonstrated here. Below is also an example of really bad and embarassing code from my MA thesis. 
+
+![really bad stuff](./images/bad_stuff.png)
+
+
+Finally, it is good practice to comment your code regularly. A # will turn everything on the line that follows it into a comment. Make sure that you provide the reader with some context as to how you are proceeding. 
 
 ## Quarto - creating nice documents in RStudio with code
 
