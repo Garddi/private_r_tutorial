@@ -990,7 +990,7 @@ $class
 [1] 1024</code></pre>
 </div>
 </div>
-<p>For loops can interact with global variables, and assignment inside the loops are tracked in the global environment, and change variables you have in your environment, unlike lapply, which usually only changes return values.</p>
+<p>For loops have what we call a global scope by default, meaning they can and will interact with global variables, and assignment inside the loops are tracked in the global environment, and change variables you have in your environment, unlike lapply, which usually only changes return values.</p>
 <section id="flow-control" class="level3" data-number="6.1.1">
 <h3 data-number="6.1.1" class="anchored" data-anchor-id="flow-control"><span class="header-section-number">6.1.1</span> flow control</h3>
 <p>For loops are just one version of repeating code, <code>while</code> and <code>repeat</code> also do similar things, however, I have never used them, and highly doubt the reader will do as well.</p>
@@ -1006,7 +1006,7 @@ $class
 </section>
 <section id="functional-programming-with-anonymous-functions" class="level2" data-number="6.2">
 <h2 data-number="6.2" class="anchored" data-anchor-id="functional-programming-with-anonymous-functions"><span class="header-section-number">6.2</span> Functional programming with anonymous functions</h2>
-<p>If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the <code>lapply</code> function, or the general family of <code>apply</code> functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where <code>lapply</code> is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. <code>sapply</code> will attempt to return the simplest datatype possible, <code>vapply</code> will return a vector.</p>
+<p>If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the <code>lapply</code> function, or the general family of <code>apply</code> functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where <code>lapply</code> is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. <code>sapply</code> will attempt to return the simplest datatype possible, <code>vapply</code> will return a vector. Note that these types of anonymous functions have a different scope than for loops. All variables within the function exists solely within the function and cannot be called into the global environment.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(loopy_vector, <span class="at">FUN =</span> <span class="cf">function</span>(x){ <span class="do">## x serves here as our "iterator"</span></span>
 <span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -1117,6 +1117,7 @@ $class
 <p></p><figcaption class="figure-caption">really bad stuff</figcaption><p></p>
 </figure>
 </div>
+<p>Note the absolute hell that is trying to find out if you have enough parentheses at the end of your mutate function.</p>
 <p>Finally, it is good practice to comment your code regularly. A # will turn everything on the line that follows it into a comment. Make sure that you provide the reader with some context as to how you are proceeding.</p>
 </section>
 <section id="quarto---creating-nice-documents-in-rstudio-with-code" class="level2" data-number="6.6">

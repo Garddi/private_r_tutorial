@@ -601,7 +601,7 @@ for(i in 1:length(loopy_vector)){
 
 
 ```
-For loops can interact with global variables, and assignment inside the loops are tracked in the global environment, and change variables you have in your environment, unlike lapply, which usually only changes return values. 
+For loops have what we call a global scope by default, meaning they can and will interact with global variables, and assignment inside the loops are tracked in the global environment, and change variables you have in your environment, unlike lapply, which usually only changes return values. 
 
 ### flow control
 
@@ -618,7 +618,7 @@ Flow control refers to ways in which you control a for loop or other similar ite
 
 ## Functional programming with anonymous functions
 
-If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the `lapply` function, or the general family of `apply` functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where `lapply` is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. `sapply` will attempt to return the simplest datatype possible, `vapply` will return a vector. 
+If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the `lapply` function, or the general family of `apply` functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where `lapply` is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. `sapply` will attempt to return the simplest datatype possible, `vapply` will return a vector. Note that these types of anonymous functions have a different scope than for loops. All variables within the function exists solely within the function and cannot be called into the global environment. 
 
 
 ```{r}
@@ -710,6 +710,8 @@ df_example2 <- df_example %>% filter(happy == FALSE, age == 27) ## GOOD
 Additionally, your code should not be too wide. Perhaps you have noticed a strange grey line running down your script editor. This is the recommended width by posit, the company who makes RStudio. while it is generally fine to break this line once or twice, it should serve as a guide to how wide your script should be, to ensure that it is easy to follow. Linebreaks are automatically spaced in a nice way when you use them inside functions between arguments, as is evident from some of the code demonstrated here. Below is also an example of really bad and embarassing code from my MA thesis. 
 
 ![really bad stuff](./images/bad_stuff.png)
+
+Note the absolute hell that is trying to find out if you have enough parentheses at the end of your mutate function. 
 
 
 Finally, it is good practice to comment your code regularly. A # will turn everything on the line that follows it into a comment. Make sure that you provide the reader with some context as to how you are proceeding. 
