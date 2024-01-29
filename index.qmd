@@ -158,6 +158,29 @@ mean(new_vector)
 mean(new_vector, na.rm = TRUE)
 ```
 
+## Folder structure and saving results
+
+If you want to save your resulting items, whether they be dataframes or images or tables, you need to have a good idea about what your folder structure looks like. Your console is usually set to be in a certain working directory. You can find this working directory, by using the `getwd` function.
+```{r}
+getwd()
+```
+From this working directory, you can access all files that are on your computer, if you know where they are relative to each other. Remember that all directories (or folders) are subfolders of other elements. To reach other files you navigate using / separators. So if I want to reach the files that are in a folder within my current working directory, I specify them with a / and then the subfolder. If I for instance want to know what files are in the images subfolder of my current working directory, I specify that as following.
+
+```{r}
+list.files("./images/") ## ./ means the current working directory
+```
+However, you are not limited to only subfolders in your current directory, by using two dots, instead of one, you go to the parent folder of your directory.
+
+```{r}
+list.files("../.")
+```
+Note that the folder which we saw as my working directory appears here as a directory. We can also look at the contents of parallel folders.
+
+```{r}
+list.files("../../advent_of_Code2022/scripts/")
+```
+In order to easily access most of your files and data, good folder structure is essential, I like to keep master scripts within the general topical folder, with subfolders for both data and results. When saving to these folders, you usually use a dedicated function that relates to the package eco-system that you are using, but the most simple datasets can be saved locally using `save` function, where you specify your dataset to save, and where you want to save it to. When saving outputs such as LateX tables, ggplot images and such, there are more dedicated functions.
+
 
 # Simple Analysis
 
@@ -547,6 +570,35 @@ grouped_f %>%
   labs(title = "Hostility towards women as legislators", x = "WVS Wave", y = "Hostility") ## Creating labels
 ```
 The values and precise aesthetics of a variable can be set with the function family `scale_AESTHETIC_TYPE`, which provides a large range of ways to modify the aesthetics. In the plot above I manually (therefore manual at the end) assign two values to the color aesthetic (therefore color in the middle). This function family can also modify labels and other elements. 
+
+We can also save the resulting plot, by assigning it to an object, and using the dedicated ggsave function, which allows for a ton of useful settings. 
+
+```{r}
+plot_obj <- grouped_f %>% 
+  mutate(wave = case_when(             ### Mutating to better cases, so they are parallel
+    year == 1995 | year == 1996 ~ 1,
+    year == 2000 | year == 2001 ~ 2,
+    year == 2005 ~ 3,
+    year == 2010 ~ 4
+  )) %>% 
+  ggplot(aes(x=wave, y = whostility, color = country)) +  ### Setting aesthetic
+  geom_point(size = 2) +  # Scatterplot, with 2 as size of the dots
+  geom_line() +          # make a line, inherits past aesthetics
+  theme_bw() +        # theme_bw is the best
+  scale_color_manual(values = c("cornflowerblue", "goldenrod")) +  ## Values are assigned alphabetically when set manually, so Japan gets first colour
+  labs(title = "Hostility towards women as legislators", x = "WVS Wave", y = "Hostility") ## Creating labels
+
+ggsave("plot_obj.jpeg", plot = plot_obj, device = "jpeg", path = "./images",
+       width = 12.5, height = 7.5)
+
+## and now its here, contrast with earlier listes files in images
+
+list.files("./images/")
+
+unlink("./images/plot_obj.jpeg") ## Just removing it 
+
+```
+
 
 ## Maps
 
