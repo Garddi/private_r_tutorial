@@ -5,6 +5,11 @@ format: html
 execute: 
   warning: false
 toc: true
+toc-location: right
+number-sections: true
+theme:
+  light: flatly
+  dark: darkly
 ---
 
 # Introduction
@@ -392,6 +397,8 @@ joined_lim_joined[c(3,4,64,65,556,557,1231,1232,5688, 5689,6783, 6784),] ## Inde
 ```
 Since `mean_eu` was the only variable in the aggregated set except the key variables `parti` and `tid`, this is the only new column in the merged dataset. 
 
+`left_join` is by far the most common way of joining a dataset when you want new information or elements to be added to your existing dataset. There also exist `right_join` and `full_join`, but `right_join` is practically the same as left, just less intuitive and more niche in my opinion, while `full_join` should not be used because it signals a misspecification of your datasets. 
+
 ## Pivoting
 
 Say we have a dataset where differences in years are stored in columns, and we want a single row for each yearly observation. Or we have data that is more extensive than we want, and we want to limit the number of rows. This can be achieved through pivot functions, primarily `pivot_wider` and `pivot_longer` which have fairly intuitive names, they make the dataframe wider or longer, by making it shorter or narrower, respectively. The way to use them is to feed a dataframe into it, with a pipe of course, and then, depending on wider or narrower, you have to specify which columns the names go to or from, and where the values go to and from. For a wider pivot, the new names are all a class of variables, such as a character string for instance, when specifying `names_from`, this is the variable that the new columns will be named after. 
@@ -661,4 +668,6 @@ The document you are currently reading is made through the quarto framework, whi
 
 ![here](./images/heres_quarto.png)
 
-When clicking new quarto document, you will arrive at a prompt to create one of several types of documents, the current one is an html document, but through quarto you can also create latex specified documents (I have a friend who wrote their Master thesis in RStudio, you can also use bibref through it). Quarto can also make presentations through beamer, revealjs and other engines for making presentations (even powerpoint can be made through RStudio). 
+When clicking new quarto document, you will arrive at a prompt to create one of several types of documents, the current one is an html document, but through quarto you can also create latex specified documents (I have a friend who wrote their Master thesis in RStudio, you can also use bibref through it). Quarto can also make presentations through beamer, revealjs and other engines for making presentations (even powerpoint can be made through RStudio). Following the creation of the file, you specify several settings in the YAML header, which is at the top, here you can specify settings that affect the entire document, and the way it is rendered. The YAML header for this document for instance looks like this: 
+
+![yaml](./images/yaml_header.png)
