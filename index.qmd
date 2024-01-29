@@ -614,6 +614,7 @@ Flow control refers to ways in which you control a for loop or other similar ite
 - `next`, usually nested within an if or else test, skips to the next iteration of the loop. 
 - `break`, exits the loop completely, stopping the iteration over loops, *needs* to be present in a repeat loop, or it will never stop
 - `return`, specifies what object or element within the function or loop that should be returned when the iteration is complete, by default the function will return the last object created within it.  
+- `switch`, is also base highlighted, and is in essence just a baseR version of case_when, but a fair bit more complicated, no need to learn it
 
 
 ## Functional programming with anonymous functions
@@ -630,6 +631,7 @@ lapply(loopy_vector, FUN = function(x){ ## x serves here as our "iterator"
   return(y)
   
 })
+
 
 ```
 Note that the output from the function is a list, with nested singular values, a normal method is to wrap a `lapply` function in an `unlist` function, or to feed the `lapply` to one using a pipe. 
