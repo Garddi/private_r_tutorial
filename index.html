@@ -101,10 +101,63 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#general-structure" id="toc-general-structure" class="nav-link" data-scroll-target="#general-structure">General structure</a>
+  <ul class="collapse">
+  <li><a href="#data-types" id="toc-data-types" class="nav-link" data-scroll-target="#data-types">Data Types</a></li>
+  <li><a href="#assignment" id="toc-assignment" class="nav-link" data-scroll-target="#assignment">Assignment</a>
+  <ul class="collapse">
+  <li><a href="#other-operators" id="toc-other-operators" class="nav-link" data-scroll-target="#other-operators">Other operators</a></li>
+  </ul></li>
+  <li><a href="#vectors" id="toc-vectors" class="nav-link" data-scroll-target="#vectors">Vectors</a></li>
+  <li><a href="#dataframes" id="toc-dataframes" class="nav-link" data-scroll-target="#dataframes">Dataframes</a></li>
+  <li><a href="#lists" id="toc-lists" class="nav-link" data-scroll-target="#lists">Lists</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a></li>
+  </ul></li>
+  <li><a href="#simple-analysis" id="toc-simple-analysis" class="nav-link" data-scroll-target="#simple-analysis">Simple Analysis</a>
+  <ul class="collapse">
+  <li><a href="#simple-data-structure-functions" id="toc-simple-data-structure-functions" class="nav-link" data-scroll-target="#simple-data-structure-functions">Simple data structure functions</a></li>
+  </ul></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">Data wrangling</a>
+  <ul class="collapse">
+  <li><a href="#mutating" id="toc-mutating" class="nav-link" data-scroll-target="#mutating">Mutating</a>
+  <ul class="collapse">
+  <li><a href="#ifelse-and-case-when-mutations" id="toc-ifelse-and-case-when-mutations" class="nav-link" data-scroll-target="#ifelse-and-case-when-mutations">Ifelse and Case when mutations</a></li>
+  <li><a href="#across" id="toc-across" class="nav-link" data-scroll-target="#across">Across</a></li>
+  </ul></li>
+  <li><a href="#filtering" id="toc-filtering" class="nav-link" data-scroll-target="#filtering">Filtering</a></li>
+  <li><a href="#grouping-and-aggregating" id="toc-grouping-and-aggregating" class="nav-link" data-scroll-target="#grouping-and-aggregating">Grouping and Aggregating</a></li>
+  <li><a href="#joining" id="toc-joining" class="nav-link" data-scroll-target="#joining">Joining</a></li>
+  <li><a href="#pivoting" id="toc-pivoting" class="nav-link" data-scroll-target="#pivoting">Pivoting</a></li>
+  </ul></li>
+  <li><a href="#plotting" id="toc-plotting" class="nav-link" data-scroll-target="#plotting">Plotting</a>
+  <ul class="collapse">
+  <li><a href="#layers" id="toc-layers" class="nav-link" data-scroll-target="#layers">Layers</a></li>
+  <li><a href="#maps" id="toc-maps" class="nav-link" data-scroll-target="#maps">Maps</a></li>
+  </ul></li>
+  <li><a href="#advanced-methods" id="toc-advanced-methods" class="nav-link" data-scroll-target="#advanced-methods">Advanced methods</a>
+  <ul class="collapse">
+  <li><a href="#for-loops-and-flow-control" id="toc-for-loops-and-flow-control" class="nav-link" data-scroll-target="#for-loops-and-flow-control">For loops and flow control</a>
+  <ul class="collapse">
+  <li><a href="#flow-control" id="toc-flow-control" class="nav-link" data-scroll-target="#flow-control">flow control</a></li>
+  </ul></li>
+  <li><a href="#functional-programming-with-anonymous-functions" id="toc-functional-programming-with-anonymous-functions" class="nav-link" data-scroll-target="#functional-programming-with-anonymous-functions">Functional programming with anonymous functions</a></li>
+  <li><a href="#string-manipulation" id="toc-string-manipulation" class="nav-link" data-scroll-target="#string-manipulation">String manipulation</a></li>
+  <li><a href="#keyboard-shortcuts-and-tips" id="toc-keyboard-shortcuts-and-tips" class="nav-link" data-scroll-target="#keyboard-shortcuts-and-tips">Keyboard shortcuts and tips</a></li>
+  <li><a href="#structuring-your-scripts" id="toc-structuring-your-scripts" class="nav-link" data-scroll-target="#structuring-your-scripts">Structuring your scripts</a></li>
+  <li><a href="#quarto---creating-nice-documents-in-rstudio-with-code" id="toc-quarto---creating-nice-documents-in-rstudio-with-code" class="nav-link" data-scroll-target="#quarto---creating-nice-documents-in-rstudio-with-code">Quarto - creating nice documents in RStudio with code</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -994,6 +1047,29 @@ $class
 <li>If you have an entire section highlighted, you can wrap it in “, (, [, etc. By just pressing that button while having the thing highlighted</li>
 </ul>
 <p>There is an extensive style guide, but generally R custom is to use what is called snake case for variable and object naming. The name “SurvData” used earlier violates this by being pascalcase, a strict snake case version would be “surv_data”. point being, avoid upper case letters, bind words with an underscore. Same custom goes for filenaming of R-scripts and datasets.</p>
+</section>
+<section id="structuring-your-scripts" class="level2">
+<h2 class="anchored" data-anchor-id="structuring-your-scripts">Structuring your scripts</h2>
+<p>Scripts are there for reproduction, you could technically run your entire code through the console, but scripts exist to ensure that you can reproduce your results, and that others can reproduce your results. For that reason it is a good idea to have a good structure to your scripts. The main elements that you should always keep in mind is: Linearity, outline, and comments. Linearity in this instance refers to a technical requirement as much as a readers requirement. It is common when beginning to write longer scripts, that you start to run elements of the code out of order. That is fine in and of itself, but becomes a problem when you start writing new code in places it does not make sense to, and when code that depends on variables specified later in your script is added. R is almost always run sequentially, if I am reviewing someone else’s script, I will just highlight the entire script, and run all of it. You should ensure that your scripts will run on the first time they are done this way, therefore, be mindful of where your variable specifications are, and of where you change variables, where you create them, and when your output needs them to be used.</p>
+<p>Outline in this instance refers to the idea that you separate your script into easily identifiable chunks. This can actually be done in the comments. If you comment 4 or more #, followed by text and then 4 or more # or -, it will create a section in your script, which can be visible from the outline command.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./images/outliners.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">outline</figcaption><p></p>
+</figure>
+</div>
+<p>You can then use this table of contents to more easily navigate the structure of your script. Additionally, creating such outlines is good to ensure the previously mentioned requirement of linearity.</p>
+</section>
+<section id="quarto---creating-nice-documents-in-rstudio-with-code" class="level2">
+<h2 class="anchored" data-anchor-id="quarto---creating-nice-documents-in-rstudio-with-code">Quarto - creating nice documents in RStudio with code</h2>
+<p>The document you are currently reading is made through the quarto framework, which is developed in RStudio. This framework allows for seamless creation of pdf, html, and other types of files, from your RStudio IDE. The outline files for these documents end in .qmd, and you can create a new one from the top corner of your IDE.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./images/heres_quarto.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">here</figcaption><p></p>
+</figure>
+</div>
+<p>When clicking new quarto document, you will arrive at a prompt to create one of several types of documents, the current one is an html document, but through quarto you can also create latex specified documents (I have a friend who wrote their Master thesis in RStudio, you can also use bibref through it). Quarto can also make presentations through beamer, revealjs and other engines for making presentations (even powerpoint can be made through RStudio).</p>
 </section>
 </section>
 

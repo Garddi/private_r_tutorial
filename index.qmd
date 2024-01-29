@@ -4,6 +4,7 @@ author: "Gard Olav Dietrichson"
 format: html
 execute: 
   warning: false
+toc: true
 ---
 
 # Introduction
@@ -643,3 +644,21 @@ str_extract(this_is_a_string, "(?<=\\,).*")
 - If you have an entire section highlighted, you can wrap it in ", (, [, etc. By just pressing that button while having the thing highlighted
 
 There is an extensive style guide, but generally R custom is to use what is called snake case for variable and object naming. The name "SurvData" used earlier violates this by being pascalcase, a strict snake case version would be "surv_data". point being, avoid upper case letters, bind words with an underscore. Same custom goes for filenaming of R-scripts and datasets. 
+
+## Structuring your scripts
+
+Scripts are there for reproduction, you could technically run your entire code through the console, but scripts exist to ensure that you can reproduce your results, and that others can reproduce your results. For that reason it is a good idea to have a good structure to your scripts. The main elements that you should always keep in mind is: Linearity, outline, and comments. Linearity in this instance refers to a technical requirement as much as a readers requirement. It is common when beginning to write longer scripts, that you start to run elements of the code out of order. That is fine in and of itself, but becomes a problem when you start writing new code in places it does not make sense to, and when code that depends on variables specified later in your script is added. R is almost always run sequentially, if I am reviewing someone else's script, I will just highlight the entire script, and run all of it. You should ensure that your scripts will run on the first time they are done this way, therefore, be mindful of where your variable specifications are, and of where you change variables, where you create them, and when your output needs them to be used. 
+
+Outline in this instance refers to the idea that you separate your script into easily identifiable chunks. This can actually be done in the comments. If you comment 4 or more #, followed by text and then 4 or more # or -, it will create a section in your script, which can be visible from the outline command.
+
+![outline](./images/outliners.png)
+
+You can then use this table of contents to more easily navigate the structure of your script. Additionally, creating such outlines is good to ensure the previously mentioned requirement of linearity. 
+
+## Quarto - creating nice documents in RStudio with code
+
+The document you are currently reading is made through the quarto framework, which is developed in RStudio. This framework allows for seamless creation of pdf, html, and other types of files, from your RStudio IDE. The outline files for these documents end in .qmd, and you can create a new one from the top corner of your IDE. 
+
+![here](./images/heres_quarto.png)
+
+When clicking new quarto document, you will arrive at a prompt to create one of several types of documents, the current one is an html document, but through quarto you can also create latex specified documents (I have a friend who wrote their Master thesis in RStudio, you can also use bibref through it). Quarto can also make presentations through beamer, revealjs and other engines for making presentations (even powerpoint can be made through RStudio). 
