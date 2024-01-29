@@ -253,6 +253,22 @@ SurvData %>%
 mean(pull(SurvData, whostility), na.rm = TRUE)
 
 ```
+## Dealing with bad names
+
+Often times your data imported from excel will have really bad names, rife with capitalisation and spacing. Ideally you want a dataset where variables do not have these things, so it is easier to memorize and enter into R. If I face this issue I will often utilize the janitor package, which can clean names into something more coherent. If there is space for instance in the variable name, then it has to be wrapped in the ` signs, which can be complicated to type out when auto-complete is not available. 
+
+```{r}
+library(janitor)
+
+df_example$`This Name is REALLY bad 120` <- "BAD"
+
+names(df_example)
+
+df_example <- clean_names(df_example)
+
+names(df_example)
+
+```
 
 
 ## Mutating
