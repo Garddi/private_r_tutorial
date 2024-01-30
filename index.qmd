@@ -51,7 +51,7 @@ hello <- 23
 
 hello ## Calling the object prints the content by default
 ```
-
+There also exists a `<<-` assignment operator, which can assign objects on a global scope within function environments, but this word salad is too advanced for this simple tutorial.
 
 ### Other operators
 
@@ -64,6 +64,7 @@ Other operators become important when discussing logical tests or other mathemat
 - &, |, Binding operators for more logical tests & (AND operator) requires both elements to be true, while | (OR operator) requires only one to be true
 - %in% Contained logical test, is there a unit in this other element which is strictly equal to the first thing.
 - ! in general reverses the proceeding logical test, so if you write `!("YES" == "YES")` it will ask if the thing inside the parenthesis _is not_ the case, reversing the logical test. 
+- :, integer operator, creates a vector of elements between the starting points. `1:7` will create a vector of whole numbers from 1 to and including 7
 
 ```{r}
 "Yes" == "Yes"
@@ -75,6 +76,10 @@ Other operators become important when discussing logical tests or other mathemat
 "Yes" != "No"
 
 "Yes" %in% c("No", "no", "Maybe", "Yes")
+
+### R is also what is called "loosely" typed, so this works
+
+3 == "3" ## Equal even tho they are different types of data
 
 ```
 
@@ -478,7 +483,7 @@ Lets use a different dataset for a more applicable situation. I am here loading 
 ## Will limit this dataset to only a single party, and a couple of questions and key variables
 ## Ignore the complex code, it might make sense later
 
-vars_i <- names(joined_sets2)[16:29]
+vars_i <- names(joined_sets2)[16:29] ## I know columns 16:29 are the ones I want
 
 mean_values_for_transf <- joined_sets2 %>% 
   select(parti, tid, all_of(vars_i)) %>% 
@@ -687,7 +692,7 @@ Flow control refers to ways in which you control a for loop or other similar ite
 
 ## Functional programming with anonymous functions
 
-If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the `lapply` function, or the general family of `apply` functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where `lapply` is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. `sapply` will attempt to return the simplest datatype possible, `vapply` will return a vector. Note that these types of anonymous functions have a different scope than for loops. All variables within the function exists solely within the function and cannot be called into the global environment. 
+If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the `lapply` function, or the general family of `apply` functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where `lapply` is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. `sapply` will attempt to return the simplest datatype possible, `vapply` will return a vector. Note that these types of anonymous functions have a different scope than for loops. All variables within the function exists solely within the function and cannot be called into the global environment. As previously mentioned this can be circumvented with the global environment assignment operator `<<-` but there is rarely a situation where the usage is necessary.  
 
 
 ```{r}
@@ -703,6 +708,64 @@ lapply(loopy_vector, FUN = function(x){ ## x serves here as our "iterator"
 
 ```
 Note that the output from the function is a list, with nested singular values, a normal method is to wrap a `lapply` function in an `unlist` function, or to feed the `lapply` to one using a pipe. 
+
+I demonstrate a more complex code chunk below, I will create a function that estimates Pi based on Monte Carlo sampling. 
+
+```{r}
+
+sample_nums <- c(10, 100, 1000, 10000)
+
+
+lapply(sample_nums, function(x){
+  
+  x_coord <- runif(x, min = 0, max = 1)    ## Randomly create coordinates in a 1x1 square
+  y_coord <- runif(x, min = 0, max = 1)    ## Note i use the x iterator as numbers of samples
+  
+  dist <- sqrt(x_coord^2 + y_coord^2) ## Measure their distance to origin
+  withiners <- ifelse(dist <= 1, TRUE, FALSE)   ## If they have 1 or less in dist, they are inside the circle
+  
+  pi <- (sum(withiners)*4)/x ## the share of dots inside the circle multiplied by 4 is pi
+  
+  
+  key <- paste0("Using ", x, " Samples, Pi is estimated to be ", pi, " (ish)") ## Create a return message
+  
+  return(key)
+  
+}) %>% unlist() ## Unlisting the results
+
+
+```
+For a more practical point, I will demonstrate using a lapply function to create a new variable in our old dataset. Let's say I want to construct an "anti-establishment" index, which is a function of opposition to EU or EEA, opposition to public services, opposition to gender equality, and extreme position on the left_right scale. In this instance I will utilize an `apply` function which will go over the rows of the dataset, in only the columns I want. When specifying a margin for the simple `apply` function, it will take either the rows or columns specified and turn them into vectors, so note that the iterator below can be indexed over, to get the relevant variable.
+
+```{r}
+vars_ext <- c("eu", "eea", "off_tjen", "likestilling", "left_right")
+
+
+joined_sets2$anti_establishment <- apply(joined_sets2[, vars_ext], MARGIN = 1, ## Margin argument specifies to view each extract by row or column
+                                         FUN = function(x){
+                                           
+                                           opposed_eu <- ifelse(x[1] > 4, 1, 0) ## If answered 5, completely disagree, then val 1
+                                           
+                                           opposed_eea <- ifelse(x[2] < 2, 1, 0) # This one is framed reverse
+                                           
+                                           opposed_public <- ifelse(x[3] > 4, 1, 0)
+                                           
+                                           opposed_equal <- ifelse(x[4] > 4, 1, 0)
+                                           
+                                           extreme <- ifelse(x[5] > 7 | x[5] < 3, 1, 0)
+                                           
+                                           anti_val <- mean(c(opposed_eu, opposed_eea, opposed_public, # index is the mean of these values
+                                                            opposed_equal, extreme), na.rm = TRUE)
+                                           
+                                           return(anti_val)
+                                           
+                                         })
+
+
+table(joined_sets2$anti_establishment)
+
+```
+Obviously more complicated operations can be done, but essentially this is here to demonstrate how you take several columns input to make a new variable, a process which can get tricky and complicated within a simple dplyr `mutate` function. 
 
 If you know what you unit you want to do the same thing over and over again for, you do practically anything with an `apply` function. A good idea is to practice situations with it, because then when you are faced with an unfamiliar problem, you can go straight to work fixing the issue, rather than searching for obscure packages with functions that do the thing you want. 
 
@@ -762,7 +825,7 @@ Outline in this instance refers to the idea that you separate your script into e
 
 You can then use this table of contents to more easily navigate the structure of your script. Additionally, creating such outlines is good to ensure the previously mentioned requirement of linearity.
 
-When it comes to readability, it is important that you take a couple of key steps to ensure that your code is light on the eyes and the code viewer. Remember to have proper spacing between elements of your code, below are a couple of examples of good and bad practice when it comes to writing code with spacing.
+When it comes to readability, it is important that you take a couple of key steps to ensure that your code is light on the eyes and the code viewer. Remember to have proper spacing between elements of your code, below are a couple of examples of good and bad practice when it comes to writing code with spacing. Note that you should also actively use linespacing to create blocks or separate code from each other. 
 
 ```{r}
 df_example2<-df_example%>%filter(happy==FALSE) ## BAD
@@ -771,7 +834,7 @@ df_example_2 <- df_example %>% filter(happy == FALSE) ## Good
 ## Note the spacing between opeerators, but not between parenthesis and text. 
 
 df_example2 <- df_example %>% filter(happy == FALSE,age == 27) ## BAD
-df_example2 <- df_example %>% filter(happy == FALSE, age == 27) ## GOOD
+df_example_2 <- df_example %>% filter(happy == FALSE, age == 27) ## GOOD
 
 ## Note that spacing after the commas, just like normal writing, is good practice
 
