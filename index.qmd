@@ -265,7 +265,7 @@ attributes(joined_sets2$straff)
 
 # Data wrangling
 
-Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. Selecting in tidyverse also supports something called tidyselect functions, which allows you to select certain variables based on a pattern, such as the `starts_with` function, which selects all variables that start with a specified string pattern. If you have a vector of your variable names you can also use the `all_of` function to select all of thoes. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.
+Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.
 
 ```{r}
 library(tidyverse)
@@ -297,6 +297,7 @@ df_example <- clean_names(df_example)
 names(df_example)
 
 ```
+
 
 
 ## Mutating
@@ -375,6 +376,69 @@ head(joined_sets2[,16:29])
 #Compared with
 head(joined_sets2_mutated[,16:29])
 
+
+```
+
+### New variables as vectors
+
+Recall that a dataframe is practically just a vector of vectors. Each column, or variable is essentially just a vector with the same length as the total dataframe. This means you can also create new variables by creating a vector of the same length and in the same order as the dataframe. Most operations you do on vectors from the dataframe will result in this kind of mergible vector. If I add together the vector-variable of `interest` and the vector variable `poldisc`, the result is simply a vector of the same length and in the same order as the dataframe. Therefore, for simple variable changes, it is sometimes easier to just assign it like this, "manually" if you will.
+
+```{r}
+length(SurvData$interest + SurvData$PolDisc)
+
+### Essentially, the following will remain true for 1:rows in dataframe
+
+(SurvData$interest + SurvData$PolDisc)[8092] == SurvData$interest[8092] + SurvData$PolDisc[8092]
+
+
+##
+
+SurvData$pol_index <- (SurvData$PolDisc + SurvData$interest)/2 ## Making the mean out of the two
+
+summary(SurvData$pol_index)
+
+```
+## Subsetting on variables
+
+Later I will go through the process for selecting away cases by `filter`, but first, as previously mentioned, there is a family of `tidyselect` functions, of which the most relevant in our instance is the normal `select` function. There are two main ways of selecting within this function, you can either select the variables you *want*, or select away the variables you *don't want*. Within a select function, if you write the names of the variables you want, then those are the ones you get in the subset, but if you write a `-` sign in front, then it means the dataset without that (or those) variable(s).
+
+```{r}
+names(SurvData) ## Note which variables I do have
+
+## First I only want country, gender and whostility
+
+SurvData_sub <- SurvData %>% 
+  select(country, gender, whostility)
+
+names(SurvData_sub)  
+
+
+## Now lets select away PolDisc and interest
+
+SurvData_sub <- SurvData %>% 
+  select(-PolDisc, -interest)
+
+
+names(SurvData_sub)
+
+```
+Selecting in tidyverse is also supported by a range of other specific tidyselect functions, which allows you to select certain variables based on a pattern, such as the `starts_with` function, which selects all variables that start with a specified string pattern. If you have a vector of your variable names you can also use the `all_of` function to select all of those. This might not seem so useful here, but a general recommendation is that if you are repeating a process more than twice, it is always useful to write a simpler process like a function or a variable for it.  
+
+```{r}
+vars_i_want <- c("gender", "country", "whostility")
+
+SurvData_sub <- SurvData %>% 
+  select(all_of(vars_i_want))
+
+names(SurvData_sub)
+
+### On a pattern with starts_with
+
+SurvData_sub <- SurvData %>% 
+  select(starts_with("gender"))
+
+
+names(SurvData_sub)
 
 ```
 
@@ -709,11 +773,11 @@ lapply(loopy_vector, FUN = function(x){ ## x serves here as our "iterator"
 ```
 Note that the output from the function is a list, with nested singular values, a normal method is to wrap a `lapply` function in an `unlist` function, or to feed the `lapply` to one using a pipe. 
 
-I demonstrate a more complex code chunk below, I will create a function that estimates Pi based on Monte Carlo sampling. 
+I demonstrate a more complex code chunk below, I will create a function that estimates Pi based on Monte Carlo sampling. Note the usage of local variables assigned, as well as the different usages of the iterator. Given that we are "looping" over the vector of different number, the iterator in each sequence becomes the number from the vector. 
 
 ```{r}
 
-sample_nums <- c(10, 100, 1000, 10000)
+sample_nums <- c(10, 100, 1000, 10000, 100000)
 
 
 lapply(sample_nums, function(x){
@@ -807,6 +871,7 @@ Regex can get extremely complex, and string manipulation in general is a very ad
 ## Keyboard shortcuts and tips
 
 - ctrl + shift + m gives a pipe %>% 
+- ctrl + shift + n creates a new script, useful for drafting purposes (sometimes)
 - alt + - gives an assignment operator <- 
 - shift + any arrow key, highlights text as you move the text entry thing
 - ctrl + shift + left/right highlights while skipping elements, so you can highlight entire words
