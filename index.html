@@ -155,7 +155,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul class="collapse">
   <li><a href="#flow-control" id="toc-flow-control" class="nav-link" data-scroll-target="#flow-control"><span class="toc-section-number">6.1.1</span>  flow control</a></li>
   </ul></li>
-  <li><a href="#functional-programming-with-anonymous-functions" id="toc-functional-programming-with-anonymous-functions" class="nav-link" data-scroll-target="#functional-programming-with-anonymous-functions"><span class="toc-section-number">6.2</span>  Functional programming with anonymous functions</a></li>
+  <li><a href="#functional-programming-with-anonymous-functions" id="toc-functional-programming-with-anonymous-functions" class="nav-link" data-scroll-target="#functional-programming-with-anonymous-functions"><span class="toc-section-number">6.2</span>  Functional programming with anonymous functions</a>
+  <ul class="collapse">
+  <li><a href="#a-very-complicated-for-loop" id="toc-a-very-complicated-for-loop" class="nav-link" data-scroll-target="#a-very-complicated-for-loop"><span class="toc-section-number">6.2.1</span>  A very complicated for loop</a></li>
+  </ul></li>
   <li><a href="#string-manipulation" id="toc-string-manipulation" class="nav-link" data-scroll-target="#string-manipulation"><span class="toc-section-number">6.3</span>  String manipulation</a></li>
   <li><a href="#keyboard-shortcuts-and-tips" id="toc-keyboard-shortcuts-and-tips" class="nav-link" data-scroll-target="#keyboard-shortcuts-and-tips"><span class="toc-section-number">6.4</span>  Keyboard shortcuts and tips</a></li>
   <li><a href="#structuring-your-scripts" id="toc-structuring-your-scripts" class="nav-link" data-scroll-target="#structuring-your-scripts"><span class="toc-section-number">6.5</span>  Structuring your scripts</a></li>
@@ -1248,11 +1251,11 @@ $class
 <span id="cb162-18"><a href="#cb162-18" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb162-19"><a href="#cb162-19" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="do">## Unlisting the results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Using 10 Samples, Pi is estimated to be 2.4 (ish)"       
-[2] "Using 100 Samples, Pi is estimated to be 2.68 (ish)"     
-[3] "Using 1000 Samples, Pi is estimated to be 3.124 (ish)"   
-[4] "Using 10000 Samples, Pi is estimated to be 3.1288 (ish)" 
-[5] "Using 1e+05 Samples, Pi is estimated to be 3.13924 (ish)"</code></pre>
+<pre><code>[1] "Using 10 Samples, Pi is estimated to be 3.6 (ish)"       
+[2] "Using 100 Samples, Pi is estimated to be 3.48 (ish)"     
+[3] "Using 1000 Samples, Pi is estimated to be 3.144 (ish)"   
+[4] "Using 10000 Samples, Pi is estimated to be 3.158 (ish)"  
+[5] "Using 1e+05 Samples, Pi is estimated to be 3.13416 (ish)"</code></pre>
 </div>
 </div>
 <p>For a more practical point, I will demonstrate using a lapply function to create a new variable in our old dataset. Let’s say I want to construct an “anti-establishment” index, which is a function of opposition to EU or EEA, opposition to public services, opposition to gender equality, and extreme position on the left_right scale. In this instance I will utilize an <code>apply</code> function which will go over the rows of the dataset, in only the columns I want. When specifying a margin for the simple <code>apply</code> function, it will take either the rows or columns specified and turn them into vectors, so note that the iterator below can be indexed over, to get the relevant variable.</p>
@@ -1294,44 +1297,170 @@ $class
 </div>
 <p>Obviously more complicated operations can be done, but essentially this is here to demonstrate how you take several columns input to make a new variable, a process which can get tricky and complicated within a simple dplyr <code>mutate</code> function.</p>
 <p>If you know what you unit you want to do the same thing over and over again for, you do practically anything with an <code>apply</code> function. A good idea is to practice situations with it, because then when you are faced with an unfamiliar problem, you can go straight to work fixing the issue, rather than searching for obscure packages with functions that do the thing you want.</p>
+<section id="a-very-complicated-for-loop" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="a-very-complicated-for-loop"><span class="header-section-number">6.2.1</span> A very complicated for loop</h3>
+<p>Below is an example of a working loop that would take text information about zambian mp’s and turn them into “spells” or period rows, where each row is an mp’s time in a particular role. There is a heavy use of regular expressions, but the point is to demonstrate how one can go from a brick of text, into a dataset. Try returning to it at some later points, to see how your understanding of the process has improved. The dataset has simply three relevant variables, start, stop, and portfolio. Start is the starting date of the MP’s period in parliament, and stop is the end of their time in this period of parliament. Meanwhile, portfolio is a long text that summarises their career, including roles in government. These roles were described as “… minister of local government (1976-1983)”. The goal of the loop is to then split this info, into rows where each row is one such period, so the previously mentioned portfolio becomes one row for the time the MP spent as a minister of local government, then more rows for the other time periods.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a>mps2 <span class="ot">&lt;-</span> mps <span class="sc">%&gt;%</span> </span>
+<span id="cb166-2"><a href="#cb166-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.character</span>(start),</span>
+<span id="cb166-3"><a href="#cb166-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">stop =</span> <span class="fu">ifelse</span>(stop <span class="sc">==</span> <span class="st">"Active"</span>, <span class="st">"2023-01-01"</span>, stop)) <span class="do">## Turns the start and stop to characters, and replaces "ACTIVE" with current year</span></span>
+<span id="cb166-4"><a href="#cb166-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb166-5"><a href="#cb166-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(mps2)){</span>
+<span id="cb166-6"><a href="#cb166-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb166-7"><a href="#cb166-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">is.na</span>(mps2<span class="sc">$</span>portfolio[i])){ <span class="do">## If it has no portfolio, then assume the entire period is just an mp, put it back in the list</span></span>
+<span id="cb166-8"><a href="#cb166-8" aria-hidden="true" tabindex="-1"></a>    mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,]</span>
+<span id="cb166-9"><a href="#cb166-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">next</span></span>
+<span id="cb166-10"><a href="#cb166-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb166-11"><a href="#cb166-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb166-12"><a href="#cb166-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">str_detect</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)){ <span class="co"># If the portfolio has no (year_start - year_end) parts, then go next</span></span>
+<span id="cb166-13"><a href="#cb166-13" aria-hidden="true" tabindex="-1"></a>    mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,]</span>
+<span id="cb166-14"><a href="#cb166-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">next</span></span>
+<span id="cb166-15"><a href="#cb166-15" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb166-16"><a href="#cb166-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb166-17"><a href="#cb166-17" aria-hidden="true" tabindex="-1"></a>    tm1 <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>) <span class="do">## First 4 digit number</span></span>
+<span id="cb166-18"><a href="#cb166-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb166-19"><a href="#cb166-19" aria-hidden="true" tabindex="-1"></a>    tm2 <span class="ot">&lt;-</span> <span class="fu">str_extract_all</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>] <span class="do">## Second 4 digit number</span></span>
+<span id="cb166-20"><a href="#cb166-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb166-21"><a href="#cb166-21" aria-hidden="true" tabindex="-1"></a>    spells_info_counter <span class="ot">&lt;-</span> <span class="fu">str_count</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>) <span class="co"># counting the amount of roles the mp has had</span></span>
+<span id="cb166-22"><a href="#cb166-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb166-23"><a href="#cb166-23" aria-hidden="true" tabindex="-1"></a>    t_start <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>start[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="co"># extracting the total period start</span></span>
+<span id="cb166-24"><a href="#cb166-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb166-25"><a href="#cb166-25" aria-hidden="true" tabindex="-1"></a>    t_end <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>stop[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="co"># and end</span></span>
+<span id="cb166-26"><a href="#cb166-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb166-27"><a href="#cb166-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(tm1 <span class="sc">==</span> t_start <span class="sc">&amp;</span> tm2 <span class="sc">==</span> t_end <span class="sc">&amp;</span> <span class="sc">!</span>(<span class="fu">is.na</span>(tm2))){ <span class="co"># if they are equal, then the role covers the entire period</span></span>
+<span id="cb166-28"><a href="#cb166-28" aria-hidden="true" tabindex="-1"></a>      mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,] <span class="co"># return to the list, go next</span></span>
+<span id="cb166-29"><a href="#cb166-29" aria-hidden="true" tabindex="-1"></a>      <span class="cf">next</span></span>
+<span id="cb166-30"><a href="#cb166-30" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
+<span id="cb166-31"><a href="#cb166-31" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-32"><a href="#cb166-32" aria-hidden="true" tabindex="-1"></a>      spell_list <span class="ot">&lt;-</span> <span class="fu">list</span>() <span class="co"># create an empty list to put all the roles into</span></span>
+<span id="cb166-33"><a href="#cb166-33" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-34"><a href="#cb166-34" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>spells_info_counter){ <span class="co"># for every time it found a role </span></span>
+<span id="cb166-35"><a href="#cb166-35" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-36"><a href="#cb166-36" aria-hidden="true" tabindex="-1"></a>        curr_span <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">unlist</span>(<span class="fu">str_extract_all</span>(<span class="fu">str_extract_all</span>(mps<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>))) <span class="co"># get that exact role span</span></span>
+<span id="cb166-37"><a href="#cb166-37" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-38"><a href="#cb166-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="fu">all</span>(curr_span <span class="sc">&gt;</span> t_end) <span class="sc">|</span> <span class="fu">all</span>(curr_span <span class="sc">&lt;</span> t_start)){ <span class="co"># if it is outside the range of the current row, ignore, go next in the role list</span></span>
+<span id="cb166-39"><a href="#cb166-39" aria-hidden="true" tabindex="-1"></a>          <span class="cf">next</span></span>
+<span id="cb166-40"><a href="#cb166-40" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb166-41"><a href="#cb166-41" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-42"><a href="#cb166-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>((<span class="fu">max</span>(curr_span) <span class="sc">==</span> t_start <span class="sc">|</span> <span class="fu">min</span>(curr_span) <span class="sc">==</span> t_end) <span class="sc">&amp;</span> <span class="fu">length</span>(curr_span) <span class="sc">!=</span> <span class="dv">1</span>){</span>
+<span id="cb166-43"><a href="#cb166-43" aria-hidden="true" tabindex="-1"></a>          <span class="cf">next</span></span>
+<span id="cb166-44"><a href="#cb166-44" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb166-45"><a href="#cb166-45" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-46"><a href="#cb166-46" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-47"><a href="#cb166-47" aria-hidden="true" tabindex="-1"></a>        spell_list[[j]]  <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
+<span id="cb166-48"><a href="#cb166-48" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">role =</span> <span class="fu">str_split</span>(portfolio, <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d{4}(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d{4})?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="do">## Find the role, string of everything before the time period identifier</span></span>
+<span id="cb166-49"><a href="#cb166-49" aria-hidden="true" tabindex="-1"></a>                 <span class="at">role_span =</span> <span class="fu">str_extract_all</span>(portfolio, <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="co"># find the span of the role, the (start - stop) string</span></span>
+<span id="cb166-50"><a href="#cb166-50" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">ifelse</span>(<span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="sc">&lt;=</span> t_start, start, <span class="co"># if the start was before this row, then the rowstart is the start</span></span>
+<span id="cb166-51"><a href="#cb166-51" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>)), <span class="co"># else the actual first part of the (start-stop) string</span></span>
+<span id="cb166-52"><a href="#cb166-52" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop  =</span> <span class="fu">ifelse</span>(<span class="fu">str_count</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>) <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>), <span class="co"># same with stop, but for the end</span></span>
+<span id="cb166-53"><a href="#cb166-53" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">ifelse</span>(<span class="fu">str_extract_all</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>] <span class="sc">&gt;=</span> t_end,</span>
+<span id="cb166-54"><a href="#cb166-54" aria-hidden="true" tabindex="-1"></a>                                       stop,</span>
+<span id="cb166-55"><a href="#cb166-55" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">str_extract_all</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>])),</span>
+<span id="cb166-56"><a href="#cb166-56" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">as.Date</span>(<span class="fu">ifelse</span>(<span class="fu">is.numeric</span>(start), start,</span>
+<span id="cb166-57"><a href="#cb166-57" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">as.Date</span>(<span class="fu">paste0</span>(start, <span class="st">"-1-1"</span>), <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)), <span class="co"># turn it in to the Date format</span></span>
+<span id="cb166-58"><a href="#cb166-58" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">origin =</span> <span class="st">"1970-01-01"</span>),</span>
+<span id="cb166-59"><a href="#cb166-59" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop =</span> <span class="fu">as.Date</span>(<span class="fu">ifelse</span>(<span class="fu">is.numeric</span>(stop), stop,</span>
+<span id="cb166-60"><a href="#cb166-60" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">as.Date</span>(<span class="fu">paste0</span>(stop, <span class="st">"-12-31"</span>), <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)),</span>
+<span id="cb166-61"><a href="#cb166-61" aria-hidden="true" tabindex="-1"></a>                                <span class="at">origin =</span> <span class="st">"1970-01-01"</span>),</span>
+<span id="cb166-62"><a href="#cb166-62" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">as.character</span>(start), <span class="co"># turn that into text again, so we have exact dates to work with</span></span>
+<span id="cb166-63"><a href="#cb166-63" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop =</span> <span class="fu">as.character</span>(stop)</span>
+<span id="cb166-64"><a href="#cb166-64" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb166-65"><a href="#cb166-65" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-66"><a href="#cb166-66" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb166-67"><a href="#cb166-67" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-68"><a href="#cb166-68" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">is_empty</span>(spell_list)){ <span class="co"># if it for some reason returned empty, cause no periods to loop over, they were just an elected member in this period</span></span>
+<span id="cb166-69"><a href="#cb166-69" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
+<span id="cb166-70"><a href="#cb166-70" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">role =</span> <span class="st">"Elected Member"</span>)</span>
+<span id="cb166-71"><a href="#cb166-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">next</span></span>
+<span id="cb166-72"><a href="#cb166-72" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb166-73"><a href="#cb166-73" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-74"><a href="#cb166-74" aria-hidden="true" tabindex="-1"></a>      speller_list <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(spell_list) <span class="co"># turn the roles into a list</span></span>
+<span id="cb166-75"><a href="#cb166-75" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-76"><a href="#cb166-76" aria-hidden="true" tabindex="-1"></a>      Y_Periods <span class="ot">&lt;-</span> speller_list <span class="sc">%&gt;%</span> </span>
+<span id="cb166-77"><a href="#cb166-77" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.Date</span>(start, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb166-78"><a href="#cb166-78" aria-hidden="true" tabindex="-1"></a>               <span class="at">stop =</span> <span class="fu">as.Date</span>(stop, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)) <span class="sc">%&gt;%</span>  <span class="do">## Back into dates again</span></span>
+<span id="cb166-79"><a href="#cb166-79" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">int_int =</span> <span class="fu">interval</span>(start,stop)) <span class="sc">%&gt;%</span>  <span class="co"># create an interval between the start and the stop</span></span>
+<span id="cb166-80"><a href="#cb166-80" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(int_int)</span>
+<span id="cb166-81"><a href="#cb166-81" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-82"><a href="#cb166-82" aria-hidden="true" tabindex="-1"></a>      X_Period <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
+<span id="cb166-83"><a href="#cb166-83" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.Date</span>(start, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb166-84"><a href="#cb166-84" aria-hidden="true" tabindex="-1"></a>               <span class="at">stop =</span> <span class="fu">as.Date</span>(stop, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)) <span class="sc">%&gt;%</span>  <span class="do">## Create a frame with the total interval for the row</span></span>
+<span id="cb166-85"><a href="#cb166-85" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">int_int =</span> <span class="fu">interval</span>(start,stop)) <span class="sc">%&gt;%</span> </span>
+<span id="cb166-86"><a href="#cb166-86" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(int_int)</span>
+<span id="cb166-87"><a href="#cb166-87" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-88"><a href="#cb166-88" aria-hidden="true" tabindex="-1"></a>      seq_X <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">seq</span>(<span class="fu">int_start</span>(X_Period), <span class="fu">int_end</span>(X_Period), <span class="at">by =</span> <span class="st">"1 day"</span>))</span>
+<span id="cb166-89"><a href="#cb166-89" aria-hidden="true" tabindex="-1"></a>      seq_Y <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">do.call</span>(<span class="st">"c"</span>, <span class="fu">lapply</span>(Y_Periods, <span class="cf">function</span>(x)</span>
+<span id="cb166-90"><a href="#cb166-90" aria-hidden="true" tabindex="-1"></a>        <span class="fu">seq</span>(<span class="fu">int_start</span>(x), <span class="fu">int_end</span>(x), <span class="at">by =</span> <span class="st">"1 day"</span>))))</span>
+<span id="cb166-91"><a href="#cb166-91" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-92"><a href="#cb166-92" aria-hidden="true" tabindex="-1"></a>      unique_dates_X <span class="ot">&lt;-</span> seq_X[<span class="sc">!</span>seq_X <span class="sc">%in%</span> seq_Y] <span class="do">## find the sequence of time not covered by these roles</span></span>
+<span id="cb166-93"><a href="#cb166-93" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb166-94"><a href="#cb166-94" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">is_empty</span>(unique_dates_X)){ <span class="co"># if there are no times they have no role, go next</span></span>
+<span id="cb166-95"><a href="#cb166-95" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> speller_list</span>
+<span id="cb166-96"><a href="#cb166-96" aria-hidden="true" tabindex="-1"></a>        <span class="cf">next</span></span>
+<span id="cb166-97"><a href="#cb166-97" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span> {</span>
+<span id="cb166-98"><a href="#cb166-98" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-99"><a href="#cb166-99" aria-hidden="true" tabindex="-1"></a>        lst <span class="ot">&lt;-</span> <span class="fu">aggregate</span>( <span class="do">### Create an aggregate of the timeholes</span></span>
+<span id="cb166-100"><a href="#cb166-100" aria-hidden="true" tabindex="-1"></a>          unique_dates_X,</span>
+<span id="cb166-101"><a href="#cb166-101" aria-hidden="true" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">list</span>(<span class="fu">cumsum</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">diff.Date</span>(unique_dates_X) <span class="sc">!=</span> <span class="dv">1</span>))),</span>
+<span id="cb166-102"><a href="#cb166-102" aria-hidden="true" tabindex="-1"></a>          <span class="at">FUN =</span> <span class="cf">function</span>(x) <span class="fu">c</span>(<span class="fu">min</span>(x), <span class="fu">max</span>(x)),</span>
+<span id="cb166-103"><a href="#cb166-103" aria-hidden="true" tabindex="-1"></a>          <span class="at">simplify =</span> F)<span class="sc">$</span>x    </span>
+<span id="cb166-104"><a href="#cb166-104" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-105"><a href="#cb166-105" aria-hidden="true" tabindex="-1"></a>        my_ints <span class="ot">&lt;-</span> <span class="fu">lapply</span>(lst, <span class="cf">function</span>(x) <span class="fu">interval</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>])) <span class="do">## Create a new interval of this</span></span>
+<span id="cb166-106"><a href="#cb166-106" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-107"><a href="#cb166-107" aria-hidden="true" tabindex="-1"></a>        l_fram <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">inter_start =</span> <span class="fu">sapply</span>(<span class="fu">lapply</span>(my_ints, <span class="at">FUN =</span> int_start), as.character),</span>
+<span id="cb166-108"><a href="#cb166-108" aria-hidden="true" tabindex="-1"></a>                             <span class="at">inter_end =</span> <span class="fu">sapply</span>(<span class="fu">lapply</span>(my_ints, <span class="at">FUN =</span> int_end), as.character))</span>
+<span id="cb166-109"><a href="#cb166-109" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-110"><a href="#cb166-110" aria-hidden="true" tabindex="-1"></a>        new_adds <span class="ot">&lt;-</span> <span class="fu">cbind</span>(mps2[i,], l_fram) <span class="sc">%&gt;%</span>  <span class="do">## Pull a copy of the original row for personal info</span></span>
+<span id="cb166-111"><a href="#cb166-111" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">start =</span> inter_start, <span class="at">stop =</span> inter_end, <span class="co"># mutat to end and start from the interval we created.</span></span>
+<span id="cb166-112"><a href="#cb166-112" aria-hidden="true" tabindex="-1"></a>                 <span class="at">role =</span> <span class="st">"Elected Member"</span>) <span class="do">## The empty times is when they were just an elected member</span></span>
+<span id="cb166-113"><a href="#cb166-113" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb166-114"><a href="#cb166-114" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> speller_list <span class="sc">%&gt;%</span> <span class="do">## Add it to the total list</span></span>
+<span id="cb166-115"><a href="#cb166-115" aria-hidden="true" tabindex="-1"></a>          <span class="fu">bind_rows</span>(new_adds)</span>
+<span id="cb166-116"><a href="#cb166-116" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb166-117"><a href="#cb166-117" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb166-118"><a href="#cb166-118" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb166-119"><a href="#cb166-119" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb166-120"><a href="#cb166-120" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 </section>
 <section id="string-manipulation" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="string-manipulation"><span class="header-section-number">6.3</span> String manipulation</h2>
 <p>I will not go into details in this section, but will make it clear that character variables can be utilized in many different ways through what is known as regular expressions or regex, which are lines of very silly text which can be used as pattern matching to strings as data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
-<span id="cb166-2"><a href="#cb166-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-3"><a href="#cb166-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
-<span id="cb166-4"><a href="#cb166-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-5"><a href="#cb166-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb166-6"><a href="#cb166-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-7"><a href="#cb166-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
-<span id="cb166-8"><a href="#cb166-8" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
-<span id="cb166-9"><a href="#cb166-9" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
-<span id="cb166-10"><a href="#cb166-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-11"><a href="#cb166-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb167"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
+<span id="cb167-2"><a href="#cb167-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-3"><a href="#cb167-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
+<span id="cb167-4"><a href="#cb167-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-5"><a href="#cb167-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb167-6"><a href="#cb167-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-7"><a href="#cb167-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
+<span id="cb167-8"><a href="#cb167-8" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
+<span id="cb167-9"><a href="#cb167-9" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
+<span id="cb167-10"><a href="#cb167-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb167-11"><a href="#cb167-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
-<span id="cb168-2"><a href="#cb168-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb168-3"><a href="#cb168-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
+<span id="cb169-2"><a href="#cb169-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb169-3"><a href="#cb169-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Gard"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Same but for a comma and then anything</span></span>
-<span id="cb170-2"><a href="#cb170-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb170-3"><a href="#cb170-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"</span><span class="sc">\\</span><span class="st">,.*"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb171"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Same but for a comma and then anything</span></span>
+<span id="cb171-2"><a href="#cb171-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-3"><a href="#cb171-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"</span><span class="sc">\\</span><span class="st">,.*"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] ", please help"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Anything following a comma, but not the comma</span></span>
-<span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb172-3"><a href="#cb172-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"(?&lt;=</span><span class="sc">\\</span><span class="st">,).*"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb173"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Anything following a comma, but not the comma</span></span>
+<span id="cb173-2"><a href="#cb173-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb173-3"><a href="#cb173-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"(?&lt;=</span><span class="sc">\\</span><span class="st">,).*"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] " please help"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb174"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb174-1"><a href="#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the space is still there</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the space is still there</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Regex can get extremely complex, and string manipulation in general is a very advanced topic in terms of common R usage, I still have to google many of the characters used in these patterns, and to teach away how regex works properly could probably be an entire course or two in and of itself.</p>
 </section>
@@ -1361,15 +1490,15 @@ $class
 <p>You can then use this table of contents to more easily navigate the structure of your script. Additionally, creating such outlines is good to ensure the previously mentioned requirement of linearity.</p>
 <p>When it comes to readability, it is important that you take a couple of key steps to ensure that your code is light on the eyes and the code viewer. Remember to have proper spacing between elements of your code, below are a couple of examples of good and bad practice when it comes to writing code with spacing. Note that you should also actively use linespacing to create blocks or separate code from each other.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a>df_example2<span class="ot">&lt;-</span>df_example<span class="sc">%&gt;%</span><span class="fu">filter</span>(happy<span class="sc">==</span><span class="cn">FALSE</span>) <span class="do">## BAD</span></span>
-<span id="cb175-2"><a href="#cb175-2" aria-hidden="true" tabindex="-1"></a>df_example_2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="do">## Good</span></span>
-<span id="cb175-3"><a href="#cb175-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb175-4"><a href="#cb175-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Note the spacing between opeerators, but not between parenthesis and text. </span></span>
-<span id="cb175-5"><a href="#cb175-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb175-6"><a href="#cb175-6" aria-hidden="true" tabindex="-1"></a>df_example2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>,age <span class="sc">==</span> <span class="dv">27</span>) <span class="do">## BAD</span></span>
-<span id="cb175-7"><a href="#cb175-7" aria-hidden="true" tabindex="-1"></a>df_example_2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>, age <span class="sc">==</span> <span class="dv">27</span>) <span class="do">## GOOD</span></span>
-<span id="cb175-8"><a href="#cb175-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb175-9"><a href="#cb175-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Note that spacing after the commas, just like normal writing, is good practice</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb176"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a>df_example2<span class="ot">&lt;-</span>df_example<span class="sc">%&gt;%</span><span class="fu">filter</span>(happy<span class="sc">==</span><span class="cn">FALSE</span>) <span class="do">## BAD</span></span>
+<span id="cb176-2"><a href="#cb176-2" aria-hidden="true" tabindex="-1"></a>df_example_2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="do">## Good</span></span>
+<span id="cb176-3"><a href="#cb176-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-4"><a href="#cb176-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Note the spacing between opeerators, but not between parenthesis and text. </span></span>
+<span id="cb176-5"><a href="#cb176-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-6"><a href="#cb176-6" aria-hidden="true" tabindex="-1"></a>df_example2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>,age <span class="sc">==</span> <span class="dv">27</span>) <span class="do">## BAD</span></span>
+<span id="cb176-7"><a href="#cb176-7" aria-hidden="true" tabindex="-1"></a>df_example_2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>, age <span class="sc">==</span> <span class="dv">27</span>) <span class="do">## GOOD</span></span>
+<span id="cb176-8"><a href="#cb176-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-9"><a href="#cb176-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Note that spacing after the commas, just like normal writing, is good practice</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Additionally, your code should not be too wide. Perhaps you have noticed a strange grey line running down your script editor. This is the recommended width by posit, the company who makes RStudio. while it is generally fine to break this line once or twice, it should serve as a guide to how wide your script should be, to ensure that it is easy to follow. Linebreaks are automatically spaced in a nice way when you use them inside functions between arguments, as is evident from some of the code demonstrated here. Below is also an example of really bad and embarassing code from my MA thesis.</p>
 <div class="quarto-figure quarto-figure-center">

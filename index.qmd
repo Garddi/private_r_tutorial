@@ -718,6 +718,8 @@ ggplot() +
 ```
 Note that the aesthetic argument is `fill` not `colour` (I have done that mistake several times). 
 
+
+
 # Advanced methods
 
 ## For loops and flow control
@@ -832,6 +834,139 @@ table(joined_sets2$anti_establishment)
 Obviously more complicated operations can be done, but essentially this is here to demonstrate how you take several columns input to make a new variable, a process which can get tricky and complicated within a simple dplyr `mutate` function. 
 
 If you know what you unit you want to do the same thing over and over again for, you do practically anything with an `apply` function. A good idea is to practice situations with it, because then when you are faced with an unfamiliar problem, you can go straight to work fixing the issue, rather than searching for obscure packages with functions that do the thing you want. 
+
+### A very complicated for loop
+
+Below is an example of a working loop that would take text information about zambian mp's and turn them into "spells" or period rows, where each row is an mp's time in a particular role. There is a heavy use of regular expressions, but the point is to demonstrate how one can go from a brick of text, into a dataset. Try returning to it at some later points, to see how your understanding of the process has improved. The dataset has simply three relevant variables, start, stop, and portfolio. Start is the starting date of the MP's period in parliament, and stop is the end of their time in this period of parliament. Meanwhile, portfolio is a long text that summarises their career, including roles in government. These roles were described as "... minister of local government (1976-1983)". The goal of the loop is to then split this info, into rows where each row is one such period, so the previously mentioned portfolio becomes one row for the time the MP spent as a minister of local government, then more rows for the other time periods. 
+
+```{r}
+#| eval: false
+
+
+mps2 <- mps %>% 
+  mutate(start = as.character(start),
+         stop = ifelse(stop == "Active", "2023-01-01", stop)) ## Turns the start and stop to characters, and replaces "ACTIVE" with current year
+
+for(i in 1:nrow(mps2)){
+  
+  if(is.na(mps2$portfolio[i])){ ## If it has no portfolio, then assume the entire period is just an mp, put it back in the list
+    mps_list[[i]] <- mps2[i,]
+    next
+  }
+  
+  if(!str_detect(mps2$portfolio[i], "\\(\\d+(?:\\-\\d+)?\\)")){ # If the portfolio has no (year_start - year_end) parts, then go next
+    mps_list[[i]] <- mps2[i,]
+    next
+  }else{
+    
+    tm1 <- str_extract(mps2$portfolio[i], "\\d+") ## First 4 digit number
+    
+    tm2 <- str_extract_all(mps2$portfolio[i], "\\d+")[[1]][2] ## Second 4 digit number
+    
+    spells_info_counter <- str_count(mps2$portfolio[i], "\\(\\d+(?:\\-\\d+)?\\)") # counting the amount of roles the mp has had
+    
+    t_start <- str_extract(mps2$start[i], "\\d{4}") # extracting the total period start
+    
+    t_end <- str_extract(mps2$stop[i], "\\d{4}") # and end
+    
+    if(tm1 == t_start & tm2 == t_end & !(is.na(tm2))){ # if they are equal, then the role covers the entire period
+      mps_list[[i]] <- mps2[i,] # return to the list, go next
+      next
+    }else{
+      
+      spell_list <- list() # create an empty list to put all the roles into
+      
+      for(j in 1:spells_info_counter){ # for every time it found a role 
+        
+        curr_span <- as.numeric(unlist(str_extract_all(str_extract_all(mps$portfolio[i], "\\(\\d+(?:\\-\\d+)?\\)")[[1]][j], "\\d{4}"))) # get that exact role span
+        
+        if(all(curr_span > t_end) | all(curr_span < t_start)){ # if it is outside the range of the current row, ignore, go next in the role list
+          next
+        }
+        
+        if((max(curr_span) == t_start | min(curr_span) == t_end) & length(curr_span) != 1){
+          next
+        }
+        
+        
+        spell_list[[j]]  <- mps2[i,] %>% 
+          mutate(role = str_split(portfolio, "\\(\\d{4}(?:\\-\\d{4})?\\)")[[1]][j], ## Find the role, string of everything before the time period identifier
+                 role_span = str_extract_all(portfolio, "\\(\\d+(?:\\-\\d+)?\\)")[[1]][j], # find the span of the role, the (start - stop) string
+                 start = ifelse(str_extract(role_span, "\\d{4}") <= t_start, start, # if the start was before this row, then the rowstart is the start
+                                str_extract(role_span, "\\d{4}")), # else the actual first part of the (start-stop) string
+                 stop  = ifelse(str_count(role_span, "\\d+") == 1, str_extract(role_span, "\\d+"), # same with stop, but for the end
+                                ifelse(str_extract_all(role_span, "\\d+")[[1]][2] >= t_end,
+                                       stop,
+                                       str_extract_all(role_span, "\\d+")[[1]][2])),
+                 start = as.Date(ifelse(is.numeric(start), start,
+                                        as.Date(paste0(start, "-1-1"), format = "%Y-%m-%d")), # turn it in to the Date format
+                                 origin = "1970-01-01"),
+                 stop = as.Date(ifelse(is.numeric(stop), stop,
+                                       as.Date(paste0(stop, "-12-31"), format = "%Y-%m-%d")),
+                                origin = "1970-01-01"),
+                 start = as.character(start), # turn that into text again, so we have exact dates to work with
+                 stop = as.character(stop)
+          )
+        
+      }
+      
+      if(is_empty(spell_list)){ # if it for some reason returned empty, cause no periods to loop over, they were just an elected member in this period
+        mps_list[[i]] <- mps2[i,] %>% 
+          mutate(role = "Elected Member")
+        next
+      }
+      
+      speller_list <- bind_rows(spell_list) # turn the roles into a list
+      
+      Y_Periods <- speller_list %>% 
+        mutate(start = as.Date(start, format = "%Y-%m-%d"),
+               stop = as.Date(stop, format = "%Y-%m-%d")) %>%  ## Back into dates again
+        mutate(int_int = interval(start,stop)) %>%  # create an interval between the start and the stop
+        pull(int_int)
+      
+      X_Period <- mps2[i,] %>% 
+        mutate(start = as.Date(start, format = "%Y-%m-%d"),
+               stop = as.Date(stop, format = "%Y-%m-%d")) %>%  ## Create a frame with the total interval for the row
+        mutate(int_int = interval(start,stop)) %>% 
+        pull(int_int)
+      
+      seq_X <- as.Date(seq(int_start(X_Period), int_end(X_Period), by = "1 day"))
+      seq_Y <- as.Date(do.call("c", lapply(Y_Periods, function(x)
+        seq(int_start(x), int_end(x), by = "1 day"))))
+      
+      unique_dates_X <- seq_X[!seq_X %in% seq_Y] ## find the sequence of time not covered by these roles
+      
+      if(is_empty(unique_dates_X)){ # if there are no times they have no role, go next
+        mps_list[[i]] <- speller_list
+        next
+      }else {
+        
+        lst <- aggregate( ### Create an aggregate of the timeholes
+          unique_dates_X,
+          by = list(cumsum(c(0, diff.Date(unique_dates_X) != 1))),
+          FUN = function(x) c(min(x), max(x)),
+          simplify = F)$x    
+        
+        my_ints <- lapply(lst, function(x) interval(x[1], x[2])) ## Create a new interval of this
+        
+        l_fram <- data.frame(inter_start = sapply(lapply(my_ints, FUN = int_start), as.character),
+                             inter_end = sapply(lapply(my_ints, FUN = int_end), as.character))
+        
+        new_adds <- cbind(mps2[i,], l_fram) %>%  ## Pull a copy of the original row for personal info
+          mutate(start = inter_start, stop = inter_end, # mutat to end and start from the interval we created.
+                 role = "Elected Member") ## The empty times is when they were just an elected member
+        
+        mps_list[[i]] <- speller_list %>% ## Add it to the total list
+          bind_rows(new_adds)
+      }
+    }
+    
+  }
+}
+
+
+```
+
 
 ## String manipulation
 
