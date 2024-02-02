@@ -186,6 +186,36 @@ list.files("../../advent_of_Code2022/scripts/")
 ```
 In order to easily access most of your files and data, good folder structure is essential, I like to keep master scripts within the general topical folder, with subfolders for both data and results. When saving to these folders, you usually use a dedicated function that relates to the package eco-system that you are using, but the most simple datasets can be saved locally using `save` function, where you specify your dataset to save, and where you want to save it to. When saving outputs such as LateX tables, ggplot images and such, there are more dedicated functions.
 
+## Added Notes on Indexing
+
+Indexing variables and rows are keys to many of the later functions that will be discussed, and especially in terms of loops. Indexing a variable with the `$` operator is the same as extracting the vector that constitutes that variable, as such it itself can be indexed with the brackets. Note that since the resulting output is a vector, and therefore unidimensional, you only use one number. 
+
+```{r}
+df_example$names
+df_example$names[3]
+
+df_example$fav_movie
+df_example$fav_movie[1]
+
+```
+Additionally, indexing is done primarily through numbers, and these numbers can and often should be, interacted with through object assignments. If I want the same indexed number several times for instance, I can store it as an object variable, maybe as a single letter (i, j, and k are common for this in loops, sometimes x as well),
+
+```{r}
+idx <- 3 # idx for indexer
+
+df_example$names[idx]
+df_example$happy[idx]
+
+## For several numbers, still works fine
+
+idx <- c(1,3)
+
+df_example$names[idx]
+df_example$fav_movie[idx]
+
+
+```
+
 
 # Simple Analysis
 
