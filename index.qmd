@@ -784,7 +784,7 @@ Flow control refers to ways in which you control a for loop or other similar ite
 - `break`, exits the loop completely, stopping the iteration over loops, *needs* to be present in a repeat loop, or it will never stop
 - `return`, specifies what object or element within the function or loop that should be returned when the iteration is complete, by default the function will return the last object created within it.  
 - `switch`, is also base highlighted, and is in essence just a baseR version of case_when, but a fair bit more complicated, no need to learn it
-
+- `stop`, nested within a statement of sorts, stops a function or loop, and executes an error action, for instance to print out where the error was thrown (oh my god why haven't I used this more for myself)
 
 ## Functional programming with anonymous functions
 

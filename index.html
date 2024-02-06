@@ -1247,6 +1247,7 @@ $class
 <li><code>return</code>, specifies what object or element within the function or loop that should be returned when the iteration is complete, by default the function will return the last object created within it.<br>
 </li>
 <li><code>switch</code>, is also base highlighted, and is in essence just a baseR version of case_when, but a fair bit more complicated, no need to learn it</li>
+<li><code>stop</code>, nested within a statement of sorts, stops a function or loop, and executes an error action, for instance to print out where the error was thrown (oh my god why haven’t I used this more for myself)</li>
 </ul>
 </section>
 </section>
@@ -1301,11 +1302,11 @@ $class
 <span id="cb178-18"><a href="#cb178-18" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb178-19"><a href="#cb178-19" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="do">## Unlisting the results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Using 10 Samples, Pi is estimated to be 3.2 (ish)"      
-[2] "Using 100 Samples, Pi is estimated to be 3.08 (ish)"    
-[3] "Using 1000 Samples, Pi is estimated to be 3.232 (ish)"  
-[4] "Using 10000 Samples, Pi is estimated to be 3.1292 (ish)"
-[5] "Using 1e+05 Samples, Pi is estimated to be 3.1364 (ish)"</code></pre>
+<pre><code>[1] "Using 10 Samples, Pi is estimated to be 3.2 (ish)"       
+[2] "Using 100 Samples, Pi is estimated to be 3.08 (ish)"     
+[3] "Using 1000 Samples, Pi is estimated to be 3.04 (ish)"    
+[4] "Using 10000 Samples, Pi is estimated to be 3.1424 (ish)" 
+[5] "Using 1e+05 Samples, Pi is estimated to be 3.12868 (ish)"</code></pre>
 </div>
 </div>
 <p>For a more practical point, I will demonstrate using a lapply function to create a new variable in our old dataset. Let’s say I want to construct an “anti-establishment” index, which is a function of opposition to EU or EEA, opposition to public services, opposition to gender equality, and extreme position on the left_right scale. In this instance I will utilize an <code>apply</code> function which will go over the rows of the dataset, in only the columns I want. When specifying a margin for the simple <code>apply</code> function, it will take either the rows or columns specified and turn them into vectors, so note that the iterator below can be indexed over, to get the relevant variable.</p>
