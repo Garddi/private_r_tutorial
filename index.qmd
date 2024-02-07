@@ -65,6 +65,7 @@ Other operators become important when discussing logical tests or other mathemat
 - %in% Contained logical test, is there a unit in this other element which is strictly equal to the first thing.
 - ! in general reverses the proceeding logical test, so if you write `!("YES" == "YES")` it will ask if the thing inside the parenthesis _is not_ the case, reversing the logical test. 
 - :, integer operator, creates a vector of elements between the starting points. `1:7` will create a vector of whole numbers from 1 to and including 7
+- `%%`, modulus operator, divides number preceeding it by number following it, and returns the remainder, so `12 %% 5` will return 2, since 5*2 = 10, with 2 as the remainder. 
 
 ```{r}
 "Yes" == "Yes"
@@ -624,6 +625,33 @@ head(dist_means_joined[,vars_i])
 
 ```
 
+# Modelling
+
+I will not spent any considerable time going into modelling here, given that outside of glm and lm, most operations will have a dedicated package with unique instructions that you will simply have to learn on your own. The main family of linear models, OLS estimations, are accessed through the `lm` function. This function accepts a formula as its first argument, which is specified with the dependent variable, followed by a tilde, then the specification of interest. We always store this as an object, a regression output, which we can interact with through generic functions such as summary, which gives a general output of the regression model.
+
+```{r}
+
+SurvData <- SurvData %>% 
+  mutate(wave = case_when( ## Just using year will give a strange intercept
+    year == 1995 | year == 1996 ~ 1,
+    year == 2000 | year == 2001 ~ 2,
+    year == 2005 ~ 3,
+    year == 2010 ~ 4
+  ))
+
+model_1 <- lm(whostility ~ gender_text + country + wave + PolDisc + interest, data = SurvData)
+
+summary(model_1)
+
+```
+From it we can see that women and south koreans in general are less hostile to women as legislators, we can underpin this with an interaction effect. which is specified with a multiplier sign. 
+
+```{r}
+model_2 <- lm(whostility ~ gender_text + country + wave + PolDisc + interest + country*gender_text, data = SurvData)
+
+summary(model_2)
+```
+Effect of South Korea holds, but effect of being a woman becomes insignificant. 
 
 
 # Plotting
@@ -785,6 +813,49 @@ Flow control refers to ways in which you control a for loop or other similar ite
 - `return`, specifies what object or element within the function or loop that should be returned when the iteration is complete, by default the function will return the last object created within it.  
 - `switch`, is also base highlighted, and is in essence just a baseR version of case_when, but a fair bit more complicated, no need to learn it
 - `stop`, nested within a statement of sorts, stops a function or loop, and executes an error action, for instance to print out where the error was thrown (oh my god why haven't I used this more for myself)
+- `try`, attempts to execute, and will not stop a loop even if failing to execute the code. Can also be modified with error handling programming, and the `tryCatch` function, which can attempt to catch these errors. Useful for loops where you know certain elements will throw an error.
+
+```{r}
+## showing ifs and elses
+
+numbers <- c(1:10)
+
+for(i in 1:length(numbers)){
+  
+  if(numbers[i] %% 2 == 0){
+    
+    print(paste0("This number: ", numbers[i], ", is even!"))
+    
+  }else{
+    print(paste0("This number: ", numbers[i], ", is odd!"))
+  }
+  
+}
+
+
+## Showing repeat, and break
+
+iter <- 1 
+
+repeat{
+  
+  print(paste0("iterator is now: ", iter, "!"))
+  
+  iter <- iter + 1
+  
+  if(iter == 12){
+    
+    print(paste0("oh no, iterator ", iter, " broke the loop! :("))
+    
+    break
+    
+  }
+  
+}
+
+
+```
+
 
 ## Functional programming with anonymous functions
 
