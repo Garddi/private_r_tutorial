@@ -419,28 +419,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"./images/"</span>) <span class="do">## ./ means the current working directory</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "bad_stuff.png"    "healy_vis.jpeg"   "heres_quarto.png" "outliners.png"   
-[5] "yaml_header.png" </code></pre>
+<pre><code>[1] "bad_stuff.png"         "healy_vis.jpeg"        "heres_quarto.png"     
+[4] "outliners.png"         "yaml_example_word.png" "yaml_header.png"      </code></pre>
 </div>
 </div>
 <p>However, you are not limited to only subfolders in your current directory, by using two dots, instead of one, you go to the parent folder of your directory.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"../."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "advanced_statistics_phd.Rproj"                                           
- [2] "data_provided"                                                           
- [3] "handout_scripts"                                                         
- [4] "my_data"                                                                 
- [5] "PAGED-basic-party-dataset-with-party-codes-Dec-2023.csv"                 
- [6] "PAGED-Notes-on-coding-principles.pdf"                                    
- [7] "PAGED-WECEE-Party-dataset-with-party-codes-Dec-2023.csv"                 
- [8] "PAGED-WECEE-Party-dataset-with-party-codes-Dec-2023.xlsx"                
- [9] "PAGED WE+CEE Potential coalition dataset with party codes (Dec 2023).csv"
-[10] "private_r_tutorial"                                                      
-[11] "some_data_prep.R"                                                        
-[12] "some_exploration.R"                                                      
-[13] "test_starlooking.html"                                                   
-[14] "v1-PAGED-basic-party-dataset-codebook.pdf"                               </code></pre>
+<pre><code> [1] "09-STS313.pdf"                                                           
+ [2] "advanced_statistics_phd.Rproj"                                           
+ [3] "data_provided"                                                           
+ [4] "handout_scripts"                                                         
+ [5] "my_data"                                                                 
+ [6] "PAGED-basic-party-dataset-with-party-codes-Dec-2023.csv"                 
+ [7] "PAGED-Notes-on-coding-principles.pdf"                                    
+ [8] "PAGED-WECEE-Party-dataset-with-party-codes-Dec-2023.csv"                 
+ [9] "PAGED-WECEE-Party-dataset-with-party-codes-Dec-2023.xlsx"                
+[10] "PAGED WE+CEE Potential coalition dataset with party codes (Dec 2023).csv"
+[11] "private_r_tutorial"                                                      
+[12] "some_data_prep.R"                                                        
+[13] "some_exploration.R"                                                      
+[14] "test_starlooking.html"                                                   
+[15] "v1-PAGED-basic-party-dataset-codebook.pdf"                               </code></pre>
 </div>
 </div>
 <p>Note that the folder which we saw as my working directory appears here as a directory. We can also look at the contents of parallel folders.</p>
@@ -1235,8 +1236,9 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb173-19"><a href="#cb173-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb173-20"><a href="#cb173-20" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"./images/"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "bad_stuff.png"    "healy_vis.jpeg"   "heres_quarto.png" "outliners.png"   
-[5] "plot_obj.jpeg"    "yaml_header.png" </code></pre>
+<pre><code>[1] "bad_stuff.png"         "healy_vis.jpeg"        "heres_quarto.png"     
+[4] "outliners.png"         "plot_obj.jpeg"         "yaml_example_word.png"
+[7] "yaml_header.png"      </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"./images/plot_obj.jpeg"</span>) <span class="do">## Just removing it </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1448,11 +1450,11 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb186-18"><a href="#cb186-18" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb186-19"><a href="#cb186-19" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="do">## Unlisting the results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Using 10 Samples, Pi is estimated to be 3.2 (ish)"       
-[2] "Using 100 Samples, Pi is estimated to be 3.24 (ish)"     
-[3] "Using 1000 Samples, Pi is estimated to be 3.156 (ish)"   
-[4] "Using 10000 Samples, Pi is estimated to be 3.166 (ish)"  
-[5] "Using 1e+05 Samples, Pi is estimated to be 3.13792 (ish)"</code></pre>
+<pre><code>[1] "Using 10 Samples, Pi is estimated to be 2.8 (ish)"       
+[2] "Using 100 Samples, Pi is estimated to be 3.16 (ish)"     
+[3] "Using 1000 Samples, Pi is estimated to be 3.164 (ish)"   
+[4] "Using 10000 Samples, Pi is estimated to be 3.1248 (ish)" 
+[5] "Using 1e+05 Samples, Pi is estimated to be 3.13832 (ish)"</code></pre>
 </div>
 </div>
 <p>For a more practical point, I will demonstrate using a lapply function to create a new variable in our old dataset. Let’s say I want to construct an “anti-establishment” index, which is a function of opposition to EU or EEA, opposition to public services, opposition to gender equality, and extreme position on the left_right scale. In this instance I will utilize an <code>apply</code> function which will go over the rows of the dataset, in only the columns I want. When specifying a margin for the simple <code>apply</code> function, it will take either the rows or columns specified and turn them into vectors, so note that the iterator below can be indexed over, to get the relevant variable.</p>
@@ -1723,6 +1725,21 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p></p><figcaption class="figure-caption">yaml</figcaption><p></p>
 </figure>
 </div>
+<p>In the above instance, the document is turned into an html file, which is the type of file which web browsers display, hence why this tutorial is viewable like this in a webpage. Note also that the output html has several subcategories that you can use to edit settings for the document output you want. You can change the <code>output</code> specification into a different type of document, to change what it is knitted into. Do however make sure that the code you are entering is not unique to the filetype you are applying. If you want a LateX style document you specify <code>output: pdf</code>, this requires a LateX implementation, and the TinyTex package to be on your computer (no overleaf here). If you want a word document, you can specify <code>output: docx</code> in the header, and you can make further specifications by indenting it in new lines, such as in the example below, where a reference document which has settings for font types and sizes, is included in addition to the normal output.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./images/yaml_example_word.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">example yaml</figcaption><p></p>
+</figure>
+</div>
+<p>Every type of output from Quarto has its own unique variations, that you can explore if you choose to go further with them. Here are some helpful pages for each of the main types of outputs. In addition to the normal outputs, you can also create presentations through beamer (a LateX implementation) and revealjs through Quarto.</p>
+<ul>
+<li>Pdf: https://quarto.org/docs/output-formats/pdf-basics.html</li>
+<li>html: https://quarto.org/docs/output-formats/html-basics.html</li>
+<li>word: https://quarto.org/docs/output-formats/ms-word.html</li>
+<li>Beamer Presentations: https://quarto.org/docs/presentations/beamer.html</li>
+<li>revaljs Presentations: https://quarto.org/docs/presentations/revealjs/</li>
+</ul>
 </section>
 </section>
 

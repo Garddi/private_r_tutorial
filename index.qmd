@@ -1159,3 +1159,15 @@ The document you are currently reading is made through the quarto framework, whi
 When clicking new quarto document, you will arrive at a prompt to create one of several types of documents, the current one is an html document, but through quarto you can also create latex specified documents (I have a friend who wrote their Master thesis in RStudio, you can also use bibref through it). Quarto can also make presentations through beamer, revealjs and other engines for making presentations (even powerpoint can be made through RStudio). Following the creation of the file, you specify several settings in the YAML header, which is at the top, here you can specify settings that affect the entire document, and the way it is rendered. The YAML header for this document for instance looks like this: 
 
 ![yaml](./images/yaml_header.png)
+
+In the above instance, the document is turned into an html file, which is the type of file which web browsers display, hence why this tutorial is viewable like this in a webpage. Note also that the output html has several subcategories that you can use to edit settings for the document output you want. You can change the `output` specification into a different type of document, to change what it is knitted into. Do however make sure that the code you are entering is not unique to the filetype you are applying. If you want a LateX style document you specify `output: pdf`, this requires a LateX implementation, and the TinyTex package to be on your computer (no overleaf here). If you want a word document, you can specify `output: docx` in the header, and you can make further specifications by indenting it in new lines, such as in the example below, where a reference document which has settings for font types and sizes, is included in addition to the normal output.
+
+![example yaml](./images/yaml_example_word.png)
+
+Every type of output from Quarto has its own unique variations, that you can explore if you choose to go further with them. Here are some helpful pages for each of the main types of outputs. In addition to the normal outputs, you can also create presentations through beamer (a LateX implementation) and revealjs through Quarto. 
+
+- Pdf: https://quarto.org/docs/output-formats/pdf-basics.html 
+- html: https://quarto.org/docs/output-formats/html-basics.html
+- word: https://quarto.org/docs/output-formats/ms-word.html
+- Beamer Presentations: https://quarto.org/docs/presentations/beamer.html
+- revaljs Presentations:  https://quarto.org/docs/presentations/revealjs/
