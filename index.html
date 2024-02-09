@@ -405,6 +405,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>[1] 4.166667</code></pre>
 </div>
 </div>
+<p>Many functions are part of packages which needs to be installed to your computer using the <code>install.packages</code> function, and then when utilized needs to be loaded into the namespace you are currently operaring in, using the reserved function <code>library</code>. Additionally, all functions (should at least) have a help file, which you can access by posing a <code>?</code> in front of the function. The help file will list the structure of the function, the necessary arguments, and their default values. Do note however, that these help files can be extremely confusing to read for anyone who does not already understand them.</p>
 </section>
 <section id="folder-structure-and-saving-results" class="level2" data-number="2.7">
 <h2 data-number="2.7" class="anchored" data-anchor-id="folder-structure-and-saving-results"><span class="header-section-number">2.7</span> Folder structure and saving results</h2>
@@ -419,8 +420,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"./images/"</span>) <span class="do">## ./ means the current working directory</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "bad_stuff.png"         "healy_vis.jpeg"        "heres_quarto.png"     
-[4] "outliners.png"         "yaml_example_word.png" "yaml_header.png"      </code></pre>
+<pre><code>[1] "bad_stuff.png"         "gglayers.png"          "healy_vis.jpeg"       
+[4] "heres_quarto.png"      "outliners.png"         "yaml_example_word.png"
+[7] "yaml_header.png"      </code></pre>
 </div>
 </div>
 <p>However, you are not limited to only subfolders in your current directory, by using two dots, instead of one, you go to the parent folder of your directory.</p>
@@ -1160,7 +1162,59 @@ Multiple R-squared:  0.07369,   Adjusted R-squared:  0.07255
 F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
-<p>Effect of South Korea holds, but effect of being a woman becomes insignificant.</p>
+<p>Effect of South Korea holds, but effect of being a woman becomes insignificant. For binary data we need a link function and a generalized linear model, which can be accesses through the function <code>glm</code> in R. Below I model the outcome of having voted.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a>SurvData_vot <span class="ot">&lt;-</span> SurvData <span class="sc">%&gt;%</span> </span>
+<span id="cb170-2"><a href="#cb170-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(voted)) <span class="sc">%&gt;%</span>  <span class="do">## Filter out all obs that did not vote</span></span>
+<span id="cb170-3"><a href="#cb170-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">vot_binary =</span> <span class="fu">ifelse</span>(voted <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb170-4"><a href="#cb170-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb170-5"><a href="#cb170-5" aria-hidden="true" tabindex="-1"></a>logit_m_1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(vot_binary <span class="sc">~</span> gender_cased <span class="sc">+</span> country <span class="sc">+</span> wave, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">data =</span> SurvData_vot)</span>
+<span id="cb170-6"><a href="#cb170-6" aria-hidden="true" tabindex="-1"></a>logit_m_2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(vot_binary <span class="sc">~</span> gender_cased <span class="sc">+</span> country <span class="sc">+</span> wave <span class="sc">+</span> whostility, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">data =</span> SurvData_vot)</span>
+<span id="cb170-7"><a href="#cb170-7" aria-hidden="true" tabindex="-1"></a>logit_m_3 <span class="ot">&lt;-</span> <span class="fu">glm</span>(vot_binary <span class="sc">~</span> gender_cased <span class="sc">+</span> country <span class="sc">+</span> wave <span class="sc">+</span> whostility <span class="sc">+</span> interest, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">data =</span> SurvData_vot)</span>
+<span id="cb170-8"><a href="#cb170-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb170-9"><a href="#cb170-9" aria-hidden="true" tabindex="-1"></a>huxtable<span class="sc">::</span><span class="fu">huxreg</span>(logit_m_1, logit_m_2, logit_m_3) <span class="do">## This is where I would normally use stargazer </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="huxtable" data-quarto-disable-processing="true" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-42">
+<colgroup><col><col><col><col></colgroup><tbody><tr>
+<th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1)</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(2)</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(3)</th></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(Intercept)</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">3.745 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">3.722 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5.129 ***</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.231)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.231)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.257)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">gender_casedWoman</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.327 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.336 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.227 ***</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.056)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.056)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.057)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">countrySouth Korea</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.005&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.079&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.215 **&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.058)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.062)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.066)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">wave</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.816 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.828 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.882 ***</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.060)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.060)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.062)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">whostility</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.058 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.040 *&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.017)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.018)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">interest</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.556 ***</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.036)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">N</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5939&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5939&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5939&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">logLik</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-3748.062&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-3742.470&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-3610.273&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">AIC</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">7504.123&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">7494.940&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">7232.545&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th colspan="4" style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</th></tr>
+</tbody></table>
+
+</div>
+<div class="sourceCode cell-code" id="cb171"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a>                          <span class="do">## But stargazer does not work in quarto html outputs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="plotting" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Plotting</h1>
@@ -1173,125 +1227,132 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <section id="layers" class="level2" data-number="6.1">
 <h2 data-number="6.1" class="anchored" data-anchor-id="layers"><span class="header-section-number">6.1</span> Layers</h2>
-<p>It is prudent to think of visualisations in ggplot as layered. These layers are bound together with plus signs, and each construct a layer ontop of the plot or other visualisation you want to make. The most basic general layer that all ggplots need is the base layer of the <code>ggplot</code> function itself. In this function you specify your dataset, and the general aesthetics. Within the <code>ggplot</code> function (and most <code>geom_</code> derivatives) there is an <code>aes</code> argument, this is an aesthetic argument, it specifies what variable from the dataset should represent what element of the plot. Based on the plot type the type of aesthetic accepted varies, but a list of potential aesthetics are: x, y, color, fill, shape, size, linewidth, linetype, etc. Following this, you add a layer that specifies what type of plot you want, this is done through a family of <code>geom_</code> functions such as <code>geom_point</code> for scatterplot, <code>geom_bar</code> for a barplot, <code>geom_boxplot</code> for a boxplot with distributions, etc. Which you use depends on how you want to visualise. If you are curious about the options, type <code>geom_</code> in R, and switch through the optins that it auto-completes to. Lets use this information to build a scatterplot of the first grouped dataframe created earlier.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> <span class="do">### Obviously you can pipe it in </span></span>
-<span id="cb170-2"><a href="#cb170-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
-<span id="cb170-3"><a href="#cb170-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
+<p>It is prudent to think of visualisations in ggplot as layered. These layers are bound together with plus signs, and each construct a layer ontop of the plot or other visualisation you want to make.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./images/gglayers.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">layers of ggplot, stolen from: https://lfoswald.github.io/2021-spring-stats2/materials/session-3/03-online-tutorial/</figcaption><p></p>
+</figure>
 </div>
-</div>
-<p>Very ugly, but it does the job. We can now add a couple of layers to improve the look. There are several themes that can be used by default, such as <code>theme_bw</code> which is my favourite, just add the function in a layer. Additionally we can modify the labels of the plot through the <code>lab</code> function as a separate layer.</p>
+<p>The most basic general layer that all ggplots need is the base layer of the <code>ggplot</code> function itself. In this function you specify your dataset, and the general aesthetics. Within the <code>ggplot</code> function (and most <code>geom_</code> derivatives) there is an <code>aes</code> argument, this is an aesthetic argument, it specifies what variable from the dataset should represent what element of the plot. Based on the plot type the type of aesthetic accepted varies, but a list of potential aesthetics are: x, y, color, fill, shape, size, linewidth, linetype, etc. Following this, you add a layer that specifies what type of plot you want, this is done through a family of <code>geom_</code> functions such as <code>geom_point</code> for scatterplot, <code>geom_bar</code> for a barplot, <code>geom_boxplot</code> for a boxplot with distributions, etc. Which you use depends on how you want to visualise. If you are curious about the options, type <code>geom_</code> in R, and switch through the optins that it auto-completes to. Lets use this information to build a scatterplot of the first grouped dataframe created earlier.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb171"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> </span>
-<span id="cb171-2"><a href="#cb171-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
-<span id="cb171-3"><a href="#cb171-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb171-4"><a href="#cb171-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb171-5"><a href="#cb171-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Here's a Title"</span>, <span class="at">x =</span> <span class="st">"Time period"</span>, <span class="at">y =</span> <span class="st">"Anti-women sentiment"</span>, <span class="at">color =</span> <span class="st">"Region"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> <span class="do">### Obviously you can pipe it in </span></span>
+<span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
+<span id="cb172-3"><a href="#cb172-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>For the final plot, I will also do some changes to the datastructure so that it visualises a bit better, there’s perhaps too much space between the timings as it is. Additionally, I think the points are too small, so I will change them manually through arguments fed through the layers. Finally, I also add a <code>geom_line</code> which when combined in this instance, draws a line between the points, separated by the color specification, by default, <code>geom_</code> functions inherit their aesthetic from the layer previous, so the same <code>aes</code> specification is inherited from the higher level.</p>
+<p>Very ugly, but it does the job. We can now add a couple of layers to improve the look. There are several themes that can be used by default, such as <code>theme_bw</code> which is my favourite, just add the function in a layer. Additionally we can modify the labels of the plot through the <code>lab</code> function as a separate layer.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> </span>
-<span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wave =</span> <span class="fu">case_when</span>(             <span class="do">### Mutating to better cases, so they are parallel</span></span>
-<span id="cb172-3"><a href="#cb172-3" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">1995</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">1996</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb172-4"><a href="#cb172-4" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2000</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">2001</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb172-5"><a href="#cb172-5" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2005</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
-<span id="cb172-6"><a href="#cb172-6" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">~</span> <span class="dv">4</span></span>
-<span id="cb172-7"><a href="#cb172-7" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
-<span id="cb172-8"><a href="#cb172-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>wave, <span class="at">y =</span> whostility, <span class="at">color =</span> country)) <span class="sc">+</span>  <span class="do">### Setting aesthetic</span></span>
-<span id="cb172-9"><a href="#cb172-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span>  <span class="co"># Scatterplot, with 2 as size of the dots</span></span>
-<span id="cb172-10"><a href="#cb172-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span>          <span class="co"># make a line, inherits past aesthetics</span></span>
-<span id="cb172-11"><a href="#cb172-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span>        <span class="co"># theme_bw is the best</span></span>
-<span id="cb172-12"><a href="#cb172-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"cornflowerblue"</span>, <span class="st">"goldenrod"</span>)) <span class="sc">+</span>  <span class="do">## Values are assigned alphabetically when set manually, so Japan gets first colour</span></span>
-<span id="cb172-13"><a href="#cb172-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Hostility towards women as legislators"</span>, <span class="at">x =</span> <span class="st">"WVS Wave"</span>, <span class="at">y =</span> <span class="st">"Hostility"</span>) <span class="do">## Creating labels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb173"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> </span>
+<span id="cb173-2"><a href="#cb173-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
+<span id="cb173-3"><a href="#cb173-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb173-4"><a href="#cb173-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb173-5"><a href="#cb173-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Here's a Title"</span>, <span class="at">x =</span> <span class="st">"Time period"</span>, <span class="at">y =</span> <span class="st">"Anti-women sentiment"</span>, <span class="at">color =</span> <span class="st">"Region"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>For the final plot, I will also do some changes to the datastructure so that it visualises a bit better, there’s perhaps too much space between the timings as it is. Additionally, I think the points are too small, so I will change them manually through arguments fed through the layers. Finally, I also add a <code>geom_line</code> which when combined in this instance, draws a line between the points, separated by the color specification, by default, <code>geom_</code> functions inherit their aesthetic from the layer previous, so the same <code>aes</code> specification is inherited from the higher level.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb174"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb174-1"><a href="#cb174-1" aria-hidden="true" tabindex="-1"></a>grouped_f <span class="sc">%&gt;%</span> </span>
+<span id="cb174-2"><a href="#cb174-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wave =</span> <span class="fu">case_when</span>(             <span class="do">### Mutating to better cases, so they are parallel</span></span>
+<span id="cb174-3"><a href="#cb174-3" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">1995</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">1996</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb174-4"><a href="#cb174-4" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2000</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">2001</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb174-5"><a href="#cb174-5" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2005</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb174-6"><a href="#cb174-6" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">~</span> <span class="dv">4</span></span>
+<span id="cb174-7"><a href="#cb174-7" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
+<span id="cb174-8"><a href="#cb174-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>wave, <span class="at">y =</span> whostility, <span class="at">color =</span> country)) <span class="sc">+</span>  <span class="do">### Setting aesthetic</span></span>
+<span id="cb174-9"><a href="#cb174-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span>  <span class="co"># Scatterplot, with 2 as size of the dots</span></span>
+<span id="cb174-10"><a href="#cb174-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span>          <span class="co"># make a line, inherits past aesthetics</span></span>
+<span id="cb174-11"><a href="#cb174-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span>        <span class="co"># theme_bw is the best</span></span>
+<span id="cb174-12"><a href="#cb174-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"cornflowerblue"</span>, <span class="st">"goldenrod"</span>)) <span class="sc">+</span>  <span class="do">## Values are assigned alphabetically when set manually, so Japan gets first colour</span></span>
+<span id="cb174-13"><a href="#cb174-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Hostility towards women as legislators"</span>, <span class="at">x =</span> <span class="st">"WVS Wave"</span>, <span class="at">y =</span> <span class="st">"Hostility"</span>) <span class="do">## Creating labels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>The values and precise aesthetics of a variable can be set with the function family <code>scale_AESTHETIC_TYPE</code>, which provides a large range of ways to modify the aesthetics. In the plot above I manually (therefore manual at the end) assign two values to the color aesthetic (therefore color in the middle). This function family can also modify labels and other elements.</p>
 <p>We can also save the resulting plot, by assigning it to an object, and using the dedicated ggsave function, which allows for a ton of useful settings.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb173"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a>plot_obj <span class="ot">&lt;-</span> grouped_f <span class="sc">%&gt;%</span> </span>
-<span id="cb173-2"><a href="#cb173-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wave =</span> <span class="fu">case_when</span>(             <span class="do">### Mutating to better cases, so they are parallel</span></span>
-<span id="cb173-3"><a href="#cb173-3" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">1995</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">1996</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb173-4"><a href="#cb173-4" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2000</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">2001</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb173-5"><a href="#cb173-5" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2005</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
-<span id="cb173-6"><a href="#cb173-6" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">~</span> <span class="dv">4</span></span>
-<span id="cb173-7"><a href="#cb173-7" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
-<span id="cb173-8"><a href="#cb173-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>wave, <span class="at">y =</span> whostility, <span class="at">color =</span> country)) <span class="sc">+</span>  <span class="do">### Setting aesthetic</span></span>
-<span id="cb173-9"><a href="#cb173-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span>  <span class="co"># Scatterplot, with 2 as size of the dots</span></span>
-<span id="cb173-10"><a href="#cb173-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span>          <span class="co"># make a line, inherits past aesthetics</span></span>
-<span id="cb173-11"><a href="#cb173-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span>        <span class="co"># theme_bw is the best</span></span>
-<span id="cb173-12"><a href="#cb173-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"cornflowerblue"</span>, <span class="st">"goldenrod"</span>)) <span class="sc">+</span>  <span class="do">## Values are assigned alphabetically when set manually, so Japan gets first colour</span></span>
-<span id="cb173-13"><a href="#cb173-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Hostility towards women as legislators"</span>, <span class="at">x =</span> <span class="st">"WVS Wave"</span>, <span class="at">y =</span> <span class="st">"Hostility"</span>) <span class="do">## Creating labels</span></span>
-<span id="cb173-14"><a href="#cb173-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb173-15"><a href="#cb173-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"plot_obj.jpeg"</span>, <span class="at">plot =</span> plot_obj, <span class="at">device =</span> <span class="st">"jpeg"</span>, <span class="at">path =</span> <span class="st">"./images"</span>,</span>
-<span id="cb173-16"><a href="#cb173-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">width =</span> <span class="fl">12.5</span>, <span class="at">height =</span> <span class="fl">7.5</span>)</span>
-<span id="cb173-17"><a href="#cb173-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb173-18"><a href="#cb173-18" aria-hidden="true" tabindex="-1"></a><span class="do">## and now its here, contrast with earlier listes files in images</span></span>
-<span id="cb173-19"><a href="#cb173-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb173-20"><a href="#cb173-20" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"./images/"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a>plot_obj <span class="ot">&lt;-</span> grouped_f <span class="sc">%&gt;%</span> </span>
+<span id="cb175-2"><a href="#cb175-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wave =</span> <span class="fu">case_when</span>(             <span class="do">### Mutating to better cases, so they are parallel</span></span>
+<span id="cb175-3"><a href="#cb175-3" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">1995</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">1996</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb175-4"><a href="#cb175-4" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2000</span> <span class="sc">|</span> year <span class="sc">==</span> <span class="dv">2001</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb175-5"><a href="#cb175-5" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2005</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb175-6"><a href="#cb175-6" aria-hidden="true" tabindex="-1"></a>    year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">~</span> <span class="dv">4</span></span>
+<span id="cb175-7"><a href="#cb175-7" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
+<span id="cb175-8"><a href="#cb175-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>wave, <span class="at">y =</span> whostility, <span class="at">color =</span> country)) <span class="sc">+</span>  <span class="do">### Setting aesthetic</span></span>
+<span id="cb175-9"><a href="#cb175-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span>  <span class="co"># Scatterplot, with 2 as size of the dots</span></span>
+<span id="cb175-10"><a href="#cb175-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span>          <span class="co"># make a line, inherits past aesthetics</span></span>
+<span id="cb175-11"><a href="#cb175-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span>        <span class="co"># theme_bw is the best</span></span>
+<span id="cb175-12"><a href="#cb175-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"cornflowerblue"</span>, <span class="st">"goldenrod"</span>)) <span class="sc">+</span>  <span class="do">## Values are assigned alphabetically when set manually, so Japan gets first colour</span></span>
+<span id="cb175-13"><a href="#cb175-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Hostility towards women as legislators"</span>, <span class="at">x =</span> <span class="st">"WVS Wave"</span>, <span class="at">y =</span> <span class="st">"Hostility"</span>) <span class="do">## Creating labels</span></span>
+<span id="cb175-14"><a href="#cb175-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb175-15"><a href="#cb175-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"plot_obj.jpeg"</span>, <span class="at">plot =</span> plot_obj, <span class="at">device =</span> <span class="st">"jpeg"</span>, <span class="at">path =</span> <span class="st">"./images"</span>,</span>
+<span id="cb175-16"><a href="#cb175-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">width =</span> <span class="fl">12.5</span>, <span class="at">height =</span> <span class="fl">7.5</span>)</span>
+<span id="cb175-17"><a href="#cb175-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb175-18"><a href="#cb175-18" aria-hidden="true" tabindex="-1"></a><span class="do">## and now its here, contrast with earlier listes files in images</span></span>
+<span id="cb175-19"><a href="#cb175-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb175-20"><a href="#cb175-20" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"./images/"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "bad_stuff.png"         "healy_vis.jpeg"        "heres_quarto.png"     
-[4] "outliners.png"         "plot_obj.jpeg"         "yaml_example_word.png"
-[7] "yaml_header.png"      </code></pre>
+<pre><code>[1] "bad_stuff.png"         "gglayers.png"          "healy_vis.jpeg"       
+[4] "heres_quarto.png"      "outliners.png"         "plot_obj.jpeg"        
+[7] "yaml_example_word.png" "yaml_header.png"      </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"./images/plot_obj.jpeg"</span>) <span class="do">## Just removing it </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb177"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"./images/plot_obj.jpeg"</span>) <span class="do">## Just removing it </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="maps" class="level2" data-number="6.2">
 <h2 data-number="6.2" class="anchored" data-anchor-id="maps"><span class="header-section-number">6.2</span> Maps</h2>
 <p>You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually. There are a lot of intricacies involving maps and shapefiles in general, but to use it with ggplot it is most common to have it as a <code>sf</code> type file, you can see that the map assignment in the code chunk below is piped into a <code>st_as_sf</code> function, this transform the <code>tera</code> (I believe it is) class object, into an <code>sf</code> class object. In some instances we would have to assign a crs as well, but that’s perhaps too much complicated to talk about right now. Note also that the <code>ggplot</code> layer is itself empty, because the data and aesthetic mapping needs to be from a shapefile function of <code>geom_sf</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb176"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb176-1"><a href="#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geodata) <span class="co"># for gadm download</span></span>
-<span id="cb176-2"><a href="#cb176-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb176-3"><a href="#cb176-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb176-4"><a href="#cb176-4" aria-hidden="true" tabindex="-1"></a>nor_map <span class="ot">&lt;-</span> <span class="fu">gadm</span>(<span class="at">country =</span> <span class="st">"NO"</span>, <span class="at">level =</span> <span class="dv">1</span>, <span class="at">path =</span> <span class="st">"./"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb176-5"><a href="#cb176-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>()</span>
-<span id="cb176-6"><a href="#cb176-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb176-7"><a href="#cb176-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span>  <span class="do">## in map data the ggplot is empty</span></span>
-<span id="cb176-8"><a href="#cb176-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map) <span class="sc">+</span> </span>
-<span id="cb176-9"><a href="#cb176-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="co"># common theme to eliminate all lines</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb178"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geodata) <span class="co"># for gadm download</span></span>
+<span id="cb178-2"><a href="#cb178-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb178-3"><a href="#cb178-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb178-4"><a href="#cb178-4" aria-hidden="true" tabindex="-1"></a>nor_map <span class="ot">&lt;-</span> <span class="fu">gadm</span>(<span class="at">country =</span> <span class="st">"NO"</span>, <span class="at">level =</span> <span class="dv">1</span>, <span class="at">path =</span> <span class="st">"./"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb178-5"><a href="#cb178-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>()</span>
+<span id="cb178-6"><a href="#cb178-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb178-7"><a href="#cb178-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span>  <span class="do">## in map data the ggplot is empty</span></span>
+<span id="cb178-8"><a href="#cb178-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map) <span class="sc">+</span> </span>
+<span id="cb178-9"><a href="#cb178-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="co"># common theme to eliminate all lines</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Aesthetics are possible, filling the map to make a cloropleth for instance. You can also left join data that are not of a GIS character straight into this dataframe, then use those variables as aesthetics, but for now lets just make a new variable based on whether I have visited the county.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb177"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" aria-hidden="true" tabindex="-1"></a>nor_map <span class="ot">&lt;-</span> nor_map <span class="sc">%&gt;%</span> </span>
-<span id="cb177-2"><a href="#cb177-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">me_there =</span> <span class="fu">case_when</span>(</span>
-<span id="cb177-3"><a href="#cb177-3" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.AA"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-4"><a href="#cb177-4" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.AK"</span> <span class="sc">~</span> <span class="st">"Home"</span>,</span>
-<span id="cb177-5"><a href="#cb177-5" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.BU"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-6"><a href="#cb177-6" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.FI"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb177-7"><a href="#cb177-7" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.HE"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-8"><a href="#cb177-8" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.HO"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-9"><a href="#cb177-9" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.MR"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb177-10"><a href="#cb177-10" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.NO"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb177-11"><a href="#cb177-11" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.NT"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb177-12"><a href="#cb177-12" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OF"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-13"><a href="#cb177-13" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OP"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-14"><a href="#cb177-14" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OS"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-15"><a href="#cb177-15" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.RO"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-16"><a href="#cb177-16" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.SF"</span> <span class="sc">~</span> <span class="st">"Home"</span>,</span>
-<span id="cb177-17"><a href="#cb177-17" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.ST"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-18"><a href="#cb177-18" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.TE"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-19"><a href="#cb177-19" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.TR"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
-<span id="cb177-20"><a href="#cb177-20" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.VA"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
-<span id="cb177-21"><a href="#cb177-21" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.VF"</span> <span class="sc">~</span> <span class="st">"Yes"</span></span>
-<span id="cb177-22"><a href="#cb177-22" aria-hidden="true" tabindex="-1"></a>))</span>
-<span id="cb177-23"><a href="#cb177-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb177-24"><a href="#cb177-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb177-25"><a href="#cb177-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map, <span class="fu">aes</span>(<span class="at">fill =</span> me_there)) <span class="sc">+</span> </span>
-<span id="cb177-26"><a href="#cb177-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span> </span>
-<span id="cb177-27"><a href="#cb177-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mitt lille land"</span>, <span class="at">fill =</span> <span class="st">"Have I been?"</span>) <span class="sc">+</span> </span>
-<span id="cb177-28"><a href="#cb177-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"goldenrod"</span>, <span class="st">"firebrick"</span>, <span class="st">"cornflowerblue"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb179"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb179-1"><a href="#cb179-1" aria-hidden="true" tabindex="-1"></a>nor_map <span class="ot">&lt;-</span> nor_map <span class="sc">%&gt;%</span> </span>
+<span id="cb179-2"><a href="#cb179-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">me_there =</span> <span class="fu">case_when</span>(</span>
+<span id="cb179-3"><a href="#cb179-3" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.AA"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-4"><a href="#cb179-4" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.AK"</span> <span class="sc">~</span> <span class="st">"Home"</span>,</span>
+<span id="cb179-5"><a href="#cb179-5" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.BU"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-6"><a href="#cb179-6" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.FI"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb179-7"><a href="#cb179-7" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.HE"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-8"><a href="#cb179-8" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.HO"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-9"><a href="#cb179-9" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.MR"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb179-10"><a href="#cb179-10" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.NO"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb179-11"><a href="#cb179-11" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.NT"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb179-12"><a href="#cb179-12" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OF"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-13"><a href="#cb179-13" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OP"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-14"><a href="#cb179-14" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.OS"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-15"><a href="#cb179-15" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.RO"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-16"><a href="#cb179-16" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.SF"</span> <span class="sc">~</span> <span class="st">"Home"</span>,</span>
+<span id="cb179-17"><a href="#cb179-17" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.ST"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-18"><a href="#cb179-18" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.TE"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-19"><a href="#cb179-19" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.TR"</span> <span class="sc">~</span> <span class="st">"No"</span>,</span>
+<span id="cb179-20"><a href="#cb179-20" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.VA"</span> <span class="sc">~</span> <span class="st">"Yes"</span>,</span>
+<span id="cb179-21"><a href="#cb179-21" aria-hidden="true" tabindex="-1"></a>    HASC_1 <span class="sc">==</span> <span class="st">"NO.VF"</span> <span class="sc">~</span> <span class="st">"Yes"</span></span>
+<span id="cb179-22"><a href="#cb179-22" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb179-23"><a href="#cb179-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb179-24"><a href="#cb179-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb179-25"><a href="#cb179-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map, <span class="fu">aes</span>(<span class="at">fill =</span> me_there)) <span class="sc">+</span> </span>
+<span id="cb179-26"><a href="#cb179-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span> </span>
+<span id="cb179-27"><a href="#cb179-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mitt lille land"</span>, <span class="at">fill =</span> <span class="st">"Have I been?"</span>) <span class="sc">+</span> </span>
+<span id="cb179-28"><a href="#cb179-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"goldenrod"</span>, <span class="st">"firebrick"</span>, <span class="st">"cornflowerblue"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Note that the aesthetic argument is <code>fill</code> not <code>colour</code> (I have done that mistake several times).</p>
@@ -1304,13 +1365,13 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>A central part of programming in most languages is the flow control and for loops. For loops in R are slower than most other languages, and usually apply family of functions is preferred, since they can basically function in the same way as for loops, with the right specifications. But knowledge of loops can give you a tool to solve certain difficult tasks where you do not want to spend a couple of hours finding a relevant function. For loops consist of the function <code>for(iterator in sequence)</code>, the iterator is the thing that changes with each loop. A for loop is an instruction to do the same task over a set of times.</p>
 <p>Below is a simple for loop. First I create a vector of some numbers. The loop itself, I call the iterator i, and specify that I am looping over a sequence of numbers, from 1 to the length of the vector. I then use that operator as an index to the vector, so that for each iteration of the loop it prints the i vector position squared.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb178"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb178-1"><a href="#cb178-1" aria-hidden="true" tabindex="-1"></a>loopy_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">15</span>,<span class="dv">23</span>,<span class="dv">34</span>,<span class="dv">66</span>,<span class="dv">32</span>)</span>
-<span id="cb178-2"><a href="#cb178-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb178-3"><a href="#cb178-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(loopy_vector)){</span>
-<span id="cb178-4"><a href="#cb178-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb178-5"><a href="#cb178-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(loopy_vector[i]<span class="sc">^</span><span class="dv">2</span>) <span class="do">### Note that unlike outside the loop, it does not print results automatically</span></span>
-<span id="cb178-6"><a href="#cb178-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb178-7"><a href="#cb178-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb180"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb180-1"><a href="#cb180-1" aria-hidden="true" tabindex="-1"></a>loopy_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">15</span>,<span class="dv">23</span>,<span class="dv">34</span>,<span class="dv">66</span>,<span class="dv">32</span>)</span>
+<span id="cb180-2"><a href="#cb180-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb180-3"><a href="#cb180-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(loopy_vector)){</span>
+<span id="cb180-4"><a href="#cb180-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb180-5"><a href="#cb180-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(loopy_vector[i]<span class="sc">^</span><span class="dv">2</span>) <span class="do">### Note that unlike outside the loop, it does not print results automatically</span></span>
+<span id="cb180-6"><a href="#cb180-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb180-7"><a href="#cb180-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 225
 [1] 529
@@ -1336,21 +1397,21 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <li><code>try</code>, attempts to execute, and will not stop a loop even if failing to execute the code. Can also be modified with error handling programming, and the <code>tryCatch</code> function, which can attempt to catch these errors. Useful for loops where you know certain elements will throw an error.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb180"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb180-1"><a href="#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="do">## showing ifs and elses</span></span>
-<span id="cb180-2"><a href="#cb180-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb180-3"><a href="#cb180-3" aria-hidden="true" tabindex="-1"></a>numbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
-<span id="cb180-4"><a href="#cb180-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb180-5"><a href="#cb180-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(numbers)){</span>
-<span id="cb180-6"><a href="#cb180-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb180-7"><a href="#cb180-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(numbers[i] <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>){</span>
-<span id="cb180-8"><a href="#cb180-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb180-9"><a href="#cb180-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"This number: "</span>, numbers[i], <span class="st">", is even!"</span>))</span>
-<span id="cb180-10"><a href="#cb180-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb180-11"><a href="#cb180-11" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb180-12"><a href="#cb180-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"This number: "</span>, numbers[i], <span class="st">", is odd!"</span>))</span>
-<span id="cb180-13"><a href="#cb180-13" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb180-14"><a href="#cb180-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb180-15"><a href="#cb180-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb182"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb182-1"><a href="#cb182-1" aria-hidden="true" tabindex="-1"></a><span class="do">## showing ifs and elses</span></span>
+<span id="cb182-2"><a href="#cb182-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb182-3"><a href="#cb182-3" aria-hidden="true" tabindex="-1"></a>numbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb182-4"><a href="#cb182-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb182-5"><a href="#cb182-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(numbers)){</span>
+<span id="cb182-6"><a href="#cb182-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb182-7"><a href="#cb182-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(numbers[i] <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>){</span>
+<span id="cb182-8"><a href="#cb182-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb182-9"><a href="#cb182-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"This number: "</span>, numbers[i], <span class="st">", is even!"</span>))</span>
+<span id="cb182-10"><a href="#cb182-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb182-11"><a href="#cb182-11" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb182-12"><a href="#cb182-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"This number: "</span>, numbers[i], <span class="st">", is odd!"</span>))</span>
+<span id="cb182-13"><a href="#cb182-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb182-14"><a href="#cb182-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb182-15"><a href="#cb182-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "This number: 1, is odd!"
 [1] "This number: 2, is even!"
@@ -1363,25 +1424,25 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 [1] "This number: 9, is odd!"
 [1] "This number: 10, is even!"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb182"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb182-1"><a href="#cb182-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Showing repeat, and break</span></span>
-<span id="cb182-2"><a href="#cb182-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb182-3"><a href="#cb182-3" aria-hidden="true" tabindex="-1"></a>iter <span class="ot">&lt;-</span> <span class="dv">1</span> </span>
-<span id="cb182-4"><a href="#cb182-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb182-5"><a href="#cb182-5" aria-hidden="true" tabindex="-1"></a><span class="cf">repeat</span>{</span>
-<span id="cb182-6"><a href="#cb182-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb182-7"><a href="#cb182-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"iterator is now: "</span>, iter, <span class="st">"!"</span>))</span>
-<span id="cb182-8"><a href="#cb182-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb182-9"><a href="#cb182-9" aria-hidden="true" tabindex="-1"></a>  iter <span class="ot">&lt;-</span> iter <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb182-10"><a href="#cb182-10" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb182-11"><a href="#cb182-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(iter <span class="sc">==</span> <span class="dv">12</span>){</span>
-<span id="cb182-12"><a href="#cb182-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb182-13"><a href="#cb182-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"oh no, iterator "</span>, iter, <span class="st">" broke the loop! :("</span>))</span>
-<span id="cb182-14"><a href="#cb182-14" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb182-15"><a href="#cb182-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">break</span></span>
-<span id="cb182-16"><a href="#cb182-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb182-17"><a href="#cb182-17" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb182-18"><a href="#cb182-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb182-19"><a href="#cb182-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb184"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb184-1"><a href="#cb184-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Showing repeat, and break</span></span>
+<span id="cb184-2"><a href="#cb184-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb184-3"><a href="#cb184-3" aria-hidden="true" tabindex="-1"></a>iter <span class="ot">&lt;-</span> <span class="dv">1</span> </span>
+<span id="cb184-4"><a href="#cb184-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb184-5"><a href="#cb184-5" aria-hidden="true" tabindex="-1"></a><span class="cf">repeat</span>{</span>
+<span id="cb184-6"><a href="#cb184-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb184-7"><a href="#cb184-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"iterator is now: "</span>, iter, <span class="st">"!"</span>))</span>
+<span id="cb184-8"><a href="#cb184-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb184-9"><a href="#cb184-9" aria-hidden="true" tabindex="-1"></a>  iter <span class="ot">&lt;-</span> iter <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb184-10"><a href="#cb184-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb184-11"><a href="#cb184-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(iter <span class="sc">==</span> <span class="dv">12</span>){</span>
+<span id="cb184-12"><a href="#cb184-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb184-13"><a href="#cb184-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">"oh no, iterator "</span>, iter, <span class="st">" broke the loop! :("</span>))</span>
+<span id="cb184-14"><a href="#cb184-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb184-15"><a href="#cb184-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">break</span></span>
+<span id="cb184-16"><a href="#cb184-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb184-17"><a href="#cb184-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb184-18"><a href="#cb184-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb184-19"><a href="#cb184-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "iterator is now: 1!"
 [1] "iterator is now: 2!"
@@ -1403,13 +1464,13 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <h2 data-number="7.2" class="anchored" data-anchor-id="functional-programming-with-anonymous-functions"><span class="header-section-number">7.2</span> Functional programming with anonymous functions</h2>
 <p>If you are uncertain about how to do certain data wrangling processes, it is always possible to write your own function, or own generic procedure for a single problem. Using the <code>lapply</code> function, or the general family of <code>apply</code> functions, one can assign a very efficient function to be applied over a set of elements in a list. The letter in front usually specifies what type of data you will get back, where <code>lapply</code> is the easiest to use, since it just returns a list, is therefore less likely to throw a merger error. <code>sapply</code> will attempt to return the simplest datatype possible, <code>vapply</code> will return a vector. Note that these types of anonymous functions have a different scope than for loops. All variables within the function exists solely within the function and cannot be called into the global environment. As previously mentioned this can be circumvented with the global environment assignment operator <code>&lt;&lt;-</code> but there is rarely a situation where the usage is necessary.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb184"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb184-1"><a href="#cb184-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(loopy_vector, <span class="at">FUN =</span> <span class="cf">function</span>(x){ <span class="do">## x serves here as our "iterator"</span></span>
-<span id="cb184-2"><a href="#cb184-2" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb184-3"><a href="#cb184-3" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> x<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb184-4"><a href="#cb184-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb184-5"><a href="#cb184-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
-<span id="cb184-6"><a href="#cb184-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb184-7"><a href="#cb184-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb186"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb186-1"><a href="#cb186-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(loopy_vector, <span class="at">FUN =</span> <span class="cf">function</span>(x){ <span class="do">## x serves here as our "iterator"</span></span>
+<span id="cb186-2"><a href="#cb186-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb186-3"><a href="#cb186-3" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> x<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb186-4"><a href="#cb186-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb186-5"><a href="#cb186-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
+<span id="cb186-6"><a href="#cb186-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb186-7"><a href="#cb186-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [1] 225
@@ -1430,60 +1491,60 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Note that the output from the function is a list, with nested singular values, a normal method is to wrap a <code>lapply</code> function in an <code>unlist</code> function, or to feed the <code>lapply</code> to one using a pipe.</p>
 <p>I demonstrate a more complex code chunk below, I will create a function that estimates Pi based on Monte Carlo sampling. Note the usage of local variables assigned, as well as the different usages of the iterator. Given that we are “looping” over the vector of different number, the iterator in each sequence becomes the number from the vector.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb186"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb186-1"><a href="#cb186-1" aria-hidden="true" tabindex="-1"></a>sample_nums <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>, <span class="dv">10000</span>, <span class="dv">100000</span>)</span>
-<span id="cb186-2"><a href="#cb186-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb186-3"><a href="#cb186-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb186-4"><a href="#cb186-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(sample_nums, <span class="cf">function</span>(x){</span>
-<span id="cb186-5"><a href="#cb186-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb186-6"><a href="#cb186-6" aria-hidden="true" tabindex="-1"></a>  x_coord <span class="ot">&lt;-</span> <span class="fu">runif</span>(x, <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">1</span>)    <span class="do">## Randomly create coordinates in a 1x1 square</span></span>
-<span id="cb186-7"><a href="#cb186-7" aria-hidden="true" tabindex="-1"></a>  y_coord <span class="ot">&lt;-</span> <span class="fu">runif</span>(x, <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">1</span>)    <span class="do">## Note i use the x iterator as numbers of samples</span></span>
-<span id="cb186-8"><a href="#cb186-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb186-9"><a href="#cb186-9" aria-hidden="true" tabindex="-1"></a>  dist <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(x_coord<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> y_coord<span class="sc">^</span><span class="dv">2</span>) <span class="do">## Measure their distance to origin</span></span>
-<span id="cb186-10"><a href="#cb186-10" aria-hidden="true" tabindex="-1"></a>  withiners <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(dist <span class="sc">&lt;=</span> <span class="dv">1</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)   <span class="do">## If they have 1 or less in dist, they are inside the circle</span></span>
-<span id="cb186-11"><a href="#cb186-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb186-12"><a href="#cb186-12" aria-hidden="true" tabindex="-1"></a>  pi <span class="ot">&lt;-</span> (<span class="fu">sum</span>(withiners)<span class="sc">*</span><span class="dv">4</span>)<span class="sc">/</span>x <span class="do">## the share of dots inside the circle multiplied by 4 is pi</span></span>
-<span id="cb186-13"><a href="#cb186-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb186-14"><a href="#cb186-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb186-15"><a href="#cb186-15" aria-hidden="true" tabindex="-1"></a>  key <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Using "</span>, x, <span class="st">" Samples, Pi is estimated to be "</span>, pi, <span class="st">" (ish)"</span>) <span class="do">## Create a return message</span></span>
-<span id="cb186-16"><a href="#cb186-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb186-17"><a href="#cb186-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(key)</span>
-<span id="cb186-18"><a href="#cb186-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb186-19"><a href="#cb186-19" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="do">## Unlisting the results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb188"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true" tabindex="-1"></a>sample_nums <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>, <span class="dv">10000</span>, <span class="dv">100000</span>)</span>
+<span id="cb188-2"><a href="#cb188-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb188-3"><a href="#cb188-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb188-4"><a href="#cb188-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(sample_nums, <span class="cf">function</span>(x){</span>
+<span id="cb188-5"><a href="#cb188-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb188-6"><a href="#cb188-6" aria-hidden="true" tabindex="-1"></a>  x_coord <span class="ot">&lt;-</span> <span class="fu">runif</span>(x, <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">1</span>)    <span class="do">## Randomly create coordinates in a 1x1 square</span></span>
+<span id="cb188-7"><a href="#cb188-7" aria-hidden="true" tabindex="-1"></a>  y_coord <span class="ot">&lt;-</span> <span class="fu">runif</span>(x, <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">1</span>)    <span class="do">## Note i use the x iterator as numbers of samples</span></span>
+<span id="cb188-8"><a href="#cb188-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb188-9"><a href="#cb188-9" aria-hidden="true" tabindex="-1"></a>  dist <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(x_coord<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> y_coord<span class="sc">^</span><span class="dv">2</span>) <span class="do">## Measure their distance to origin</span></span>
+<span id="cb188-10"><a href="#cb188-10" aria-hidden="true" tabindex="-1"></a>  withiners <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(dist <span class="sc">&lt;=</span> <span class="dv">1</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)   <span class="do">## If they have 1 or less in dist, they are inside the circle</span></span>
+<span id="cb188-11"><a href="#cb188-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb188-12"><a href="#cb188-12" aria-hidden="true" tabindex="-1"></a>  pi <span class="ot">&lt;-</span> (<span class="fu">sum</span>(withiners)<span class="sc">*</span><span class="dv">4</span>)<span class="sc">/</span>x <span class="do">## the share of dots inside the circle multiplied by 4 is pi</span></span>
+<span id="cb188-13"><a href="#cb188-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb188-14"><a href="#cb188-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb188-15"><a href="#cb188-15" aria-hidden="true" tabindex="-1"></a>  key <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Using "</span>, x, <span class="st">" Samples, Pi is estimated to be "</span>, pi, <span class="st">" (ish)"</span>) <span class="do">## Create a return message</span></span>
+<span id="cb188-16"><a href="#cb188-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb188-17"><a href="#cb188-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(key)</span>
+<span id="cb188-18"><a href="#cb188-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb188-19"><a href="#cb188-19" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="do">## Unlisting the results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Using 10 Samples, Pi is estimated to be 2.8 (ish)"       
-[2] "Using 100 Samples, Pi is estimated to be 3.16 (ish)"     
-[3] "Using 1000 Samples, Pi is estimated to be 3.164 (ish)"   
-[4] "Using 10000 Samples, Pi is estimated to be 3.1248 (ish)" 
-[5] "Using 1e+05 Samples, Pi is estimated to be 3.13832 (ish)"</code></pre>
+<pre><code>[1] "Using 10 Samples, Pi is estimated to be 2 (ish)"         
+[2] "Using 100 Samples, Pi is estimated to be 3.04 (ish)"     
+[3] "Using 1000 Samples, Pi is estimated to be 3.124 (ish)"   
+[4] "Using 10000 Samples, Pi is estimated to be 3.1688 (ish)" 
+[5] "Using 1e+05 Samples, Pi is estimated to be 3.14116 (ish)"</code></pre>
 </div>
 </div>
 <p>For a more practical point, I will demonstrate using a lapply function to create a new variable in our old dataset. Let’s say I want to construct an “anti-establishment” index, which is a function of opposition to EU or EEA, opposition to public services, opposition to gender equality, and extreme position on the left_right scale. In this instance I will utilize an <code>apply</code> function which will go over the rows of the dataset, in only the columns I want. When specifying a margin for the simple <code>apply</code> function, it will take either the rows or columns specified and turn them into vectors, so note that the iterator below can be indexed over, to get the relevant variable.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb188"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true" tabindex="-1"></a>vars_ext <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"eu"</span>, <span class="st">"eea"</span>, <span class="st">"off_tjen"</span>, <span class="st">"likestilling"</span>, <span class="st">"left_right"</span>)</span>
-<span id="cb188-2"><a href="#cb188-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb188-3"><a href="#cb188-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb188-4"><a href="#cb188-4" aria-hidden="true" tabindex="-1"></a>joined_sets2<span class="sc">$</span>anti_establishment <span class="ot">&lt;-</span> <span class="fu">apply</span>(joined_sets2[, vars_ext], <span class="at">MARGIN =</span> <span class="dv">1</span>, <span class="do">## Margin argument specifies to view each extract by row or column</span></span>
-<span id="cb188-5"><a href="#cb188-5" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">FUN =</span> <span class="cf">function</span>(x){</span>
-<span id="cb188-6"><a href="#cb188-6" aria-hidden="true" tabindex="-1"></a>                                           </span>
-<span id="cb188-7"><a href="#cb188-7" aria-hidden="true" tabindex="-1"></a>                                           opposed_eu <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">1</span>] <span class="sc">&gt;</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>) <span class="do">## If answered 5, completely disagree, then val 1</span></span>
-<span id="cb188-8"><a href="#cb188-8" aria-hidden="true" tabindex="-1"></a>                                           </span>
-<span id="cb188-9"><a href="#cb188-9" aria-hidden="true" tabindex="-1"></a>                                           opposed_eea <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">2</span>] <span class="sc">&lt;</span> <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>) <span class="co"># This one is framed reverse</span></span>
-<span id="cb188-10"><a href="#cb188-10" aria-hidden="true" tabindex="-1"></a>                                           </span>
-<span id="cb188-11"><a href="#cb188-11" aria-hidden="true" tabindex="-1"></a>                                           opposed_public <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">3</span>] <span class="sc">&gt;</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb188-12"><a href="#cb188-12" aria-hidden="true" tabindex="-1"></a>                                           </span>
-<span id="cb188-13"><a href="#cb188-13" aria-hidden="true" tabindex="-1"></a>                                           opposed_equal <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">4</span>] <span class="sc">&gt;</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb188-14"><a href="#cb188-14" aria-hidden="true" tabindex="-1"></a>                                           </span>
-<span id="cb188-15"><a href="#cb188-15" aria-hidden="true" tabindex="-1"></a>                                           extreme <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">5</span>] <span class="sc">&gt;</span> <span class="dv">7</span> <span class="sc">|</span> x[<span class="dv">5</span>] <span class="sc">&lt;</span> <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb188-16"><a href="#cb188-16" aria-hidden="true" tabindex="-1"></a>                                           </span>
-<span id="cb188-17"><a href="#cb188-17" aria-hidden="true" tabindex="-1"></a>                                           anti_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">c</span>(opposed_eu, opposed_eea, opposed_public, <span class="co"># index is the mean of these values</span></span>
-<span id="cb188-18"><a href="#cb188-18" aria-hidden="true" tabindex="-1"></a>                                                            opposed_equal, extreme), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb188-19"><a href="#cb188-19" aria-hidden="true" tabindex="-1"></a>                                           </span>
-<span id="cb188-20"><a href="#cb188-20" aria-hidden="true" tabindex="-1"></a>                                           <span class="fu">return</span>(anti_val)</span>
-<span id="cb188-21"><a href="#cb188-21" aria-hidden="true" tabindex="-1"></a>                                           </span>
-<span id="cb188-22"><a href="#cb188-22" aria-hidden="true" tabindex="-1"></a>                                         })</span>
-<span id="cb188-23"><a href="#cb188-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb188-24"><a href="#cb188-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb188-25"><a href="#cb188-25" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(joined_sets2<span class="sc">$</span>anti_establishment)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb190"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb190-1"><a href="#cb190-1" aria-hidden="true" tabindex="-1"></a>vars_ext <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"eu"</span>, <span class="st">"eea"</span>, <span class="st">"off_tjen"</span>, <span class="st">"likestilling"</span>, <span class="st">"left_right"</span>)</span>
+<span id="cb190-2"><a href="#cb190-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb190-3"><a href="#cb190-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb190-4"><a href="#cb190-4" aria-hidden="true" tabindex="-1"></a>joined_sets2<span class="sc">$</span>anti_establishment <span class="ot">&lt;-</span> <span class="fu">apply</span>(joined_sets2[, vars_ext], <span class="at">MARGIN =</span> <span class="dv">1</span>, <span class="do">## Margin argument specifies to view each extract by row or column</span></span>
+<span id="cb190-5"><a href="#cb190-5" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">FUN =</span> <span class="cf">function</span>(x){</span>
+<span id="cb190-6"><a href="#cb190-6" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb190-7"><a href="#cb190-7" aria-hidden="true" tabindex="-1"></a>                                           opposed_eu <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">1</span>] <span class="sc">&gt;</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>) <span class="do">## If answered 5, completely disagree, then val 1</span></span>
+<span id="cb190-8"><a href="#cb190-8" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb190-9"><a href="#cb190-9" aria-hidden="true" tabindex="-1"></a>                                           opposed_eea <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">2</span>] <span class="sc">&lt;</span> <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>) <span class="co"># This one is framed reverse</span></span>
+<span id="cb190-10"><a href="#cb190-10" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb190-11"><a href="#cb190-11" aria-hidden="true" tabindex="-1"></a>                                           opposed_public <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">3</span>] <span class="sc">&gt;</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb190-12"><a href="#cb190-12" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb190-13"><a href="#cb190-13" aria-hidden="true" tabindex="-1"></a>                                           opposed_equal <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">4</span>] <span class="sc">&gt;</span> <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb190-14"><a href="#cb190-14" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb190-15"><a href="#cb190-15" aria-hidden="true" tabindex="-1"></a>                                           extreme <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(x[<span class="dv">5</span>] <span class="sc">&gt;</span> <span class="dv">7</span> <span class="sc">|</span> x[<span class="dv">5</span>] <span class="sc">&lt;</span> <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb190-16"><a href="#cb190-16" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb190-17"><a href="#cb190-17" aria-hidden="true" tabindex="-1"></a>                                           anti_val <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">c</span>(opposed_eu, opposed_eea, opposed_public, <span class="co"># index is the mean of these values</span></span>
+<span id="cb190-18"><a href="#cb190-18" aria-hidden="true" tabindex="-1"></a>                                                            opposed_equal, extreme), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb190-19"><a href="#cb190-19" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb190-20"><a href="#cb190-20" aria-hidden="true" tabindex="-1"></a>                                           <span class="fu">return</span>(anti_val)</span>
+<span id="cb190-21"><a href="#cb190-21" aria-hidden="true" tabindex="-1"></a>                                           </span>
+<span id="cb190-22"><a href="#cb190-22" aria-hidden="true" tabindex="-1"></a>                                         })</span>
+<span id="cb190-23"><a href="#cb190-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb190-24"><a href="#cb190-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb190-25"><a href="#cb190-25" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(joined_sets2<span class="sc">$</span>anti_establishment)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
                 0               0.2              0.25 0.333333333333333 
@@ -1500,126 +1561,126 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <h3 data-number="7.2.1" class="anchored" data-anchor-id="a-very-complicated-for-loop"><span class="header-section-number">7.2.1</span> A very complicated for loop</h3>
 <p>Below is an example of a working loop that would take text information about zambian mp’s and turn them into “spells” or period rows, where each row is an mp’s time in a particular role. There is a heavy use of regular expressions, but the point is to demonstrate how one can go from a brick of text, into a dataset. Try returning to it at some later points, to see how your understanding of the process has improved. The dataset has simply three relevant variables, start, stop, and portfolio. Start is the starting date of the MP’s period in parliament, and stop is the end of their time in this period of parliament. Meanwhile, portfolio is a long text that summarises their career, including roles in government. These roles were described as “… minister of local government (1976-1983)”. The goal of the loop is to then split this info, into rows where each row is one such period, so the previously mentioned portfolio becomes one row for the time the MP spent as a minister of local government, then more rows for the other time periods.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb190"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb190-1"><a href="#cb190-1" aria-hidden="true" tabindex="-1"></a>mps2 <span class="ot">&lt;-</span> mps <span class="sc">%&gt;%</span> </span>
-<span id="cb190-2"><a href="#cb190-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.character</span>(start),</span>
-<span id="cb190-3"><a href="#cb190-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">stop =</span> <span class="fu">ifelse</span>(stop <span class="sc">==</span> <span class="st">"Active"</span>, <span class="st">"2023-01-01"</span>, stop)) <span class="do">## Turns the start and stop to characters, and replaces "ACTIVE" with current year</span></span>
-<span id="cb190-4"><a href="#cb190-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb190-5"><a href="#cb190-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(mps2)){</span>
-<span id="cb190-6"><a href="#cb190-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb190-7"><a href="#cb190-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">is.na</span>(mps2<span class="sc">$</span>portfolio[i])){ <span class="do">## If it has no portfolio, then assume the entire period is just an mp, put it back in the list</span></span>
-<span id="cb190-8"><a href="#cb190-8" aria-hidden="true" tabindex="-1"></a>    mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,]</span>
-<span id="cb190-9"><a href="#cb190-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">next</span></span>
-<span id="cb190-10"><a href="#cb190-10" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb190-11"><a href="#cb190-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb190-12"><a href="#cb190-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">str_detect</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)){ <span class="co"># If the portfolio has no (year_start - year_end) parts, then go next</span></span>
-<span id="cb190-13"><a href="#cb190-13" aria-hidden="true" tabindex="-1"></a>    mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,]</span>
-<span id="cb190-14"><a href="#cb190-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">next</span></span>
-<span id="cb190-15"><a href="#cb190-15" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
-<span id="cb190-16"><a href="#cb190-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb190-17"><a href="#cb190-17" aria-hidden="true" tabindex="-1"></a>    tm1 <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>) <span class="do">## First 4 digit number</span></span>
-<span id="cb190-18"><a href="#cb190-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb190-19"><a href="#cb190-19" aria-hidden="true" tabindex="-1"></a>    tm2 <span class="ot">&lt;-</span> <span class="fu">str_extract_all</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>] <span class="do">## Second 4 digit number</span></span>
-<span id="cb190-20"><a href="#cb190-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb190-21"><a href="#cb190-21" aria-hidden="true" tabindex="-1"></a>    spells_info_counter <span class="ot">&lt;-</span> <span class="fu">str_count</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>) <span class="co"># counting the amount of roles the mp has had</span></span>
-<span id="cb190-22"><a href="#cb190-22" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb190-23"><a href="#cb190-23" aria-hidden="true" tabindex="-1"></a>    t_start <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>start[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="co"># extracting the total period start</span></span>
-<span id="cb190-24"><a href="#cb190-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb190-25"><a href="#cb190-25" aria-hidden="true" tabindex="-1"></a>    t_end <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>stop[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="co"># and end</span></span>
-<span id="cb190-26"><a href="#cb190-26" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb190-27"><a href="#cb190-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(tm1 <span class="sc">==</span> t_start <span class="sc">&amp;</span> tm2 <span class="sc">==</span> t_end <span class="sc">&amp;</span> <span class="sc">!</span>(<span class="fu">is.na</span>(tm2))){ <span class="co"># if they are equal, then the role covers the entire period</span></span>
-<span id="cb190-28"><a href="#cb190-28" aria-hidden="true" tabindex="-1"></a>      mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,] <span class="co"># return to the list, go next</span></span>
-<span id="cb190-29"><a href="#cb190-29" aria-hidden="true" tabindex="-1"></a>      <span class="cf">next</span></span>
-<span id="cb190-30"><a href="#cb190-30" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
-<span id="cb190-31"><a href="#cb190-31" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-32"><a href="#cb190-32" aria-hidden="true" tabindex="-1"></a>      spell_list <span class="ot">&lt;-</span> <span class="fu">list</span>() <span class="co"># create an empty list to put all the roles into</span></span>
-<span id="cb190-33"><a href="#cb190-33" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-34"><a href="#cb190-34" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>spells_info_counter){ <span class="co"># for every time it found a role </span></span>
-<span id="cb190-35"><a href="#cb190-35" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-36"><a href="#cb190-36" aria-hidden="true" tabindex="-1"></a>        curr_span <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">unlist</span>(<span class="fu">str_extract_all</span>(<span class="fu">str_extract_all</span>(mps<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>))) <span class="co"># get that exact role span</span></span>
-<span id="cb190-37"><a href="#cb190-37" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-38"><a href="#cb190-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="fu">all</span>(curr_span <span class="sc">&gt;</span> t_end) <span class="sc">|</span> <span class="fu">all</span>(curr_span <span class="sc">&lt;</span> t_start)){ <span class="co"># if it is outside the range of the current row, ignore, go next in the role list</span></span>
-<span id="cb190-39"><a href="#cb190-39" aria-hidden="true" tabindex="-1"></a>          <span class="cf">next</span></span>
-<span id="cb190-40"><a href="#cb190-40" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb190-41"><a href="#cb190-41" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-42"><a href="#cb190-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>((<span class="fu">max</span>(curr_span) <span class="sc">==</span> t_start <span class="sc">|</span> <span class="fu">min</span>(curr_span) <span class="sc">==</span> t_end) <span class="sc">&amp;</span> <span class="fu">length</span>(curr_span) <span class="sc">!=</span> <span class="dv">1</span>){</span>
-<span id="cb190-43"><a href="#cb190-43" aria-hidden="true" tabindex="-1"></a>          <span class="cf">next</span></span>
-<span id="cb190-44"><a href="#cb190-44" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb190-45"><a href="#cb190-45" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-46"><a href="#cb190-46" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-47"><a href="#cb190-47" aria-hidden="true" tabindex="-1"></a>        spell_list[[j]]  <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
-<span id="cb190-48"><a href="#cb190-48" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">role =</span> <span class="fu">str_split</span>(portfolio, <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d{4}(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d{4})?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="do">## Find the role, string of everything before the time period identifier</span></span>
-<span id="cb190-49"><a href="#cb190-49" aria-hidden="true" tabindex="-1"></a>                 <span class="at">role_span =</span> <span class="fu">str_extract_all</span>(portfolio, <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="co"># find the span of the role, the (start - stop) string</span></span>
-<span id="cb190-50"><a href="#cb190-50" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">ifelse</span>(<span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="sc">&lt;=</span> t_start, start, <span class="co"># if the start was before this row, then the rowstart is the start</span></span>
-<span id="cb190-51"><a href="#cb190-51" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>)), <span class="co"># else the actual first part of the (start-stop) string</span></span>
-<span id="cb190-52"><a href="#cb190-52" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop  =</span> <span class="fu">ifelse</span>(<span class="fu">str_count</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>) <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>), <span class="co"># same with stop, but for the end</span></span>
-<span id="cb190-53"><a href="#cb190-53" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">ifelse</span>(<span class="fu">str_extract_all</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>] <span class="sc">&gt;=</span> t_end,</span>
-<span id="cb190-54"><a href="#cb190-54" aria-hidden="true" tabindex="-1"></a>                                       stop,</span>
-<span id="cb190-55"><a href="#cb190-55" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">str_extract_all</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>])),</span>
-<span id="cb190-56"><a href="#cb190-56" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">as.Date</span>(<span class="fu">ifelse</span>(<span class="fu">is.numeric</span>(start), start,</span>
-<span id="cb190-57"><a href="#cb190-57" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">as.Date</span>(<span class="fu">paste0</span>(start, <span class="st">"-1-1"</span>), <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)), <span class="co"># turn it in to the Date format</span></span>
-<span id="cb190-58"><a href="#cb190-58" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">origin =</span> <span class="st">"1970-01-01"</span>),</span>
-<span id="cb190-59"><a href="#cb190-59" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop =</span> <span class="fu">as.Date</span>(<span class="fu">ifelse</span>(<span class="fu">is.numeric</span>(stop), stop,</span>
-<span id="cb190-60"><a href="#cb190-60" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">as.Date</span>(<span class="fu">paste0</span>(stop, <span class="st">"-12-31"</span>), <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)),</span>
-<span id="cb190-61"><a href="#cb190-61" aria-hidden="true" tabindex="-1"></a>                                <span class="at">origin =</span> <span class="st">"1970-01-01"</span>),</span>
-<span id="cb190-62"><a href="#cb190-62" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">as.character</span>(start), <span class="co"># turn that into text again, so we have exact dates to work with</span></span>
-<span id="cb190-63"><a href="#cb190-63" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop =</span> <span class="fu">as.character</span>(stop)</span>
-<span id="cb190-64"><a href="#cb190-64" aria-hidden="true" tabindex="-1"></a>          )</span>
-<span id="cb190-65"><a href="#cb190-65" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-66"><a href="#cb190-66" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb190-67"><a href="#cb190-67" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-68"><a href="#cb190-68" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">is_empty</span>(spell_list)){ <span class="co"># if it for some reason returned empty, cause no periods to loop over, they were just an elected member in this period</span></span>
-<span id="cb190-69"><a href="#cb190-69" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
-<span id="cb190-70"><a href="#cb190-70" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">role =</span> <span class="st">"Elected Member"</span>)</span>
-<span id="cb190-71"><a href="#cb190-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">next</span></span>
-<span id="cb190-72"><a href="#cb190-72" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb190-73"><a href="#cb190-73" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-74"><a href="#cb190-74" aria-hidden="true" tabindex="-1"></a>      speller_list <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(spell_list) <span class="co"># turn the roles into a list</span></span>
-<span id="cb190-75"><a href="#cb190-75" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-76"><a href="#cb190-76" aria-hidden="true" tabindex="-1"></a>      Y_Periods <span class="ot">&lt;-</span> speller_list <span class="sc">%&gt;%</span> </span>
-<span id="cb190-77"><a href="#cb190-77" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.Date</span>(start, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb190-78"><a href="#cb190-78" aria-hidden="true" tabindex="-1"></a>               <span class="at">stop =</span> <span class="fu">as.Date</span>(stop, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)) <span class="sc">%&gt;%</span>  <span class="do">## Back into dates again</span></span>
-<span id="cb190-79"><a href="#cb190-79" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">int_int =</span> <span class="fu">interval</span>(start,stop)) <span class="sc">%&gt;%</span>  <span class="co"># create an interval between the start and the stop</span></span>
-<span id="cb190-80"><a href="#cb190-80" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(int_int)</span>
-<span id="cb190-81"><a href="#cb190-81" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-82"><a href="#cb190-82" aria-hidden="true" tabindex="-1"></a>      X_Period <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
-<span id="cb190-83"><a href="#cb190-83" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.Date</span>(start, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb190-84"><a href="#cb190-84" aria-hidden="true" tabindex="-1"></a>               <span class="at">stop =</span> <span class="fu">as.Date</span>(stop, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)) <span class="sc">%&gt;%</span>  <span class="do">## Create a frame with the total interval for the row</span></span>
-<span id="cb190-85"><a href="#cb190-85" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">int_int =</span> <span class="fu">interval</span>(start,stop)) <span class="sc">%&gt;%</span> </span>
-<span id="cb190-86"><a href="#cb190-86" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(int_int)</span>
-<span id="cb190-87"><a href="#cb190-87" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-88"><a href="#cb190-88" aria-hidden="true" tabindex="-1"></a>      seq_X <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">seq</span>(<span class="fu">int_start</span>(X_Period), <span class="fu">int_end</span>(X_Period), <span class="at">by =</span> <span class="st">"1 day"</span>))</span>
-<span id="cb190-89"><a href="#cb190-89" aria-hidden="true" tabindex="-1"></a>      seq_Y <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">do.call</span>(<span class="st">"c"</span>, <span class="fu">lapply</span>(Y_Periods, <span class="cf">function</span>(x)</span>
-<span id="cb190-90"><a href="#cb190-90" aria-hidden="true" tabindex="-1"></a>        <span class="fu">seq</span>(<span class="fu">int_start</span>(x), <span class="fu">int_end</span>(x), <span class="at">by =</span> <span class="st">"1 day"</span>))))</span>
-<span id="cb190-91"><a href="#cb190-91" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-92"><a href="#cb190-92" aria-hidden="true" tabindex="-1"></a>      unique_dates_X <span class="ot">&lt;-</span> seq_X[<span class="sc">!</span>seq_X <span class="sc">%in%</span> seq_Y] <span class="do">## find the sequence of time not covered by these roles</span></span>
-<span id="cb190-93"><a href="#cb190-93" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb190-94"><a href="#cb190-94" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">is_empty</span>(unique_dates_X)){ <span class="co"># if there are no times they have no role, go next</span></span>
-<span id="cb190-95"><a href="#cb190-95" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> speller_list</span>
-<span id="cb190-96"><a href="#cb190-96" aria-hidden="true" tabindex="-1"></a>        <span class="cf">next</span></span>
-<span id="cb190-97"><a href="#cb190-97" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span> {</span>
-<span id="cb190-98"><a href="#cb190-98" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-99"><a href="#cb190-99" aria-hidden="true" tabindex="-1"></a>        lst <span class="ot">&lt;-</span> <span class="fu">aggregate</span>( <span class="do">### Create an aggregate of the timeholes</span></span>
-<span id="cb190-100"><a href="#cb190-100" aria-hidden="true" tabindex="-1"></a>          unique_dates_X,</span>
-<span id="cb190-101"><a href="#cb190-101" aria-hidden="true" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">list</span>(<span class="fu">cumsum</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">diff.Date</span>(unique_dates_X) <span class="sc">!=</span> <span class="dv">1</span>))),</span>
-<span id="cb190-102"><a href="#cb190-102" aria-hidden="true" tabindex="-1"></a>          <span class="at">FUN =</span> <span class="cf">function</span>(x) <span class="fu">c</span>(<span class="fu">min</span>(x), <span class="fu">max</span>(x)),</span>
-<span id="cb190-103"><a href="#cb190-103" aria-hidden="true" tabindex="-1"></a>          <span class="at">simplify =</span> F)<span class="sc">$</span>x    </span>
-<span id="cb190-104"><a href="#cb190-104" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-105"><a href="#cb190-105" aria-hidden="true" tabindex="-1"></a>        my_ints <span class="ot">&lt;-</span> <span class="fu">lapply</span>(lst, <span class="cf">function</span>(x) <span class="fu">interval</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>])) <span class="do">## Create a new interval of this</span></span>
-<span id="cb190-106"><a href="#cb190-106" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-107"><a href="#cb190-107" aria-hidden="true" tabindex="-1"></a>        l_fram <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">inter_start =</span> <span class="fu">sapply</span>(<span class="fu">lapply</span>(my_ints, <span class="at">FUN =</span> int_start), as.character),</span>
-<span id="cb190-108"><a href="#cb190-108" aria-hidden="true" tabindex="-1"></a>                             <span class="at">inter_end =</span> <span class="fu">sapply</span>(<span class="fu">lapply</span>(my_ints, <span class="at">FUN =</span> int_end), as.character))</span>
-<span id="cb190-109"><a href="#cb190-109" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-110"><a href="#cb190-110" aria-hidden="true" tabindex="-1"></a>        new_adds <span class="ot">&lt;-</span> <span class="fu">cbind</span>(mps2[i,], l_fram) <span class="sc">%&gt;%</span>  <span class="do">## Pull a copy of the original row for personal info</span></span>
-<span id="cb190-111"><a href="#cb190-111" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">start =</span> inter_start, <span class="at">stop =</span> inter_end, <span class="co"># mutat to end and start from the interval we created.</span></span>
-<span id="cb190-112"><a href="#cb190-112" aria-hidden="true" tabindex="-1"></a>                 <span class="at">role =</span> <span class="st">"Elected Member"</span>) <span class="do">## The empty times is when they were just an elected member</span></span>
-<span id="cb190-113"><a href="#cb190-113" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb190-114"><a href="#cb190-114" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> speller_list <span class="sc">%&gt;%</span> <span class="do">## Add it to the total list</span></span>
-<span id="cb190-115"><a href="#cb190-115" aria-hidden="true" tabindex="-1"></a>          <span class="fu">bind_rows</span>(new_adds)</span>
-<span id="cb190-116"><a href="#cb190-116" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb190-117"><a href="#cb190-117" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb190-118"><a href="#cb190-118" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb190-119"><a href="#cb190-119" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb190-120"><a href="#cb190-120" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb192"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb192-1"><a href="#cb192-1" aria-hidden="true" tabindex="-1"></a>mps2 <span class="ot">&lt;-</span> mps <span class="sc">%&gt;%</span> </span>
+<span id="cb192-2"><a href="#cb192-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.character</span>(start),</span>
+<span id="cb192-3"><a href="#cb192-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">stop =</span> <span class="fu">ifelse</span>(stop <span class="sc">==</span> <span class="st">"Active"</span>, <span class="st">"2023-01-01"</span>, stop)) <span class="do">## Turns the start and stop to characters, and replaces "ACTIVE" with current year</span></span>
+<span id="cb192-4"><a href="#cb192-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb192-5"><a href="#cb192-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(mps2)){</span>
+<span id="cb192-6"><a href="#cb192-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb192-7"><a href="#cb192-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">is.na</span>(mps2<span class="sc">$</span>portfolio[i])){ <span class="do">## If it has no portfolio, then assume the entire period is just an mp, put it back in the list</span></span>
+<span id="cb192-8"><a href="#cb192-8" aria-hidden="true" tabindex="-1"></a>    mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,]</span>
+<span id="cb192-9"><a href="#cb192-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">next</span></span>
+<span id="cb192-10"><a href="#cb192-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb192-11"><a href="#cb192-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb192-12"><a href="#cb192-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">str_detect</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)){ <span class="co"># If the portfolio has no (year_start - year_end) parts, then go next</span></span>
+<span id="cb192-13"><a href="#cb192-13" aria-hidden="true" tabindex="-1"></a>    mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,]</span>
+<span id="cb192-14"><a href="#cb192-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">next</span></span>
+<span id="cb192-15"><a href="#cb192-15" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb192-16"><a href="#cb192-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb192-17"><a href="#cb192-17" aria-hidden="true" tabindex="-1"></a>    tm1 <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>) <span class="do">## First 4 digit number</span></span>
+<span id="cb192-18"><a href="#cb192-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb192-19"><a href="#cb192-19" aria-hidden="true" tabindex="-1"></a>    tm2 <span class="ot">&lt;-</span> <span class="fu">str_extract_all</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>] <span class="do">## Second 4 digit number</span></span>
+<span id="cb192-20"><a href="#cb192-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb192-21"><a href="#cb192-21" aria-hidden="true" tabindex="-1"></a>    spells_info_counter <span class="ot">&lt;-</span> <span class="fu">str_count</span>(mps2<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>) <span class="co"># counting the amount of roles the mp has had</span></span>
+<span id="cb192-22"><a href="#cb192-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb192-23"><a href="#cb192-23" aria-hidden="true" tabindex="-1"></a>    t_start <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>start[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="co"># extracting the total period start</span></span>
+<span id="cb192-24"><a href="#cb192-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb192-25"><a href="#cb192-25" aria-hidden="true" tabindex="-1"></a>    t_end <span class="ot">&lt;-</span> <span class="fu">str_extract</span>(mps2<span class="sc">$</span>stop[i], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="co"># and end</span></span>
+<span id="cb192-26"><a href="#cb192-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb192-27"><a href="#cb192-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(tm1 <span class="sc">==</span> t_start <span class="sc">&amp;</span> tm2 <span class="sc">==</span> t_end <span class="sc">&amp;</span> <span class="sc">!</span>(<span class="fu">is.na</span>(tm2))){ <span class="co"># if they are equal, then the role covers the entire period</span></span>
+<span id="cb192-28"><a href="#cb192-28" aria-hidden="true" tabindex="-1"></a>      mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,] <span class="co"># return to the list, go next</span></span>
+<span id="cb192-29"><a href="#cb192-29" aria-hidden="true" tabindex="-1"></a>      <span class="cf">next</span></span>
+<span id="cb192-30"><a href="#cb192-30" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
+<span id="cb192-31"><a href="#cb192-31" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-32"><a href="#cb192-32" aria-hidden="true" tabindex="-1"></a>      spell_list <span class="ot">&lt;-</span> <span class="fu">list</span>() <span class="co"># create an empty list to put all the roles into</span></span>
+<span id="cb192-33"><a href="#cb192-33" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-34"><a href="#cb192-34" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>spells_info_counter){ <span class="co"># for every time it found a role </span></span>
+<span id="cb192-35"><a href="#cb192-35" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-36"><a href="#cb192-36" aria-hidden="true" tabindex="-1"></a>        curr_span <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">unlist</span>(<span class="fu">str_extract_all</span>(<span class="fu">str_extract_all</span>(mps<span class="sc">$</span>portfolio[i], <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>))) <span class="co"># get that exact role span</span></span>
+<span id="cb192-37"><a href="#cb192-37" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-38"><a href="#cb192-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="fu">all</span>(curr_span <span class="sc">&gt;</span> t_end) <span class="sc">|</span> <span class="fu">all</span>(curr_span <span class="sc">&lt;</span> t_start)){ <span class="co"># if it is outside the range of the current row, ignore, go next in the role list</span></span>
+<span id="cb192-39"><a href="#cb192-39" aria-hidden="true" tabindex="-1"></a>          <span class="cf">next</span></span>
+<span id="cb192-40"><a href="#cb192-40" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb192-41"><a href="#cb192-41" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-42"><a href="#cb192-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>((<span class="fu">max</span>(curr_span) <span class="sc">==</span> t_start <span class="sc">|</span> <span class="fu">min</span>(curr_span) <span class="sc">==</span> t_end) <span class="sc">&amp;</span> <span class="fu">length</span>(curr_span) <span class="sc">!=</span> <span class="dv">1</span>){</span>
+<span id="cb192-43"><a href="#cb192-43" aria-hidden="true" tabindex="-1"></a>          <span class="cf">next</span></span>
+<span id="cb192-44"><a href="#cb192-44" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb192-45"><a href="#cb192-45" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-46"><a href="#cb192-46" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-47"><a href="#cb192-47" aria-hidden="true" tabindex="-1"></a>        spell_list[[j]]  <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
+<span id="cb192-48"><a href="#cb192-48" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">role =</span> <span class="fu">str_split</span>(portfolio, <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d{4}(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d{4})?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="do">## Find the role, string of everything before the time period identifier</span></span>
+<span id="cb192-49"><a href="#cb192-49" aria-hidden="true" tabindex="-1"></a>                 <span class="at">role_span =</span> <span class="fu">str_extract_all</span>(portfolio, <span class="st">"</span><span class="sc">\\</span><span class="st">(</span><span class="sc">\\</span><span class="st">d+(?:</span><span class="sc">\\</span><span class="st">-</span><span class="sc">\\</span><span class="st">d+)?</span><span class="sc">\\</span><span class="st">)"</span>)[[<span class="dv">1</span>]][j], <span class="co"># find the span of the role, the (start - stop) string</span></span>
+<span id="cb192-50"><a href="#cb192-50" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">ifelse</span>(<span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>) <span class="sc">&lt;=</span> t_start, start, <span class="co"># if the start was before this row, then the rowstart is the start</span></span>
+<span id="cb192-51"><a href="#cb192-51" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d{4}"</span>)), <span class="co"># else the actual first part of the (start-stop) string</span></span>
+<span id="cb192-52"><a href="#cb192-52" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop  =</span> <span class="fu">ifelse</span>(<span class="fu">str_count</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>) <span class="sc">==</span> <span class="dv">1</span>, <span class="fu">str_extract</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>), <span class="co"># same with stop, but for the end</span></span>
+<span id="cb192-53"><a href="#cb192-53" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">ifelse</span>(<span class="fu">str_extract_all</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>] <span class="sc">&gt;=</span> t_end,</span>
+<span id="cb192-54"><a href="#cb192-54" aria-hidden="true" tabindex="-1"></a>                                       stop,</span>
+<span id="cb192-55"><a href="#cb192-55" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">str_extract_all</span>(role_span, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>)[[<span class="dv">1</span>]][<span class="dv">2</span>])),</span>
+<span id="cb192-56"><a href="#cb192-56" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">as.Date</span>(<span class="fu">ifelse</span>(<span class="fu">is.numeric</span>(start), start,</span>
+<span id="cb192-57"><a href="#cb192-57" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">as.Date</span>(<span class="fu">paste0</span>(start, <span class="st">"-1-1"</span>), <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)), <span class="co"># turn it in to the Date format</span></span>
+<span id="cb192-58"><a href="#cb192-58" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">origin =</span> <span class="st">"1970-01-01"</span>),</span>
+<span id="cb192-59"><a href="#cb192-59" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop =</span> <span class="fu">as.Date</span>(<span class="fu">ifelse</span>(<span class="fu">is.numeric</span>(stop), stop,</span>
+<span id="cb192-60"><a href="#cb192-60" aria-hidden="true" tabindex="-1"></a>                                       <span class="fu">as.Date</span>(<span class="fu">paste0</span>(stop, <span class="st">"-12-31"</span>), <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)),</span>
+<span id="cb192-61"><a href="#cb192-61" aria-hidden="true" tabindex="-1"></a>                                <span class="at">origin =</span> <span class="st">"1970-01-01"</span>),</span>
+<span id="cb192-62"><a href="#cb192-62" aria-hidden="true" tabindex="-1"></a>                 <span class="at">start =</span> <span class="fu">as.character</span>(start), <span class="co"># turn that into text again, so we have exact dates to work with</span></span>
+<span id="cb192-63"><a href="#cb192-63" aria-hidden="true" tabindex="-1"></a>                 <span class="at">stop =</span> <span class="fu">as.character</span>(stop)</span>
+<span id="cb192-64"><a href="#cb192-64" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb192-65"><a href="#cb192-65" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-66"><a href="#cb192-66" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb192-67"><a href="#cb192-67" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-68"><a href="#cb192-68" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">is_empty</span>(spell_list)){ <span class="co"># if it for some reason returned empty, cause no periods to loop over, they were just an elected member in this period</span></span>
+<span id="cb192-69"><a href="#cb192-69" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
+<span id="cb192-70"><a href="#cb192-70" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">role =</span> <span class="st">"Elected Member"</span>)</span>
+<span id="cb192-71"><a href="#cb192-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">next</span></span>
+<span id="cb192-72"><a href="#cb192-72" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb192-73"><a href="#cb192-73" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-74"><a href="#cb192-74" aria-hidden="true" tabindex="-1"></a>      speller_list <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(spell_list) <span class="co"># turn the roles into a list</span></span>
+<span id="cb192-75"><a href="#cb192-75" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-76"><a href="#cb192-76" aria-hidden="true" tabindex="-1"></a>      Y_Periods <span class="ot">&lt;-</span> speller_list <span class="sc">%&gt;%</span> </span>
+<span id="cb192-77"><a href="#cb192-77" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.Date</span>(start, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb192-78"><a href="#cb192-78" aria-hidden="true" tabindex="-1"></a>               <span class="at">stop =</span> <span class="fu">as.Date</span>(stop, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)) <span class="sc">%&gt;%</span>  <span class="do">## Back into dates again</span></span>
+<span id="cb192-79"><a href="#cb192-79" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">int_int =</span> <span class="fu">interval</span>(start,stop)) <span class="sc">%&gt;%</span>  <span class="co"># create an interval between the start and the stop</span></span>
+<span id="cb192-80"><a href="#cb192-80" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(int_int)</span>
+<span id="cb192-81"><a href="#cb192-81" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-82"><a href="#cb192-82" aria-hidden="true" tabindex="-1"></a>      X_Period <span class="ot">&lt;-</span> mps2[i,] <span class="sc">%&gt;%</span> </span>
+<span id="cb192-83"><a href="#cb192-83" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">start =</span> <span class="fu">as.Date</span>(start, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb192-84"><a href="#cb192-84" aria-hidden="true" tabindex="-1"></a>               <span class="at">stop =</span> <span class="fu">as.Date</span>(stop, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)) <span class="sc">%&gt;%</span>  <span class="do">## Create a frame with the total interval for the row</span></span>
+<span id="cb192-85"><a href="#cb192-85" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">int_int =</span> <span class="fu">interval</span>(start,stop)) <span class="sc">%&gt;%</span> </span>
+<span id="cb192-86"><a href="#cb192-86" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(int_int)</span>
+<span id="cb192-87"><a href="#cb192-87" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-88"><a href="#cb192-88" aria-hidden="true" tabindex="-1"></a>      seq_X <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">seq</span>(<span class="fu">int_start</span>(X_Period), <span class="fu">int_end</span>(X_Period), <span class="at">by =</span> <span class="st">"1 day"</span>))</span>
+<span id="cb192-89"><a href="#cb192-89" aria-hidden="true" tabindex="-1"></a>      seq_Y <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">do.call</span>(<span class="st">"c"</span>, <span class="fu">lapply</span>(Y_Periods, <span class="cf">function</span>(x)</span>
+<span id="cb192-90"><a href="#cb192-90" aria-hidden="true" tabindex="-1"></a>        <span class="fu">seq</span>(<span class="fu">int_start</span>(x), <span class="fu">int_end</span>(x), <span class="at">by =</span> <span class="st">"1 day"</span>))))</span>
+<span id="cb192-91"><a href="#cb192-91" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-92"><a href="#cb192-92" aria-hidden="true" tabindex="-1"></a>      unique_dates_X <span class="ot">&lt;-</span> seq_X[<span class="sc">!</span>seq_X <span class="sc">%in%</span> seq_Y] <span class="do">## find the sequence of time not covered by these roles</span></span>
+<span id="cb192-93"><a href="#cb192-93" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb192-94"><a href="#cb192-94" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">is_empty</span>(unique_dates_X)){ <span class="co"># if there are no times they have no role, go next</span></span>
+<span id="cb192-95"><a href="#cb192-95" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> speller_list</span>
+<span id="cb192-96"><a href="#cb192-96" aria-hidden="true" tabindex="-1"></a>        <span class="cf">next</span></span>
+<span id="cb192-97"><a href="#cb192-97" aria-hidden="true" tabindex="-1"></a>      }<span class="cf">else</span> {</span>
+<span id="cb192-98"><a href="#cb192-98" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-99"><a href="#cb192-99" aria-hidden="true" tabindex="-1"></a>        lst <span class="ot">&lt;-</span> <span class="fu">aggregate</span>( <span class="do">### Create an aggregate of the timeholes</span></span>
+<span id="cb192-100"><a href="#cb192-100" aria-hidden="true" tabindex="-1"></a>          unique_dates_X,</span>
+<span id="cb192-101"><a href="#cb192-101" aria-hidden="true" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">list</span>(<span class="fu">cumsum</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">diff.Date</span>(unique_dates_X) <span class="sc">!=</span> <span class="dv">1</span>))),</span>
+<span id="cb192-102"><a href="#cb192-102" aria-hidden="true" tabindex="-1"></a>          <span class="at">FUN =</span> <span class="cf">function</span>(x) <span class="fu">c</span>(<span class="fu">min</span>(x), <span class="fu">max</span>(x)),</span>
+<span id="cb192-103"><a href="#cb192-103" aria-hidden="true" tabindex="-1"></a>          <span class="at">simplify =</span> F)<span class="sc">$</span>x    </span>
+<span id="cb192-104"><a href="#cb192-104" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-105"><a href="#cb192-105" aria-hidden="true" tabindex="-1"></a>        my_ints <span class="ot">&lt;-</span> <span class="fu">lapply</span>(lst, <span class="cf">function</span>(x) <span class="fu">interval</span>(x[<span class="dv">1</span>], x[<span class="dv">2</span>])) <span class="do">## Create a new interval of this</span></span>
+<span id="cb192-106"><a href="#cb192-106" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-107"><a href="#cb192-107" aria-hidden="true" tabindex="-1"></a>        l_fram <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">inter_start =</span> <span class="fu">sapply</span>(<span class="fu">lapply</span>(my_ints, <span class="at">FUN =</span> int_start), as.character),</span>
+<span id="cb192-108"><a href="#cb192-108" aria-hidden="true" tabindex="-1"></a>                             <span class="at">inter_end =</span> <span class="fu">sapply</span>(<span class="fu">lapply</span>(my_ints, <span class="at">FUN =</span> int_end), as.character))</span>
+<span id="cb192-109"><a href="#cb192-109" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-110"><a href="#cb192-110" aria-hidden="true" tabindex="-1"></a>        new_adds <span class="ot">&lt;-</span> <span class="fu">cbind</span>(mps2[i,], l_fram) <span class="sc">%&gt;%</span>  <span class="do">## Pull a copy of the original row for personal info</span></span>
+<span id="cb192-111"><a href="#cb192-111" aria-hidden="true" tabindex="-1"></a>          <span class="fu">mutate</span>(<span class="at">start =</span> inter_start, <span class="at">stop =</span> inter_end, <span class="co"># mutat to end and start from the interval we created.</span></span>
+<span id="cb192-112"><a href="#cb192-112" aria-hidden="true" tabindex="-1"></a>                 <span class="at">role =</span> <span class="st">"Elected Member"</span>) <span class="do">## The empty times is when they were just an elected member</span></span>
+<span id="cb192-113"><a href="#cb192-113" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb192-114"><a href="#cb192-114" aria-hidden="true" tabindex="-1"></a>        mps_list[[i]] <span class="ot">&lt;-</span> speller_list <span class="sc">%&gt;%</span> <span class="do">## Add it to the total list</span></span>
+<span id="cb192-115"><a href="#cb192-115" aria-hidden="true" tabindex="-1"></a>          <span class="fu">bind_rows</span>(new_adds)</span>
+<span id="cb192-116"><a href="#cb192-116" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb192-117"><a href="#cb192-117" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb192-118"><a href="#cb192-118" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb192-119"><a href="#cb192-119" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb192-120"><a href="#cb192-120" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -1627,39 +1688,39 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <h2 data-number="7.3" class="anchored" data-anchor-id="string-manipulation"><span class="header-section-number">7.3</span> String manipulation</h2>
 <p>I will not go into details in this section, but will make it clear that character variables can be utilized in many different ways through what is known as regular expressions or regex, which are lines of very silly text which can be used as pattern matching to strings as data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb191"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
-<span id="cb191-2"><a href="#cb191-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb191-3"><a href="#cb191-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
-<span id="cb191-4"><a href="#cb191-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb191-5"><a href="#cb191-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb191-6"><a href="#cb191-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb191-7"><a href="#cb191-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
-<span id="cb191-8"><a href="#cb191-8" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
-<span id="cb191-9"><a href="#cb191-9" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
-<span id="cb191-10"><a href="#cb191-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb191-11"><a href="#cb191-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb193"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb193-1"><a href="#cb193-1" aria-hidden="true" tabindex="-1"></a>this_is_a_string <span class="ot">&lt;-</span> <span class="st">"hi my name is Gard and I have clinical depression, please help"</span></span>
+<span id="cb193-2"><a href="#cb193-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb193-3"><a href="#cb193-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Regex looks insane, so when i for instance want to check whether there is a capitalized name in this string</span></span>
+<span id="cb193-4"><a href="#cb193-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb193-5"><a href="#cb193-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb193-6"><a href="#cb193-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb193-7"><a href="#cb193-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Now i check the string on a pattern that matches to any substring that </span></span>
+<span id="cb193-8"><a href="#cb193-8" aria-hidden="true" tabindex="-1"></a><span class="do">## starts with a single capitalized letter followed by 2 or more uncapitalized</span></span>
+<span id="cb193-9"><a href="#cb193-9" aria-hidden="true" tabindex="-1"></a><span class="do">## letters.</span></span>
+<span id="cb193-10"><a href="#cb193-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb193-11"><a href="#cb193-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb193"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb193-1"><a href="#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
-<span id="cb193-2"><a href="#cb193-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb193-3"><a href="#cb193-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb195"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb195-1"><a href="#cb195-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other functions could do similar stuff, like extract the match</span></span>
+<span id="cb195-2"><a href="#cb195-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb195-3"><a href="#cb195-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"[A-Z]{1}[a-z]{2,}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Gard"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb195"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb195-1"><a href="#cb195-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Same but for a comma and then anything</span></span>
-<span id="cb195-2"><a href="#cb195-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb195-3"><a href="#cb195-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"</span><span class="sc">\\</span><span class="st">,.*"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb197"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb197-1"><a href="#cb197-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Same but for a comma and then anything</span></span>
+<span id="cb197-2"><a href="#cb197-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb197-3"><a href="#cb197-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"</span><span class="sc">\\</span><span class="st">,.*"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] ", please help"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb197"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb197-1"><a href="#cb197-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Anything following a comma, but not the comma</span></span>
-<span id="cb197-2"><a href="#cb197-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb197-3"><a href="#cb197-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"(?&lt;=</span><span class="sc">\\</span><span class="st">,).*"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb199"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb199-1"><a href="#cb199-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Anything following a comma, but not the comma</span></span>
+<span id="cb199-2"><a href="#cb199-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-3"><a href="#cb199-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(this_is_a_string, <span class="st">"(?&lt;=</span><span class="sc">\\</span><span class="st">,).*"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] " please help"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb199"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb199-1"><a href="#cb199-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the space is still there</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb201"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb201-1"><a href="#cb201-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the space is still there</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Regex can get extremely complex, and string manipulation in general is a very advanced topic in terms of common R usage, I still have to google many of the characters used in these patterns, and to teach away how regex works properly could probably be an entire course or two in and of itself.</p>
 </section>
@@ -1689,15 +1750,15 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>You can then use this table of contents to more easily navigate the structure of your script. Additionally, creating such outlines is good to ensure the previously mentioned requirement of linearity.</p>
 <p>When it comes to readability, it is important that you take a couple of key steps to ensure that your code is light on the eyes and the code viewer. Remember to have proper spacing between elements of your code, below are a couple of examples of good and bad practice when it comes to writing code with spacing. Note that you should also actively use linespacing to create blocks or separate code from each other.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb200"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb200-1"><a href="#cb200-1" aria-hidden="true" tabindex="-1"></a>df_example2<span class="ot">&lt;-</span>df_example<span class="sc">%&gt;%</span><span class="fu">filter</span>(happy<span class="sc">==</span><span class="cn">FALSE</span>) <span class="do">## BAD</span></span>
-<span id="cb200-2"><a href="#cb200-2" aria-hidden="true" tabindex="-1"></a>df_example_2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="do">## Good</span></span>
-<span id="cb200-3"><a href="#cb200-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-4"><a href="#cb200-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Note the spacing between opeerators, but not between parenthesis and text. </span></span>
-<span id="cb200-5"><a href="#cb200-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-6"><a href="#cb200-6" aria-hidden="true" tabindex="-1"></a>df_example2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>,age <span class="sc">==</span> <span class="dv">27</span>) <span class="do">## BAD</span></span>
-<span id="cb200-7"><a href="#cb200-7" aria-hidden="true" tabindex="-1"></a>df_example_2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>, age <span class="sc">==</span> <span class="dv">27</span>) <span class="do">## GOOD</span></span>
-<span id="cb200-8"><a href="#cb200-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb200-9"><a href="#cb200-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Note that spacing after the commas, just like normal writing, is good practice</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb202"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb202-1"><a href="#cb202-1" aria-hidden="true" tabindex="-1"></a>df_example2<span class="ot">&lt;-</span>df_example<span class="sc">%&gt;%</span><span class="fu">filter</span>(happy<span class="sc">==</span><span class="cn">FALSE</span>) <span class="do">## BAD</span></span>
+<span id="cb202-2"><a href="#cb202-2" aria-hidden="true" tabindex="-1"></a>df_example_2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="do">## Good</span></span>
+<span id="cb202-3"><a href="#cb202-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb202-4"><a href="#cb202-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Note the spacing between opeerators, but not between parenthesis and text. </span></span>
+<span id="cb202-5"><a href="#cb202-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb202-6"><a href="#cb202-6" aria-hidden="true" tabindex="-1"></a>df_example2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>,age <span class="sc">==</span> <span class="dv">27</span>) <span class="do">## BAD</span></span>
+<span id="cb202-7"><a href="#cb202-7" aria-hidden="true" tabindex="-1"></a>df_example_2 <span class="ot">&lt;-</span> df_example <span class="sc">%&gt;%</span> <span class="fu">filter</span>(happy <span class="sc">==</span> <span class="cn">FALSE</span>, age <span class="sc">==</span> <span class="dv">27</span>) <span class="do">## GOOD</span></span>
+<span id="cb202-8"><a href="#cb202-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb202-9"><a href="#cb202-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Note that spacing after the commas, just like normal writing, is good practice</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Additionally, your code should not be too wide. Perhaps you have noticed a strange grey line running down your script editor. This is the recommended width by posit, the company who makes RStudio. while it is generally fine to break this line once or twice, it should serve as a guide to how wide your script should be, to ensure that it is easy to follow. Linebreaks are automatically spaced in a nice way when you use them inside functions between arguments, as is evident from some of the code demonstrated here. Below is also an example of really bad and embarassing code from my MA thesis.</p>
 <div class="quarto-figure quarto-figure-center">

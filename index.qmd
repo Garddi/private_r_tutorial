@@ -163,6 +163,8 @@ mean(new_vector)
 
 mean(new_vector, na.rm = TRUE)
 ```
+Many functions are part of packages which needs to be installed to your computer using the `install.packages` function, and then when utilized needs to be loaded into the namespace you are currently operaring in, using the reserved function `library`. Additionally, all functions (should at least) have a help file, which you can access by posing a `?` in front of the function. The help file will list the structure of the function, the necessary arguments, and their default values. Do note however, that these help files can be extremely confusing to read for anyone who does not already understand them. 
+
 
 ## Folder structure and saving results
 
@@ -651,7 +653,22 @@ model_2 <- lm(whostility ~ gender_text + country + wave + PolDisc + interest + c
 
 summary(model_2)
 ```
-Effect of South Korea holds, but effect of being a woman becomes insignificant. 
+Effect of South Korea holds, but effect of being a woman becomes insignificant. For binary data we need a link function and a generalized linear model, which can be accesses through the function `glm` in R. Below I model the outcome of having voted. 
+
+```{r}
+SurvData_vot <- SurvData %>% 
+  filter(!is.na(voted)) %>%  ## Filter out all obs that did not vote
+  mutate(vot_binary = ifelse(voted == 1, 1, 0))
+
+logit_m_1 <- glm(vot_binary ~ gender_cased + country + wave, family = "binomial", data = SurvData_vot)
+logit_m_2 <- glm(vot_binary ~ gender_cased + country + wave + whostility, family = "binomial", data = SurvData_vot)
+logit_m_3 <- glm(vot_binary ~ gender_cased + country + wave + whostility + interest, family = "binomial", data = SurvData_vot)
+
+huxtable::huxreg(logit_m_1, logit_m_2, logit_m_3) ## This is where I would normally use stargazer 
+                          ## But stargazer does not work in quarto html outputs
+                          
+```
+
 
 
 # Plotting
@@ -662,7 +679,11 @@ To paraphrase the Beatles, all you need is ggplot. This framework allows you to 
 
 ## Layers
 
-It is prudent to think of visualisations in ggplot as layered. These layers are bound together with plus signs, and each construct a layer ontop of the plot or other visualisation you want to make. The most basic general layer that all ggplots need is the base layer of the `ggplot` function itself. In this function you specify your dataset, and the general aesthetics. Within the `ggplot` function (and most `geom_` derivatives) there is an `aes` argument, this is an aesthetic argument, it specifies what variable from the dataset should represent what element of the plot. Based on the plot type the type of aesthetic accepted varies, but a list of potential aesthetics are: x, y, color, fill, shape, size, linewidth, linetype, etc. Following this, you add a layer that specifies what type of plot you want, this is done through a family of `geom_` functions such as `geom_point` for scatterplot, `geom_bar` for a barplot, `geom_boxplot` for a boxplot with distributions, etc. Which you use depends on how you want to visualise. If you are curious about the options, type `geom_` in R, and switch through the optins that it auto-completes to. Lets use this information to build a scatterplot of the first grouped dataframe created earlier.
+It is prudent to think of visualisations in ggplot as layered. These layers are bound together with plus signs, and each construct a layer ontop of the plot or other visualisation you want to make. 
+
+![layers of ggplot, stolen from: https://lfoswald.github.io/2021-spring-stats2/materials/session-3/03-online-tutorial/](./images/gglayers.png)
+
+The most basic general layer that all ggplots need is the base layer of the `ggplot` function itself. In this function you specify your dataset, and the general aesthetics. Within the `ggplot` function (and most `geom_` derivatives) there is an `aes` argument, this is an aesthetic argument, it specifies what variable from the dataset should represent what element of the plot. Based on the plot type the type of aesthetic accepted varies, but a list of potential aesthetics are: x, y, color, fill, shape, size, linewidth, linetype, etc. Following this, you add a layer that specifies what type of plot you want, this is done through a family of `geom_` functions such as `geom_point` for scatterplot, `geom_bar` for a barplot, `geom_boxplot` for a boxplot with distributions, etc. Which you use depends on how you want to visualise. If you are curious about the options, type `geom_` in R, and switch through the optins that it auto-completes to. Lets use this information to build a scatterplot of the first grouped dataframe created earlier.
 
 ```{r}
 grouped_f %>% ### Obviously you can pipe it in 
