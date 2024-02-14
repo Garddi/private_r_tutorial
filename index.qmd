@@ -1192,3 +1192,15 @@ Every type of output from Quarto has its own unique variations, that you can exp
 - word: https://quarto.org/docs/output-formats/ms-word.html
 - Beamer Presentations: https://quarto.org/docs/presentations/beamer.html
 - revaljs Presentations:  https://quarto.org/docs/presentations/revealjs/
+
+## Special Environment section
+
+Quarto has dedicated display for certain elements if you so desire. You might have noticed that throughout this document, some coding terms appear in in `special coding font`, this is done in text by wrapping the text in the ` marker. This is not the only unique wrapper characteristic of Quarto, for font specification we have * for *cursive*, and ** for **bold**. But more importantly, the $ sign can be used in text to implement formula type of typesetting. So that you can naturally interweave model language in your writing. 
+
+Ex: "Model 1 specifies the dependent variable $y_i$ as dependent on variables $D_i$ and $T_i$"
+
+Additionally, wrapping lines withing two $ makes it into a chunk for longer model specifications. Examplified below by a generaic DiD model.  
+
+$$
+y_i = \beta_1 D_i + \beta_2 T_i + \beta_3 D_i  T_i + \epsilon_i
+$$
