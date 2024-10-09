@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.4.553">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -18,11 +18,12 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -47,43 +48,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -100,7 +71,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link href="index_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="index_files/libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -112,61 +111,66 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="toc-section-number">1</span>  Introduction</a></li>
-  <li><a href="#general-structure" id="toc-general-structure" class="nav-link" data-scroll-target="#general-structure"><span class="toc-section-number">2</span>  General structure</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a>
   <ul class="collapse">
-  <li><a href="#data-types" id="toc-data-types" class="nav-link" data-scroll-target="#data-types"><span class="toc-section-number">2.1</span>  Data Types</a></li>
-  <li><a href="#assignment" id="toc-assignment" class="nav-link" data-scroll-target="#assignment"><span class="toc-section-number">2.2</span>  Assignment</a>
-  <ul class="collapse">
-  <li><a href="#other-operators" id="toc-other-operators" class="nav-link" data-scroll-target="#other-operators"><span class="toc-section-number">2.2.1</span>  Other operators</a></li>
+  <li><a href="#what-is-r" id="toc-what-is-r" class="nav-link" data-scroll-target="#what-is-r"><span class="header-section-number">1.1</span> What is R?</a></li>
+  <li><a href="#installing-r" id="toc-installing-r" class="nav-link" data-scroll-target="#installing-r"><span class="header-section-number">1.2</span> Installing R</a></li>
+  <li><a href="#code-editor-rstudio-if-we-are-being-honest" id="toc-code-editor-rstudio-if-we-are-being-honest" class="nav-link" data-scroll-target="#code-editor-rstudio-if-we-are-being-honest"><span class="header-section-number">1.3</span> Code Editor (Rstudio, if we are being honest)</a></li>
   </ul></li>
-  <li><a href="#vectors" id="toc-vectors" class="nav-link" data-scroll-target="#vectors"><span class="toc-section-number">2.3</span>  Vectors</a></li>
-  <li><a href="#dataframes" id="toc-dataframes" class="nav-link" data-scroll-target="#dataframes"><span class="toc-section-number">2.4</span>  Dataframes</a></li>
-  <li><a href="#lists" id="toc-lists" class="nav-link" data-scroll-target="#lists"><span class="toc-section-number">2.5</span>  Lists</a></li>
-  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions"><span class="toc-section-number">2.6</span>  Functions</a></li>
-  <li><a href="#folder-structure-and-saving-results" id="toc-folder-structure-and-saving-results" class="nav-link" data-scroll-target="#folder-structure-and-saving-results"><span class="toc-section-number">2.7</span>  Folder structure and saving results</a></li>
-  <li><a href="#added-notes-on-indexing" id="toc-added-notes-on-indexing" class="nav-link" data-scroll-target="#added-notes-on-indexing"><span class="toc-section-number">2.8</span>  Added Notes on Indexing</a></li>
-  </ul></li>
-  <li><a href="#simple-analysis" id="toc-simple-analysis" class="nav-link" data-scroll-target="#simple-analysis"><span class="toc-section-number">3</span>  Simple Analysis</a>
+  <li><a href="#general-structure" id="toc-general-structure" class="nav-link" data-scroll-target="#general-structure"><span class="header-section-number">2</span> General structure</a>
   <ul class="collapse">
-  <li><a href="#simple-data-structure-functions" id="toc-simple-data-structure-functions" class="nav-link" data-scroll-target="#simple-data-structure-functions"><span class="toc-section-number">3.1</span>  Simple data structure functions</a></li>
-  </ul></li>
-  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="toc-section-number">4</span>  Data wrangling</a>
+  <li><a href="#data-types" id="toc-data-types" class="nav-link" data-scroll-target="#data-types"><span class="header-section-number">2.1</span> Data Types</a></li>
+  <li><a href="#assignment" id="toc-assignment" class="nav-link" data-scroll-target="#assignment"><span class="header-section-number">2.2</span> Assignment</a>
   <ul class="collapse">
-  <li><a href="#dealing-with-bad-names" id="toc-dealing-with-bad-names" class="nav-link" data-scroll-target="#dealing-with-bad-names"><span class="toc-section-number">4.1</span>  Dealing with bad names</a></li>
-  <li><a href="#mutating" id="toc-mutating" class="nav-link" data-scroll-target="#mutating"><span class="toc-section-number">4.2</span>  Mutating</a>
-  <ul class="collapse">
-  <li><a href="#ifelse-and-case-when-mutations" id="toc-ifelse-and-case-when-mutations" class="nav-link" data-scroll-target="#ifelse-and-case-when-mutations"><span class="toc-section-number">4.2.1</span>  Ifelse and Case when mutations</a></li>
-  <li><a href="#across" id="toc-across" class="nav-link" data-scroll-target="#across"><span class="toc-section-number">4.2.2</span>  Across</a></li>
-  <li><a href="#new-variables-as-vectors" id="toc-new-variables-as-vectors" class="nav-link" data-scroll-target="#new-variables-as-vectors"><span class="toc-section-number">4.2.3</span>  New variables as vectors</a></li>
+  <li><a href="#other-operators" id="toc-other-operators" class="nav-link" data-scroll-target="#other-operators"><span class="header-section-number">2.2.1</span> Other operators</a></li>
   </ul></li>
-  <li><a href="#subsetting-on-variables" id="toc-subsetting-on-variables" class="nav-link" data-scroll-target="#subsetting-on-variables"><span class="toc-section-number">4.3</span>  Subsetting on variables</a></li>
-  <li><a href="#filtering" id="toc-filtering" class="nav-link" data-scroll-target="#filtering"><span class="toc-section-number">4.4</span>  Filtering</a></li>
-  <li><a href="#grouping-and-aggregating" id="toc-grouping-and-aggregating" class="nav-link" data-scroll-target="#grouping-and-aggregating"><span class="toc-section-number">4.5</span>  Grouping and Aggregating</a></li>
-  <li><a href="#joining" id="toc-joining" class="nav-link" data-scroll-target="#joining"><span class="toc-section-number">4.6</span>  Joining</a></li>
-  <li><a href="#pivoting" id="toc-pivoting" class="nav-link" data-scroll-target="#pivoting"><span class="toc-section-number">4.7</span>  Pivoting</a></li>
+  <li><a href="#vectors" id="toc-vectors" class="nav-link" data-scroll-target="#vectors"><span class="header-section-number">2.3</span> Vectors</a></li>
+  <li><a href="#dataframes" id="toc-dataframes" class="nav-link" data-scroll-target="#dataframes"><span class="header-section-number">2.4</span> Dataframes</a></li>
+  <li><a href="#lists" id="toc-lists" class="nav-link" data-scroll-target="#lists"><span class="header-section-number">2.5</span> Lists</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions"><span class="header-section-number">2.6</span> Functions</a></li>
+  <li><a href="#folder-structure-and-saving-results" id="toc-folder-structure-and-saving-results" class="nav-link" data-scroll-target="#folder-structure-and-saving-results"><span class="header-section-number">2.7</span> Folder structure and saving results</a></li>
+  <li><a href="#added-notes-on-indexing" id="toc-added-notes-on-indexing" class="nav-link" data-scroll-target="#added-notes-on-indexing"><span class="header-section-number">2.8</span> Added Notes on Indexing</a></li>
   </ul></li>
-  <li><a href="#modelling" id="toc-modelling" class="nav-link" data-scroll-target="#modelling"><span class="toc-section-number">5</span>  Modelling</a></li>
-  <li><a href="#plotting" id="toc-plotting" class="nav-link" data-scroll-target="#plotting"><span class="toc-section-number">6</span>  Plotting</a>
+  <li><a href="#simple-analysis" id="toc-simple-analysis" class="nav-link" data-scroll-target="#simple-analysis"><span class="header-section-number">3</span> Simple Analysis</a>
   <ul class="collapse">
-  <li><a href="#layers" id="toc-layers" class="nav-link" data-scroll-target="#layers"><span class="toc-section-number">6.1</span>  Layers</a></li>
-  <li><a href="#maps" id="toc-maps" class="nav-link" data-scroll-target="#maps"><span class="toc-section-number">6.2</span>  Maps</a></li>
+  <li><a href="#simple-data-structure-functions" id="toc-simple-data-structure-functions" class="nav-link" data-scroll-target="#simple-data-structure-functions"><span class="header-section-number">3.1</span> Simple data structure functions</a></li>
   </ul></li>
-  <li><a href="#advanced-methods" id="toc-advanced-methods" class="nav-link" data-scroll-target="#advanced-methods"><span class="toc-section-number">7</span>  Advanced methods</a>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">4</span> Data wrangling</a>
   <ul class="collapse">
-  <li><a href="#for-loops-and-flow-control" id="toc-for-loops-and-flow-control" class="nav-link" data-scroll-target="#for-loops-and-flow-control"><span class="toc-section-number">7.1</span>  For loops and flow control</a>
+  <li><a href="#dealing-with-bad-names" id="toc-dealing-with-bad-names" class="nav-link" data-scroll-target="#dealing-with-bad-names"><span class="header-section-number">4.1</span> Dealing with bad names</a></li>
+  <li><a href="#mutating" id="toc-mutating" class="nav-link" data-scroll-target="#mutating"><span class="header-section-number">4.2</span> Mutating</a>
   <ul class="collapse">
-  <li><a href="#flow-control" id="toc-flow-control" class="nav-link" data-scroll-target="#flow-control"><span class="toc-section-number">7.1.1</span>  flow control</a></li>
+  <li><a href="#ifelse-and-case-when-mutations" id="toc-ifelse-and-case-when-mutations" class="nav-link" data-scroll-target="#ifelse-and-case-when-mutations"><span class="header-section-number">4.2.1</span> Ifelse and Case when mutations</a></li>
+  <li><a href="#across" id="toc-across" class="nav-link" data-scroll-target="#across"><span class="header-section-number">4.2.2</span> Across</a></li>
+  <li><a href="#new-variables-as-vectors" id="toc-new-variables-as-vectors" class="nav-link" data-scroll-target="#new-variables-as-vectors"><span class="header-section-number">4.2.3</span> New variables as vectors</a></li>
   </ul></li>
-  <li><a href="#functional-programming-with-anonymous-functions" id="toc-functional-programming-with-anonymous-functions" class="nav-link" data-scroll-target="#functional-programming-with-anonymous-functions"><span class="toc-section-number">7.2</span>  Functional programming with anonymous functions</a>
-  <ul class="collapse">
-  <li><a href="#a-very-complicated-for-loop" id="toc-a-very-complicated-for-loop" class="nav-link" data-scroll-target="#a-very-complicated-for-loop"><span class="toc-section-number">7.2.1</span>  A very complicated for loop</a></li>
+  <li><a href="#subsetting-on-variables" id="toc-subsetting-on-variables" class="nav-link" data-scroll-target="#subsetting-on-variables"><span class="header-section-number">4.3</span> Subsetting on variables</a></li>
+  <li><a href="#filtering" id="toc-filtering" class="nav-link" data-scroll-target="#filtering"><span class="header-section-number">4.4</span> Filtering</a></li>
+  <li><a href="#grouping-and-aggregating" id="toc-grouping-and-aggregating" class="nav-link" data-scroll-target="#grouping-and-aggregating"><span class="header-section-number">4.5</span> Grouping and Aggregating</a></li>
+  <li><a href="#joining" id="toc-joining" class="nav-link" data-scroll-target="#joining"><span class="header-section-number">4.6</span> Joining</a></li>
+  <li><a href="#pivoting" id="toc-pivoting" class="nav-link" data-scroll-target="#pivoting"><span class="header-section-number">4.7</span> Pivoting</a></li>
   </ul></li>
-  <li><a href="#string-manipulation" id="toc-string-manipulation" class="nav-link" data-scroll-target="#string-manipulation"><span class="toc-section-number">7.3</span>  String manipulation</a></li>
-  <li><a href="#keyboard-shortcuts-and-tips" id="toc-keyboard-shortcuts-and-tips" class="nav-link" data-scroll-target="#keyboard-shortcuts-and-tips"><span class="toc-section-number">7.4</span>  Keyboard shortcuts and tips</a></li>
-  <li><a href="#structuring-your-scripts" id="toc-structuring-your-scripts" class="nav-link" data-scroll-target="#structuring-your-scripts"><span class="toc-section-number">7.5</span>  Structuring your scripts</a></li>
-  <li><a href="#quarto---creating-nice-documents-in-rstudio-with-code" id="toc-quarto---creating-nice-documents-in-rstudio-with-code" class="nav-link" data-scroll-target="#quarto---creating-nice-documents-in-rstudio-with-code"><span class="toc-section-number">7.6</span>  Quarto - creating nice documents in RStudio with code</a></li>
-  <li><a href="#special-environment-section" id="toc-special-environment-section" class="nav-link" data-scroll-target="#special-environment-section"><span class="toc-section-number">7.7</span>  Special Environment section</a></li>
+  <li><a href="#modelling" id="toc-modelling" class="nav-link" data-scroll-target="#modelling"><span class="header-section-number">5</span> Modelling</a></li>
+  <li><a href="#plotting" id="toc-plotting" class="nav-link" data-scroll-target="#plotting"><span class="header-section-number">6</span> Plotting</a>
+  <ul class="collapse">
+  <li><a href="#layers" id="toc-layers" class="nav-link" data-scroll-target="#layers"><span class="header-section-number">6.1</span> Layers</a></li>
+  <li><a href="#maps" id="toc-maps" class="nav-link" data-scroll-target="#maps"><span class="header-section-number">6.2</span> Maps</a></li>
+  </ul></li>
+  <li><a href="#advanced-methods" id="toc-advanced-methods" class="nav-link" data-scroll-target="#advanced-methods"><span class="header-section-number">7</span> Advanced methods</a>
+  <ul class="collapse">
+  <li><a href="#for-loops-and-flow-control" id="toc-for-loops-and-flow-control" class="nav-link" data-scroll-target="#for-loops-and-flow-control"><span class="header-section-number">7.1</span> For loops and flow control</a>
+  <ul class="collapse">
+  <li><a href="#flow-control" id="toc-flow-control" class="nav-link" data-scroll-target="#flow-control"><span class="header-section-number">7.1.1</span> flow control</a></li>
+  </ul></li>
+  <li><a href="#functional-programming-with-anonymous-functions" id="toc-functional-programming-with-anonymous-functions" class="nav-link" data-scroll-target="#functional-programming-with-anonymous-functions"><span class="header-section-number">7.2</span> Functional programming with anonymous functions</a>
+  <ul class="collapse">
+  <li><a href="#a-very-complicated-for-loop" id="toc-a-very-complicated-for-loop" class="nav-link" data-scroll-target="#a-very-complicated-for-loop"><span class="header-section-number">7.2.1</span> A very complicated for loop</a></li>
+  </ul></li>
+  <li><a href="#string-manipulation" id="toc-string-manipulation" class="nav-link" data-scroll-target="#string-manipulation"><span class="header-section-number">7.3</span> String manipulation</a></li>
+  <li><a href="#keyboard-shortcuts-and-tips" id="toc-keyboard-shortcuts-and-tips" class="nav-link" data-scroll-target="#keyboard-shortcuts-and-tips"><span class="header-section-number">7.4</span> Keyboard shortcuts and tips</a></li>
+  <li><a href="#structuring-your-scripts" id="toc-structuring-your-scripts" class="nav-link" data-scroll-target="#structuring-your-scripts"><span class="header-section-number">7.5</span> Structuring your scripts</a></li>
+  <li><a href="#quarto---creating-nice-documents-in-rstudio-with-code" id="toc-quarto---creating-nice-documents-in-rstudio-with-code" class="nav-link" data-scroll-target="#quarto---creating-nice-documents-in-rstudio-with-code"><span class="header-section-number">7.6</span> Quarto - creating nice documents in RStudio with code</a></li>
+  <li><a href="#special-environment-section" id="toc-special-environment-section" class="nav-link" data-scroll-target="#special-environment-section"><span class="header-section-number">7.7</span> Special Environment section</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -194,11 +198,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
   
 
+
 </header>
+
 
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
 <p>Welcome to a (more or less) thorough walkthrough of R in applied areas. Covers the sections: General Structure, Data import, Simple Data checking, Data Wrangling, Plotting, and advanced R methods.</p>
+<p>Before we dive deeper into explaining the elements of R as a programming language, we can start by having a brief discussion about what R <em>is</em> and how you as a student/data scientist/whatever you are will interact with this programming language. The remaining text will be narrowly focused on code <em>as is</em>, but in this section, I would like to talk a bit about how you will experience using the software.</p>
+<section id="what-is-r" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="what-is-r"><span class="header-section-number">1.1</span> What is R?</h2>
+<p>R is a programming language dedicated to statistical analysis. A simple review of the wikipedia page for programming languages by type, tells us that R is an array, interpreted, impure, interactive mode, list-based, object-oriented prototype-based, and scripting language. As it is a programming language, there are few things that you cannot do through R with your computer. Later on, when we are writing code itself, you will see that programming involves managing elements in your memory (objects or functions) and interacting them with eachother to produce an output from your code. The code itself is written in plain text, and can technically be written with something as simple as a notepad, but using a dedicated environment will allow many advantages, such as typing completion, dedicated graph viewer windows, and a window for all the objects in your environment (but this is getting ahead of ourselves).</p>
+<p>In the definition of R as a programming language, I mentioned that it is interactive. This means that you are able to execute parts of the code in whatever sequence you want, and you are able to individually send certain lines of code to the REPL (the console as we will call it), and get the results of that code immediately. This is different from certain other programming languages, which require you to run the entire code each time you wish to see elements of it.</p>
+</section>
+<section id="installing-r" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="installing-r"><span class="header-section-number">1.2</span> Installing R</h2>
+<p>The first thing you need to do when starting to program in R, is to download R itself. Currently, the latest version of R is 4.4.1 (August 10th, 2024), and you can get a version by retrieving it from a distributor from a CRAN mirror here: https://cran.r-project.org/mirrors.html I select the version from Norway, and just follow the link for “download R for windows”. R is totally free and open source, and you do not need a license or anything of the sort to use it.</p>
+</section>
+<section id="code-editor-rstudio-if-we-are-being-honest" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="code-editor-rstudio-if-we-are-being-honest"><span class="header-section-number">1.3</span> Code Editor (Rstudio, if we are being honest)</h2>
+<p>Once you have R on your computer, you will need a way to edit scripts so that you can work with the language more easily. In programming this is usually done through an Integrated Developer Environment (IDE), a program which has dedicated elements that allow you to write code better. For R, the preferred IDE is RStudio, which is run by Posit, a foundation that is responsible for many of the quality of life extension to the R language that has come about in the past decade, such as the tidyverse ecosystem. You can download RStudio from posit’s homepage at: https://posit.co/download/rstudio-desktop/.</p>
+<p>When you open RStudio, it might at first seem a bit overwhelming, so let’s take the time to explain what the layout of RStudio is like, and how you can use elements of it to your benefit. When opening RStudio for the first time, it will look like this:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./images/rstudio_default.png" class="img-fluid figure-img"></p>
+<figcaption>Default Rstudio appearance</figcaption>
+</figure>
+</div>
+<p>If you are uncomfortable with a light editor, you can also change to dark mode by opening the tools header on the top of your editor, then clicking global options, then find the appearance tab to select a new theme for RStudio. In the image, we see three essential windows currently open, normally you will have four of these windows, but we will get to the script window later. The first window we will discuss is the console window, in the image it takes up half the screen. This is where the direct output of many of your functions will be printed, the console is the actual interpreter of all code that you feed into it, and by default it will print out the results of such code. You can also type in code directly into that console, try typing in 1 + 1 in your own console if you are following along. When we write scripts and execute sections of the script, what we are actually doing is sending the code we write to the console. A script is just a way of saving the information for future use and replication.</p>
+<p>On your right then, we will see there are two windows. The top window, is by default your environment, you will primarily use this window to keep track of objects in your environment, such as datasets, functions, lists, etc. The environment does also have extensions for browsing functions imported by other packages, but for the most basic of usecases, you will only need to have the global environment displayed in this window. You may also notice there are several other panes in this window, such as history and connections, these will most likely not be relevant for you. In the window below this, you will find the window for files, plots, packages, help and viewer. This window you will more likely change between different panes. Files provide you with easy access to your files, and is basicly another file explorer, that you can also load datasets through, and otherwise more easily interact with elements of your project with. The plots pane will be where your plots appear when you start to make them, through it you can also save such plots, if you prefer doing it that way, rather than through code. The packages pane will be where you can check what packages you have installed, what versions they are, and update them if they are out of date. The help pane will be where the documentation for functions will appear, so that you can read about how to use certain functions. The viewer pane is for certain html elements that will be produced by some code outputs, such as the <code>modelsummary</code> package for making regression tables.</p>
+<p>The final window that should be in your RStudio is that for your script editing itself. To open up a new script, note the small icon of a paper sheet with a pluss sign attached to it, below the “file” and “edit” pane in the top left of your editor. Click this, and select R-script, or alternatively just press ctrl+shift+n, to create a new script. This will open an empty text file, in which you can start typing out your R-script. When you type out a line in an R-script, you will notice that the IDE will autocomplete the text you are writing, if there is an existing object or a function that follows. When you write anything in a script, you can place your cursor on the line that you are working with, or highlight what you want to run, and press ctrl+enter to send that line of code to the console, and execute it. Try typing 1+1 in your script window, then sending it to the console for execution.</p>
+</section>
 </section>
 <section id="general-structure" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> General structure</h1>
@@ -423,32 +453,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"./images/"</span>) <span class="do">## ./ means the current working directory</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "bad_stuff.png"         "gglayers.png"          "healy_vis.jpeg"       
-[4] "heres_quarto.png"      "outliners.png"         "yaml_example_word.png"
-[7] "yaml_header.png"      </code></pre>
+[4] "heres_quarto.png"      "outliners.png"         "rstudio_default.png"  
+[7] "yaml_example_word.png" "yaml_header.png"      </code></pre>
 </div>
 </div>
 <p>However, you are not limited to only subfolders in your current directory, by using two dots, instead of one, you go to the parent folder of your directory.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"../."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "09-STS313.pdf"                                                           
- [2] "advanced_statistics_phd.Rproj"                                           
- [3] "causal_inference_doc.html"                                               
- [4] "causal_inference_doc.qmd"                                                
- [5] "data_provided"                                                           
- [6] "handout_scripts"                                                         
- [7] "my_bib.bib"                                                              
- [8] "my_data"                                                                 
- [9] "PAGED-basic-party-dataset-with-party-codes-Dec-2023.csv"                 
-[10] "PAGED-Notes-on-coding-principles.pdf"                                    
-[11] "PAGED-WECEE-Party-dataset-with-party-codes-Dec-2023.csv"                 
-[12] "PAGED-WECEE-Party-dataset-with-party-codes-Dec-2023.xlsx"                
-[13] "PAGED WE+CEE Potential coalition dataset with party codes (Dec 2023).csv"
-[14] "private_r_tutorial"                                                      
-[15] "some_data_prep.R"                                                        
-[16] "some_exploration.R"                                                      
-[17] "test_starlooking.html"                                                   
-[18] "v1-PAGED-basic-party-dataset-codebook.pdf"                               </code></pre>
+<pre><code> [1] "09-STS313.pdf"                                                                                                                      
+ [2] "advanced_statistics_phd.Rproj"                                                                                                      
+ [3] "alice58budget.txt"                                                                                                                  
+ [4] "brms_tests.R"                                                                                                                       
+ [5] "causal_inference_doc.html"                                                                                                          
+ [6] "causal_inference_doc.qmd"                                                                                                           
+ [7] "data_provided"                                                                                                                      
+ [8] "drafts_for_stina.R"                                                                                                                 
+ [9] "exercise_drafts.R"                                                                                                                  
+[10] "final_paper"                                                                                                                        
+[11] "final_paper_draft_script.R"                                                                                                         
+[12] "handout_scripts"                                                                                                                    
+[13] "lecture_notes_USETHEM.txt"                                                                                                          
+[14] "MethodologyintheSocialSciencesTimothyA.BrownPsyD-ConfirmatoryFactorAnalysisforAppliedResearchSecondEdition-TheGuilfordPress2015.pdf"
+[15] "mlm_exercise.html"                                                                                                                  
+[16] "mlm_exercise.qmd"                                                                                                                   
+[17] "mlm_exercise_files"                                                                                                                 
+[18] "my_bib.bib"                                                                                                                         
+[19] "my_data"                                                                                                                            
+[20] "PAGED-basic-party-dataset-with-party-codes-Dec-2023.csv"                                                                            
+[21] "PAGED-Notes-on-coding-principles.pdf"                                                                                               
+[22] "PAGED-WECEE-Party-dataset-with-party-codes-Dec-2023.csv"                                                                            
+[23] "PAGED-WECEE-Party-dataset-with-party-codes-Dec-2023.xlsx"                                                                           
+[24] "PAGED WE+CEE Potential coalition dataset with party codes (Dec 2023).csv"                                                           
+[25] "parlgov_data"                                                                                                                       
+[26] "PhD Papers.zip"                                                                                                                     
+[27] "presentation"                                                                                                                       
+[28] "private_r_tutorial"                                                                                                                 
+[29] "some_data_prep.R"                                                                                                                   
+[30] "some_exploration.R"                                                                                                                 
+[31] "test_starlooking.html"                                                                                                              
+[32] "v1-PAGED-basic-party-dataset-codebook.pdf"                                                                                          </code></pre>
 </div>
 </div>
 <p>Note that the folder which we saw as my working directory appears here as a directory. We can also look at the contents of parallel folders.</p>
@@ -594,11 +638,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(SurvData<span class="sc">$</span>whostility))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(SurvData<span class="sc">$</span>whostility)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Additionally, some dataforms have labels attached to their columns, this is normal for data imported from spss, or stata. These labels provide information about the coding, without searching the codebook, these can be found with the <code>attributes</code> function. I load a dataset here, which has this type of labels. This data will also be used later.</p>
@@ -1179,7 +1231,6 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb170-8"><a href="#cb170-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb170-9"><a href="#cb170-9" aria-hidden="true" tabindex="-1"></a>huxtable<span class="sc">::</span><span class="fu">huxreg</span>(logit_m_1, logit_m_2, logit_m_3) <span class="do">## This is where I would normally use stargazer </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
 <table class="huxtable" data-quarto-disable-processing="true" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-42">
 <colgroup><col><col><col><col></colgroup><tbody><tr>
 <th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1)</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(2)</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(3)</th></tr>
@@ -1227,7 +1278,7 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./images/healy_vis.jpeg" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">neat book</figcaption><p></p>
+<figcaption>neat book</figcaption>
 </figure>
 </div>
 <section id="layers" class="level2" data-number="6.1">
@@ -1236,7 +1287,7 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./images/gglayers.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">layers of ggplot, stolen from: https://lfoswald.github.io/2021-spring-stats2/materials/session-3/03-online-tutorial/</figcaption><p></p>
+<figcaption>layers of ggplot, stolen from: https://lfoswald.github.io/2021-spring-stats2/materials/session-3/03-online-tutorial/</figcaption>
 </figure>
 </div>
 <p>The most basic general layer that all ggplots need is the base layer of the <code>ggplot</code> function itself. In this function you specify your dataset, and the general aesthetics. Within the <code>ggplot</code> function (and most <code>geom_</code> derivatives) there is an <code>aes</code> argument, this is an aesthetic argument, it specifies what variable from the dataset should represent what element of the plot. Based on the plot type the type of aesthetic accepted varies, but a list of potential aesthetics are: x, y, color, fill, shape, size, linewidth, linetype, etc. Following this, you add a layer that specifies what type of plot you want, this is done through a family of <code>geom_</code> functions such as <code>geom_point</code> for scatterplot, <code>geom_bar</code> for a barplot, <code>geom_boxplot</code> for a boxplot with distributions, etc. Which you use depends on how you want to visualise. If you are curious about the options, type <code>geom_</code> in R, and switch through the optins that it auto-completes to. Lets use this information to build a scatterplot of the first grouped dataframe created earlier.</p>
@@ -1245,7 +1296,11 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>year, <span class="at">y=</span>whostility, <span class="at">color =</span> country)) <span class="sc">+</span> </span>
 <span id="cb172-3"><a href="#cb172-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Very ugly, but it does the job. We can now add a couple of layers to improve the look. There are several themes that can be used by default, such as <code>theme_bw</code> which is my favourite, just add the function in a layer. Additionally we can modify the labels of the plot through the <code>lab</code> function as a separate layer.</p>
@@ -1256,7 +1311,11 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb173-4"><a href="#cb173-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
 <span id="cb173-5"><a href="#cb173-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Here's a Title"</span>, <span class="at">x =</span> <span class="st">"Time period"</span>, <span class="at">y =</span> <span class="st">"Anti-women sentiment"</span>, <span class="at">color =</span> <span class="st">"Region"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>For the final plot, I will also do some changes to the datastructure so that it visualises a bit better, there’s perhaps too much space between the timings as it is. Additionally, I think the points are too small, so I will change them manually through arguments fed through the layers. Finally, I also add a <code>geom_line</code> which when combined in this instance, draws a line between the points, separated by the color specification, by default, <code>geom_</code> functions inherit their aesthetic from the layer previous, so the same <code>aes</code> specification is inherited from the higher level.</p>
@@ -1275,7 +1334,11 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb174-12"><a href="#cb174-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"cornflowerblue"</span>, <span class="st">"goldenrod"</span>)) <span class="sc">+</span>  <span class="do">## Values are assigned alphabetically when set manually, so Japan gets first colour</span></span>
 <span id="cb174-13"><a href="#cb174-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Hostility towards women as legislators"</span>, <span class="at">x =</span> <span class="st">"WVS Wave"</span>, <span class="at">y =</span> <span class="st">"Hostility"</span>) <span class="do">## Creating labels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>The values and precise aesthetics of a variable can be set with the function family <code>scale_AESTHETIC_TYPE</code>, which provides a large range of ways to modify the aesthetics. In the plot above I manually (therefore manual at the end) assign two values to the color aesthetic (therefore color in the middle). This function family can also modify labels and other elements.</p>
@@ -1304,7 +1367,7 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "bad_stuff.png"         "gglayers.png"          "healy_vis.jpeg"       
 [4] "heres_quarto.png"      "outliners.png"         "plot_obj.jpeg"        
-[7] "yaml_example_word.png" "yaml_header.png"      </code></pre>
+[7] "rstudio_default.png"   "yaml_example_word.png" "yaml_header.png"      </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb177"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">"./images/plot_obj.jpeg"</span>) <span class="do">## Just removing it </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1323,7 +1386,11 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb178-8"><a href="#cb178-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> nor_map) <span class="sc">+</span> </span>
 <span id="cb178-9"><a href="#cb178-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="co"># common theme to eliminate all lines</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Aesthetics are possible, filling the map to make a cloropleth for instance. You can also left join data that are not of a GIS character straight into this dataframe, then use those variables as aesthetics, but for now lets just make a new variable based on whether I have visited the county.</p>
@@ -1357,7 +1424,11 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb179-27"><a href="#cb179-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mitt lille land"</span>, <span class="at">fill =</span> <span class="st">"Have I been?"</span>) <span class="sc">+</span> </span>
 <span id="cb179-28"><a href="#cb179-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"goldenrod"</span>, <span class="st">"firebrick"</span>, <span class="st">"cornflowerblue"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Note that the aesthetic argument is <code>fill</code> not <code>colour</code> (I have done that mistake several times).</p>
@@ -1517,10 +1588,10 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb188-19"><a href="#cb188-19" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="do">## Unlisting the results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Using 10 Samples, Pi is estimated to be 2.8 (ish)"       
-[2] "Using 100 Samples, Pi is estimated to be 3.32 (ish)"     
-[3] "Using 1000 Samples, Pi is estimated to be 3.176 (ish)"   
-[4] "Using 10000 Samples, Pi is estimated to be 3.1124 (ish)" 
-[5] "Using 1e+05 Samples, Pi is estimated to be 3.13492 (ish)"</code></pre>
+[2] "Using 100 Samples, Pi is estimated to be 3 (ish)"        
+[3] "Using 1000 Samples, Pi is estimated to be 3.092 (ish)"   
+[4] "Using 10000 Samples, Pi is estimated to be 3.1516 (ish)" 
+[5] "Using 1e+05 Samples, Pi is estimated to be 3.15416 (ish)"</code></pre>
 </div>
 </div>
 <p>For a more practical point, I will demonstrate using a lapply function to create a new variable in our old dataset. Let’s say I want to construct an “anti-establishment” index, which is a function of opposition to EU or EEA, opposition to public services, opposition to gender equality, and extreme position on the left_right scale. In this instance I will utilize an <code>apply</code> function which will go over the rows of the dataset, in only the columns I want. When specifying a margin for the simple <code>apply</code> function, it will take either the rows or columns specified and turn them into vectors, so note that the iterator below can be indexed over, to get the relevant variable.</p>
@@ -1749,7 +1820,7 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./images/outliners.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">outline</figcaption><p></p>
+<figcaption>outline</figcaption>
 </figure>
 </div>
 <p>You can then use this table of contents to more easily navigate the structure of your script. Additionally, creating such outlines is good to ensure the previously mentioned requirement of linearity.</p>
@@ -1769,7 +1840,7 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./images/bad_stuff.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">really bad stuff</figcaption><p></p>
+<figcaption>really bad stuff</figcaption>
 </figure>
 </div>
 <p>Note the absolute hell that is trying to find out if you have enough parentheses at the end of your mutate function.</p>
@@ -1781,21 +1852,21 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./images/heres_quarto.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">here</figcaption><p></p>
+<figcaption>here</figcaption>
 </figure>
 </div>
 <p>When clicking new quarto document, you will arrive at a prompt to create one of several types of documents, the current one is an html document, but through quarto you can also create latex specified documents (I have a friend who wrote their Master thesis in RStudio, you can also use bibref through it). Quarto can also make presentations through beamer, revealjs and other engines for making presentations (even powerpoint can be made through RStudio). Following the creation of the file, you specify several settings in the YAML header, which is at the top, here you can specify settings that affect the entire document, and the way it is rendered. The YAML header for this document for instance looks like this:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./images/yaml_header.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">yaml</figcaption><p></p>
+<figcaption>yaml</figcaption>
 </figure>
 </div>
 <p>In the above instance, the document is turned into an html file, which is the type of file which web browsers display, hence why this tutorial is viewable like this in a webpage. Note also that the output html has several subcategories that you can use to edit settings for the document output you want. You can change the <code>output</code> specification into a different type of document, to change what it is knitted into. Do however make sure that the code you are entering is not unique to the filetype you are applying. If you want a LateX style document you specify <code>output: pdf</code>, this requires a LateX implementation, and the TinyTex package to be on your computer (no overleaf here). If you want a word document, you can specify <code>output: docx</code> in the header, and you can make further specifications by indenting it in new lines, such as in the example below, where a reference document which has settings for font types and sizes, is included in addition to the normal output.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./images/yaml_example_word.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">example yaml</figcaption><p></p>
+<figcaption>example yaml</figcaption>
 </figure>
 </div>
 <p>Every type of output from Quarto has its own unique variations, that you can explore if you choose to go further with them. Here are some helpful pages for each of the main types of outputs. In addition to the normal outputs, you can also create presentations through beamer (a LateX implementation) and revealjs through Quarto.</p>
@@ -1861,6 +1932,33 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       } else {
         el.classList.add('notransition');
       }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
     }
   }
   const toggleColorMode = (alternate) => {
@@ -1929,13 +2027,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  let localAlternateSentinel = 'default';
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {
     // Read the current dark / light value 
     let toAlternate = !hasAlternateSentinel();
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -1962,9 +2062,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -2000,10 +2114,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -2013,8 +2144,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -2026,9 +2166,245 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -2069,6 +2445,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 
