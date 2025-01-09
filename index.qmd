@@ -14,7 +14,9 @@ theme:
 
 # Introduction
 
-Welcome to a (more or less) thorough walkthrough of R in applied areas. Covers the sections: General Structure, Data import, Simple Data checking, Data Wrangling, Plotting, and advanced R methods. 
+Welcome to a (more or less) thorough walkthrough of R in applied areas. Covers the sections: General Structure, Data import, Simple Data checking, Data Wrangling, Plotting, and advanced R methods. If you want to read it in darkmode there is a button-thing in the top right corner (multi-language support is coming... maybe).
+
+When it comes to utilizing this document, I want to emphasize the fact that the document is intended to give you the tools to independently solve problems, and to troubleshoot potential problems. While generative AI is currently doing quite well in helping amateur coders like us be proficient in programming for social data science, using such services often depend on you understanding the nature of the problem. For that reason, familiarity with the basic construction of the language, enables you to do troubleshooting to figure out where your code has gone wrong in the first place. I also believe that having familiarity with the language, allows you to understand any suggested code that may be thrown at you by a generative AI model better, and you will be better at utilizing this to expand your own knowledge. 
 
 Before we dive deeper into explaining the elements of R as a programming language, we can start by having a brief discussion about what R *is* and how you as a student/data scientist/whatever you are will interact with this programming language. The remaining text will be narrowly focused on code *as is*, but in this section, I would like to talk a bit about how you will experience using the software.
 
@@ -23,6 +25,12 @@ Before we dive deeper into explaining the elements of R as a programming languag
 R is a programming language dedicated to statistical analysis. A simple review of the wikipedia page for programming languages by type, tells us that R is an array, interpreted, impure, interactive mode, list-based, object-oriented prototype-based, and scripting language. As it is a programming language, there are few things that you cannot do through R with your computer. Later on, when we are writing code itself, you will see that programming involves managing elements in your memory (objects or functions) and interacting them with eachother to produce an output from your code. The code itself is written in plain text, and can technically be written with something as simple as a notepad, but using a dedicated environment will allow many advantages, such as typing completion, dedicated graph viewer windows, and a window for all the objects in your environment (but this is getting ahead of ourselves).
 
 In the definition of R as a programming language, I mentioned that it is interactive. This means that you are able to execute parts of the code in whatever sequence you want, and you are able to individually send certain lines of code to the REPL (the console as we will call it), and get the results of that code immediately. This is different from certain other programming languages, which require you to run the entire code each time you wish to see elements of it. 
+
+## Who uses R, and why?
+
+R is one of two primary programming languages used by professional data scientists, alongside Python (and to a lesser extent Julia, but we are not **that** concerned with computational time). Whereas Python has advantages over R in terms of applied computational time, and integration with certain machine learning models, R is by most considered to be easier to learn, as well as having more reliable and accessible tools for data-wrangling, plotting, and statistical modelling (it also doesn't use significant whitespace, which is the devil's work). Additionally, there is a rich eco-system of well-integrated package libraries that allow for new tools to be added to your R environment. In this tutorial for instance, we will utilize the `tidyverse` family of packages, which provide a long list of helpful functions that all work well with each other. R also has integration with advanced statistical models such as structural topic models through `stm`, and Bayesian data analysis through `rstan`. 
+
+As previously mentioned, R is a programming language, and can therefore do almost everything you could want from a computer (as long as you can code it). In my own experience from knowledge of working life, both Statistics Norway, and the office of the auditor general (Riksrevisjonen) in Norway, primarily rely on R for their work. Additionally, I know of a couple of credit analysis firms that do contract work for banks, that utilize R primarily. The program is used heavily in statistical analysis across sectors, is my main point here. 
 
 ## Installing R
 
@@ -46,12 +54,14 @@ The final window that should be in your RStudio is that for your script editing 
 
 ## Data Types
 
-Information takes several forms in R, all attached with a class, the basic forms of data that needs to be known are numeric (will appear as "double" sometimes, this is related to memory allocation, but just means more decimals numeric), integer (whole numbers), factor (text but with numbers assigned to certain values), character, boolean (logical, true or false), and several types of Date data. Additionally there are a class of missing values, but they are all covered by NA.
+Information takes several forms in R, all attached with a class, the basic forms of data that needs to be known are numeric (will appear as "double" sometimes, this is related to memory allocation, but just means more decimals numeric), integer (whole numbers), complex (complex numbers, such as `2i`), factor (text but with numbers assigned to certain values, this is created using a function), character, boolean (logical, true or false), and several types of Date data. Additionally there are a class of missing values, but they are all covered by NA.
 
 ```{r}
 1 + 1 ### Comments are in hashtags 
 
 "hello" ## Strings or characters
+
+2i ## Complex
 
 NA
 
@@ -114,7 +124,7 @@ Logical tests are also relevant through certain functions, these functions all r
 
 ## Vectors
 
-All complex data of interest to us in R is either a vector, a list or a dataframe (Matrix and Arrays exist, but are not relevant to this scope). Vectors are uni-dimensional with strict same type requirement, dataframes are two-dimensional, and lists are uni-dimensionals with no requirement for consistency among entries.
+All complex data of interest to us in R is either a vector, a list or a dataframe (Matrix and Arrays exist, but are not relevant to this scope). Vectors are uni-dimensional with strict same type requirement, dataframes are two-dimensional, and lists are uni-dimensionals with no requirement for consistency among entries. Vectors are created manually using the `c` function, as seen below, which simply creates an object of type vector, containing the elements within the parenthesis. Some functions will also output vectors, which can then be assigned to variables, or to standalone vectors.
 
 ```{r}
 # Vector
@@ -128,7 +138,7 @@ a_vector[4] ## Fourth number of the vector above
 ```
 ## Dataframes
 
-Two dimensional data structures are referred to as dataframes, and consists of rows of units across columns of variables. Columns are essentially vectors, and must therefore be of the same type. Indexing is done using brackets, and has to be separated with a comma, first number is the rownumber, second is the column number. Empty spaces extracts the whole row/column.
+Two dimensional data structures are referred to as dataframes, and consists of rows of units across columns of variables. Columns are essentially vectors, and must therefore be of the same type, and have to be the same length for each entry. Indexing is done using brackets, and has to be separated with a comma, first number is the rownumber, second is the column number. Empty spaces extracts the whole row/column.
 
 ```{r}
 df_example <- data.frame(names = c("Gard", "Grad", "Gard Olav", "the Notorious G.A.R.D."),
@@ -149,7 +159,11 @@ df_example[3,2]
 ## Selecting on names
 
 df_example[,c("fav_movie")]
+```
 
+The most common process of accessing variables when using dataframe objects however, is to use the $ sign, which is an indexation tool for column names.
+
+```{r}
 ## Index tool
 
 df_example$age
@@ -158,11 +172,10 @@ df_example$happy
 
 ```
 
-The most common process of accessing variables when using dataframe objects however, is to use the $ sign, which is an indexation tool for column names.
 
 ## Lists
 
-Lists can have anything in them, even dataframes or vectors, with no rules as to consistency over elements. Elements are then stored unidimensionally, accessed with double brackets for a relevant element. 
+Lists can have anything in them, even dataframes, vectors, or even other lists, with no rules as to consistency over elements. Elements are then stored unidimensionally, accessed with double brackets for a relevant element. Named lists can also have names instead of just numbers attached to their entries, and can therefore be accessed with the names instead of a number. 
 
 ```{r}
 ex_list <- list(df_example, a_vector)
@@ -171,6 +184,10 @@ ex_list[[2]]
 
 ```
 Lists are not often used in our branch of datascience, but will appear as accidental outputs to certain functions and processes, so its good to know what they are. 
+
+## Unique Object Types
+
+The previously mentioned structured data types represent the main "family" of object types in R. However, in the Object-Oriented paradigm, you often work with unique classes of objects as outputs from certain functions. These are usually the result of a package, and will often appear in your environment as something other than a list or a dataframe, but in the data portion of your environment. These classes have dedicated methods that control the ouput of certain functions when applied on them, but most of them are technically just named lists, and can be accessed in the same ways we did with lists above. Some are formal S4 class objects, which *can* technically be indexed using the `@` operator, but you are doing some strange stuff if that is necessary.
 
 ## Functions
 
@@ -189,7 +206,7 @@ mean(new_vector)
 
 mean(new_vector, na.rm = TRUE)
 ```
-Many functions are part of packages which needs to be installed to your computer using the `install.packages` function, and then when utilized needs to be loaded into the namespace you are currently operaring in, using the reserved function `library`. Additionally, all functions (should at least) have a help file, which you can access by posing a `?` in front of the function. The help file will list the structure of the function, the necessary arguments, and their default values. Do note however, that these help files can be extremely confusing to read for anyone who does not already understand them. 
+Many functions are part of packages which needs to be installed to your computer using the `install.packages` function, and then when utilized needs to be loaded into the namespace you are currently operating in, using the reserved function `library`. Additionally, all functions (should at least) have a help file, which you can access by placing a `?` in front of the function, and then executing the empty function such as  `?mean()`, although you don't need the parenthesis. The help file will list the structure of the function, the necessary arguments, and their default values. Do note however, that these help files can be extremely confusing to read for anyone who does not already understand them. 
 
 
 ## Folder structure and saving results
@@ -248,15 +265,15 @@ df_example$fav_movie[idx]
 
 # Simple Analysis
 
-Before you can use R to conduct data wrangling or very directed plotting, you should utilize some functions to explore the data you are interested in. In this section I will utilize a singular dataset to demonstrate some of the simpler data exploring techniques. 
+Before you can use R to conduct data wrangling or very directed plotting, you should utilize some functions to explore the data you are interested in. In this section I will utilize a singular dataset to demonstrate some of the simpler data exploring techniques. The data is a limited portion of the World Value Survey from Japan and South Korea, which I used for my MA thesis, primarily the items relating to political interest, gender, and the degree to which the respondent thinks women are suited for political office.
 
-First thing to address is data import. Based on the type of data applied, you utilize a particular function, usually found in the `haven` package, or just in base R. The most common datatypes are .csv for comma separated files, .xlsx files for excel (lots of strange things can happen when reading these files, be mindful), .sav for stata files, additionally, R has a set of unique filetypes that are relevant, .rda, .rds, and .rdata, .rda and .rdata are loaded with a simple `load` function, while .rds is read using a `readRDS` function.  Each has an appropriate function for reading the relevant data. I load in a compiled set from WVS from South Korea and Japan here.
+First thing to address is data import. Based on the type of data applied, you utilize a particular function, usually found in the `haven` package, or just in base R. The most common datatypes are .csv for comma separated files, .xlsx files for excel (lots of strange things can happen when reading these files, be mindful), .sav for stata files, additionally, R has a set of unique filetypes that are relevant, .rda, .rds, and .rdata, .rda and .rdata are loaded with a simple `load` function, while .rds is read using a `readRDS` function.  Each has an appropriate function for reading the relevant data. Here I already have a prepared dataset ready for analysis that has been appropriately filtered and deliminated through R, and therefore saved as a native R object.
 
 ```{r}
 
 ## Note the file path specification is also very specific. Two dots signal
 ## a directory above your current. So this data is found in 
-## the parallell folder MA thesis, which is parallell to the folder two layers
+## the parallell folder MA thesis, which is parallell to the folder one layer
 ## above the current directory, then with a specified path to find it.
 
 library(haven)
@@ -270,7 +287,7 @@ load("../../MA thesis/Data and R scripts/Survey Data/SurvData.Rdata")
 
 ## Simple data structure functions
 
-For simple sakes, we can explore the structure of the dataset through just clicking on it in the global environment, the same effect can be achieved by using the `view` function, either in the console or in the script (but it can get annoying when re-running it inside the script). For a more systematized view of the data, the `head`, `str`, and `summary` functions are often used. Try them on your own data, but I will utilize head here, because it looks the best in this type of document.
+For simplicity's sake, we can explore the structure of the dataset through just clicking on it in the global environment, the same effect can be achieved by using the `view` function, either in the console or in the script (but it can get annoying when re-running it inside the script). For a more systematized view of the data, the `head`, `str`, and `summary` functions are often used. `head` displays the first 6 rows by default (can be modified through the `n = 6` argument), `str` shows the structure of the object, and `summary` prints a general summary of the object (the structure of the summary depends on the type of object). Note that summary works on practically every type of complex object in R. Try them on your own data, but I will utilize head here, because it looks the best in this type of document.
 
 ```{r}
 head(SurvData)
@@ -281,7 +298,7 @@ This dataset is clearly already been processed a bit, since a WVS would probably
 ```{r}
 names(SurvData)
 ```
-This is all on an overview level, to give you an idea of what the data looks like and how to further explore it. When it comes to familiarizing yourself with aspects of the dataset, the $ sign for indexing columns becomes helpful. I usually pair this with a `table` function, or a `summary` function, which gives me an idea of what the distribution looks like. For simple interaction exploration, `table` also accepts several variables so you can see where they overlap
+This is all on an overview level, to give you an idea of what the data looks like and how to further explore it. When it comes to familiarizing yourself with aspects of the dataset, the $ sign for indexing columns becomes helpful. I usually pair this with a `table` function, or a `summary` function, which gives me an idea of what the distribution looks like. `table` creates an overview of the number of observations that have each unique value in a variable (do not use for continous data). For simple interaction exploration, `table` also accepts several variables so you can see where they overlap.
 
 ```{r}
 summary(SurvData$gender)
@@ -320,11 +337,11 @@ attributes(joined_sets2$straff)
 
 ```
 
- It is also in Norwegian, apologies for that. 
+ It is also in Norwegian, apologies for that. The label is meant to give information about what the variable is, while the labels say what the numbers actually signify, when the surveyed respondent answered the questionnaire. Here we can therefore see that the respondent ranked agreement with a statement on a likert scale. The statement was related to whether or not preventative work is better than punishment to prevent criminal activity. 
 
 # Data wrangling
 
-Transforming data is best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.
+Transforming data is (in my opinion) best done through the tidyverse system. The most key aspect of this framework is the usage of the pipe operator `%>%`, which takes the output from whatever is in front of the pipe, and gives it as the first argument in the function following the pipe (As a sidenote, if you want to call the preceeding object again, you can use a . to put it more places). This is useful because as a general rule, tidyverse functions all have a dataset as the first argument in their functions, and output a dataset from the function, meaning that you can run a function on a dataset, then pipe that into a new function, in a manner that makes more sense for beginners in programming. Tidyverse allows for many useful simplifications, such as selecting columns by names without complex indexing or name wrapping. In this section I will use the dataset previously outlined in the section on simple analysis. I will go through the most common data wrangling functions that I use in my processes.
 
 ```{r}
 library(tidyverse)
@@ -340,9 +357,12 @@ SurvData %>%
 mean(pull(SurvData, whostility), na.rm = TRUE)
 
 ```
+
+The code above demonstrates the improved intuity of using tidyverse functions. The code follows your natural progression of treatment of data, whereas the un-tidyversed code you have to start writing with the final function, and it is not easy to extend if you want to add further actions to the data when revising the code. It is easier to start with "I have this dataset", then writing "I want to do something with *this* variable" and then "I want to do this function exactly". 
+
 ## Dealing with bad names
 
-Often times your data imported from excel will have really bad names, rife with capitalisation and spacing. Ideally you want a dataset where variables do not have these things, so it is easier to memorize and enter into R. If I face this issue I will often utilize the janitor package, which can clean names into something more coherent. If there is space for instance in the variable name, then it has to be wrapped in the ` signs, which can be complicated to type out when auto-complete is not available. 
+Often times your data imported from excel will have really bad names, rife with capitalization and spacing. Ideally you want a dataset where variables do not have these things, so it is easier to memorize and enter into R. If I face this issue I will often utilize the janitor package, which can clean names into something more coherent. If there is space for instance in the variable name, then it has to be wrapped in the ` signs, which can be complicated to type out when auto-complete is not available. 
 
 ```{r}
 library(janitor)
@@ -356,8 +376,6 @@ df_example <- clean_names(df_example)
 names(df_example)
 
 ```
-
-
 
 ## Mutating
 
@@ -561,7 +579,7 @@ grouped_more <- SurvData %>%
 head(grouped_more)
 
 ```
-Here we see a NaN example, where a mean of nothing is not a number, since we specified na.rm to be true. 
+Here we see a NaN example, where a mean of nothing is not a number, since we specified na.rm to be true. This is because the question PolDisc was not asked in 2005 and 2010 for Japan, so all observations are NA, when NA's are filtered out from na.rm, this then leaves the mean of nothing, which is not a number.
 
 
 
@@ -592,7 +610,7 @@ Since `mean_eu` was the only variable in the aggregated set except the key varia
 
 `left_join` is by far the most common way of joining a dataset when you want new information or elements to be added to your existing dataset. There also exist `right_join` and `full_join`, but `right_join` is practically the same as left, just less intuitive and more niche in my opinion, while `full_join` should not be used because I can rarely think of a scenario where it makes sense to use in relation to dataset specifications. 
 
-The other relevant form of merging is when you have new data that is identical in structure to the old data, but they represent perhaps new observations to that data. In this instance you seek to bind the rows together, and suitably the function is just called `bind_rows`, if the datasets are structured properly, then you can just enter two datasets in that function and it should merge them. If they are not similar, you have to data wrangle them a bit. 
+The other relevant form of merging is when you have new data that is identical in structure to the old data, but they represent perhaps new observations to that data. In this instance you seek to bind the rows together, and suitably the function is just called `bind_rows`, if the datasets are structured properly, then you can just enter two datasets in that function and it should merge them. If they are not similar, you have to data wrangle them a bit. Perhaps the newer frame from a later survey coded all their numerical responses as character vectors, then you have to make sure that the columns of this variable have consistent datatypes, because R will not do that work for you.
 
 ## Pivoting
 
@@ -778,18 +796,17 @@ unlink("./images/plot_obj.jpeg") ## Just removing it
 
 You can also utilize the ggplot package, in conjunction with the sf package, to visualise maps. This requires shapefiles, which describes the general outlines of some countries. These can also be accessed through several packages, or downloaded from gadm manually. There are a lot of intricacies involving maps and shapefiles in general, but to use it with ggplot it is most common to have it as a `sf` type file, you can see that the map assignment in the code chunk below is piped into a `st_as_sf` function, this transform the `tera` (I believe it is) class object, into an `sf` class object. In some instances we would have to assign a crs as well, but that's perhaps too much complicated to talk about right now. Note also that the `ggplot` layer is itself empty, because the data and aesthetic mapping needs to be from a shapefile function of `geom_sf`. 
 ```{r}
-library(geodata) # for gadm download
+library(geodata) # gadm function can download shapefile data from gadm's API
 library(sf)
 
-nor_map <- gadm(country = "NO", level = 1, path = "./") %>% 
+nor_map <- gadm(country = "NO", level = 1, path = "./") %>% ## Try running this but swapping to "SE" for a swedish map
   st_as_sf()
 
 ggplot() +  ## in map data the ggplot is empty
-  geom_sf(data = nor_map) + 
-  theme_void() # common theme to eliminate all lines
+  geom_sf(data = nor_map) 
 
 ```
-Aesthetics are possible, filling the map to make a cloropleth for instance. You can also left join data that are not of a GIS character straight into this dataframe, then use those variables as aesthetics, but for now lets just make a new variable based on whether I have visited the county.
+Aesthetics are possible, filling the map to make a choropleth for instance. You can also left join data that are not of a GIS character straight into this dataframe, then use those variables as aesthetics, but for now lets just make a new variable based on whether I have visited the county.
 
 ```{r}
 nor_map <- nor_map %>% 
@@ -817,21 +834,57 @@ nor_map <- nor_map %>%
 
 ggplot() + 
   geom_sf(data = nor_map, aes(fill = me_there)) + 
-  theme_void() + 
+  theme_void() +                                                  ## Removes the coordinate lines seen in the first one
   labs(title = "Mitt lille land", fill = "Have I been?") + 
   scale_fill_manual(values = c("goldenrod", "firebrick", "cornflowerblue"))
 ```
 Note that the aesthetic argument is `fill` not `colour` (I have done that mistake several times). 
 
+Often you will also want labels on the geographical points.
+
+
+```{r}
+nor_map <- nor_map %>% 
+  mutate(last_there = case_when(
+    HASC_1 == "NO.AA" ~ "2017",
+    HASC_1 == "NO.AK" ~ "2025",
+    HASC_1 == "NO.BU" ~ "2024",
+    HASC_1 == "NO.FI" ~ "Never",
+    HASC_1 == "NO.HE" ~ "2016",
+    HASC_1 == "NO.HO" ~ "2024",
+    HASC_1 == "NO.MR" ~ "Never",
+    HASC_1 == "NO.NO" ~ "Never",
+    HASC_1 == "NO.NT" ~ "Never",
+    HASC_1 == "NO.OF" ~ "2025",
+    HASC_1 == "NO.OP" ~ "2016",
+    HASC_1 == "NO.OS" ~ "2025",
+    HASC_1 == "NO.RO" ~ "2013",
+    HASC_1 == "NO.SF" ~ "2008",
+    HASC_1 == "NO.ST" ~ "2014",
+    HASC_1 == "NO.TE" ~ "2013",
+    HASC_1 == "NO.TR" ~ "Never",
+    HASC_1 == "NO.VA" ~ "2016",
+    HASC_1 == "NO.VF" ~ "2024"
+))
+
+ggplot() + 
+  geom_sf(data = nor_map) + 
+  geom_label(data = nor_map, 
+             aes(label = last_there, geometry = geometry),
+             stat = "sf_coordinates") +
+  theme_void() +                                                  ## Removes the coordinate lines seen in the first one
+  labs(title = "Disclosing to much Personal Information")
+```
+Clearly too cluttered, this map would need a lot of improvement. Increasing the plot size and decreasing label size might help, but then you run into other issues in regards to visibility. Perhaps this visualisation just is not suited to labels itself? These are aesthetic considerations you should make when creating plots. Remember that plots should be intuitive, and visually easy to understand and get information from. 
 
 
 # Advanced methods
 
 ## For loops and flow control
 
-A central part of programming in most languages is the flow control and for loops. For loops in R are slower than most other languages, and usually apply family of functions is preferred, since they can basically function in the same way as for loops, with the right specifications. But knowledge of loops can give you a tool to solve certain difficult tasks where you do not want to spend a couple of hours finding a relevant function. For loops consist of the function `for(iterator in sequence)`, the iterator is the thing that changes with each loop. A for loop is an instruction to do the same task over a set of times. 
+A central part of programming in most languages is the flow control and for loops. For loops in R are slower than most other languages, and usually apply family of functions is preferred, since they can basically function in the same way as for loops, with the right specifications. But knowledge of loops can give you a tool to solve certain difficult tasks where you do not want to spend a couple of hours finding a relevant function. For loops consist of the function `for(iterator in sequence)` followed by curly brackets `{` and `}` which contain the function expression to be repeated. The iterator is the thing that changes with each loop. A for loop is an instruction to do the same task over a set of times. 
 
-Below is a simple for loop. First I create a vector of some numbers. The loop itself, I call the iterator i, and specify that I am looping over a sequence of numbers, from 1 to the length of the vector. I then use that operator as an index to the vector, so that for each iteration of the loop it prints the i vector position squared. 
+Below is a simple for loop. First I create a vector of some numbers. In the loop itself, I call the iterator i, and specify that I am looping over a sequence of numbers, from 1 to the length of the vector. I then use that operator as an index to the vector, so that for each iteration of the loop it prints the i vector position squared. 
 
 ```{r}
 
@@ -1230,3 +1283,22 @@ Additionally, wrapping lines withing two $ makes it into a chunk for longer mode
 $$
 y_i = \beta_1 D_i + \beta_2 T_i + \beta_3 D_i  T_i + \epsilon_i
 $$
+This code was made within the `$$` environment, using the following line of text: `y_i = \beta_1 D_i + \beta_2 T_i + \beta_3 D_i  T_i + \epsilon_i`. This follows generally standard LateX notation rules for mathematical formula.
+
+# Recommended packages and ecosystems to explore!
+
+Packages dedicated to certain subfields of statistical analysis, or other useful programming techniques, will usually have rather extensive user manuals when you google them. These manuals will often have very useful vignettes giving you examples of how to practically use the function, and what type of data it is suited to, so the main task for you is to get the dataframe into an appropriate form for the package. If any of these packages interest you, google them such as "lme4 r package" and read some of the documentation. 
+
+`rstan` and its attached packages (see Stan's homepage) is a useful tool for Bayesian statistical analysis, if that stuff interests you. The `brms` package implements a very useful hierarchical modelling tool utilizing this Stan, which has certain computational advantages over other packages.
+
+For statistical packages, `lme4` allows for hierarchical modelling with random effects using Maximum likelihood estimations. `plm` is a natural extension of glm and lm functions that focus on panel-data estimations. `zoo`, `xts` and `fts` are commonly used for time-series analysis. `survreg` has survival analysis using maximum likelihood estimations. `betareg` provides a maximum likelihood implementation for beta regressions (my fav). For causal inference, `rdrobust` is the most used for regression discontinuity and provides good estimation functions and plotting functions, `ivreg` for instrumental variable estimation (although both of these methods are rather simple to implement manually in R if you know the math, I have some scripts for it if you are interested). Additionally, the package `margineffects` (it might actually be `margins`) is often used in survey experiments to estimate marginal effects, it also has many plot functions for visualizing such effects. `HMM` provides hidden markov model estimations, extended by `mHMMbayes` which creates hierarchical HMM's using Bayesian estimations. 
+
+For machine learning procedures, `stm` is considered a good package to use for structural topic modelling, or LDA estimations. To apply this, one would need to be familiar with text-as-data processing procedures, which are part of the packages `tidytext`, `SnowballC`, and `quanteda`, which might require you to have Python as a backend. For supervised machine learning methods, `randomForest` provides implementation of the algorithm sometimes known as arbitrary woodland. `gbm` provides gradient boosting algorithms. For more advanced transformer models however, you will probably need to learn Python. 
+
+Text harvesting such as webscraping is an entire entity of itself, maybe I can add a separate document set to this webpage in the future about it. But the relevant packages used for it, and API services are `rvest` for scraping, `httr2` for GET and similar HTTP requests, and `jsonlite` for transforming retrieved JSON files. 
+
+Network analysis tools are mostly provided through the `igraph` package, which is mostly for quantitative analysis of network data. Ego network analysis can be extended from `igraph` through the `egor` package. Visualizations of networks however, I feel is simpler using `ggraph` given that it integrates well with ggplot syntax, so you can utilize familiar methods and functions from that family of packages. 
+
+For visualization and reporting of regression outputs, the "industry-standard" so to speak is `stargazer`. This package provides a single function, named `stargazer` which has one of the longest help files in existence. But it creates txt, html, or LateX tables for outputs from regressions. It normally only accepts `lm` and `glm` functions, but can be extended through certain methods from the `broom` and `broom.mixed` packages, which can transform objects that do not have a stargazer method into objects that do, for easier integration. Outside of `stargazer`, `modelsummary` provides a flexible solution for table creation, while accepting more types of objects than stargazer. `huxreg` is also an option when creating quarto documents with regression outputs, it works similar to `stargazer`. Additionally, ggplot has many functions for visualizing model estimations such as `qplot`, but many effects estimations visualizations are better created by manually creating dataframes of expected effects with confidence intervals. 
+
+`plotly` provides interactive plot elements and animated plot functions for documents meant for websites or similar, there are a lot of interesting elements one can use there, that can be integrated with both quarto documents, or as stand-alone apps in shiny.
