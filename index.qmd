@@ -1278,7 +1278,7 @@ Quarto has dedicated display for certain elements if you so desire. You might ha
 
 Ex: "Model 1 specifies the dependent variable $y_i$ as dependent on variables $D_i$ and $T_i$"
 
-Additionally, wrapping lines withing two $ makes it into a chunk for longer model specifications. Examplified below by a generaic DiD model.  
+Additionally, wrapping lines withing two $ makes it into a chunk for longer model specifications. Exemplified below by a generaic DiD model.  
 
 $$
 y_i = \beta_1 D_i + \beta_2 T_i + \beta_3 D_i  T_i + \epsilon_i

@@ -1647,11 +1647,11 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb191-18"><a href="#cb191-18" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb191-19"><a href="#cb191-19" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>() <span class="do">## Unlisting the results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Using 10 Samples, Pi is estimated to be 2 (ish)"         
-[2] "Using 100 Samples, Pi is estimated to be 2.88 (ish)"     
-[3] "Using 1000 Samples, Pi is estimated to be 3.112 (ish)"   
-[4] "Using 10000 Samples, Pi is estimated to be 3.166 (ish)"  
-[5] "Using 1e+05 Samples, Pi is estimated to be 3.14476 (ish)"</code></pre>
+<pre><code>[1] "Using 10 Samples, Pi is estimated to be 3.2 (ish)"       
+[2] "Using 100 Samples, Pi is estimated to be 2.76 (ish)"     
+[3] "Using 1000 Samples, Pi is estimated to be 3.268 (ish)"   
+[4] "Using 10000 Samples, Pi is estimated to be 3.146 (ish)"  
+[5] "Using 1e+05 Samples, Pi is estimated to be 3.13228 (ish)"</code></pre>
 </div>
 </div>
 <p>For a more practical point, I will demonstrate using a lapply function to create a new variable in our old dataset. Let’s say I want to construct an “anti-establishment” index, which is a function of opposition to EU or EEA, opposition to public services, opposition to gender equality, and extreme position on the left_right scale. In this instance I will utilize an <code>apply</code> function which will go over the rows of the dataset, in only the columns I want. When specifying a margin for the simple <code>apply</code> function, it will take either the rows or columns specified and turn them into vectors, so note that the iterator below can be indexed over, to get the relevant variable.</p>
@@ -1942,7 +1942,7 @@ F-statistic: 64.41 on 6 and 4858 DF,  p-value: &lt; 2.2e-16</code></pre>
 <h2 data-number="7.7" class="anchored" data-anchor-id="special-environment-section"><span class="header-section-number">7.7</span> Special Environment section</h2>
 <p>Quarto has dedicated display for certain elements if you so desire. You might have noticed that throughout this document, some coding terms appear in in <code>special coding font</code>, this is done in text by wrapping the text in the ` marker. This is not the only unique wrapper characteristic of Quarto, for font specification we have * for <em>cursive</em>, and ** for <strong>bold</strong>. But more importantly, the $ sign can be used in text to implement formula type of typesetting. So that you can naturally interweave model language in your writing.</p>
 <p>Ex: “Model 1 specifies the dependent variable <span class="math inline">\(y_i\)</span> as dependent on variables <span class="math inline">\(D_i\)</span> and <span class="math inline">\(T_i\)</span>”</p>
-<p>Additionally, wrapping lines withing two $ makes it into a chunk for longer model specifications. Examplified below by a generaic DiD model.</p>
+<p>Additionally, wrapping lines withing two $ makes it into a chunk for longer model specifications. Exemplified below by a generaic DiD model.</p>
 <p><span class="math display">\[
 y_i = \beta_1 D_i + \beta_2 T_i + \beta_3 D_i  T_i + \epsilon_i
 \]</span> This code was made within the <code>$$</code> environment, using the following line of text: <code>y_i = \beta_1 D_i + \beta_2 T_i + \beta_3 D_i  T_i + \epsilon_i</code>. This follows generally standard LateX notation rules for mathematical formula.</p>
